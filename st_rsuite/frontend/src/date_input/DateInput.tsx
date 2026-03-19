@@ -13,6 +13,7 @@ export type DateInputData = {
   size: "lg" | "md" | "sm" | "xs";
   placeholder: string;
   disabled: boolean;
+  locale?: string | null;
 };
 
 type Props = {

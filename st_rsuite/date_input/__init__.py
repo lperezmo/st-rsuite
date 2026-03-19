@@ -23,6 +23,7 @@ def date_input(
     size: str = "md",
     placeholder: str | None = None,
     disabled: bool = False,
+    locale: str | None = None,
     on_change: Callable | None = None,
     key: str | None = None,
 ) -> date | None:
@@ -45,6 +46,8 @@ def date_input(
         Placeholder text when empty.
     disabled : bool
         Whether the input is disabled.
+    locale : str or None
+        RSuite locale key (e.g. 'ja_JP', 'zh_CN', 'es_ES'). None for English.
     on_change : callable or None
         Callback when the selected date changes.
     key : str or None
@@ -75,6 +78,7 @@ def date_input(
             "size": size,
             "placeholder": placeholder or "",
             "disabled": disabled,
+            "locale": locale,
         },
         on_selected_date_change=on_change or _noop,
     )

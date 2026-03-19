@@ -28,6 +28,7 @@ def time_picker(
     cleanable: bool = True,
     block: bool = False,
     show_meridiem: bool = False,
+    locale: str | None = None,
     on_change: Callable | None = None,
     key: str | None = None,
 ) -> time | None:
@@ -57,6 +58,8 @@ def time_picker(
         Full width.
     show_meridiem : bool
         Show AM/PM for 12-hour format.
+    locale : str or None
+        RSuite locale key (e.g. 'ja_JP', 'zh_CN', 'es_ES'). None for English.
     on_change : callable or None
         Callback when the selected time changes.
     key : str or None
@@ -92,6 +95,7 @@ def time_picker(
             "cleanable": cleanable,
             "block": block,
             "showMeridiem": show_meridiem,
+            "locale": locale,
         },
         on_selected_time_change=on_change or _noop,
     )

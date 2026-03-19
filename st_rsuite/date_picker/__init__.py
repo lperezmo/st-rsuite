@@ -30,6 +30,7 @@ def date_picker(
     block: bool = False,
     iso_week: bool = False,
     show_week_numbers: bool = False,
+    locale: str | None = None,
     on_change: Callable | None = None,
     key: str | None = None,
 ) -> date | None:
@@ -63,6 +64,8 @@ def date_picker(
         Weeks start on Monday (ISO 8601).
     show_week_numbers : bool
         Show week numbers in the calendar.
+    locale : str or None
+        RSuite locale key (e.g. 'ja_JP', 'zh_CN', 'es_ES'). None for English.
     on_change : callable or None
         Callback when the selected date changes.
     key : str or None
@@ -102,6 +105,7 @@ def date_picker(
             "block": block,
             "isoWeek": iso_week,
             "showWeekNumbers": show_week_numbers,
+            "locale": locale,
         },
         on_selected_date_change=on_change or _noop,
     )

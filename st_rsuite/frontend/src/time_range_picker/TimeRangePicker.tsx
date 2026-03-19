@@ -22,6 +22,7 @@ export type TimeRangePickerData = {
   cleanable: boolean;
   block: boolean;
   showMeridiem: boolean;
+  locale?: string | null;
 };
 
 type Props = {

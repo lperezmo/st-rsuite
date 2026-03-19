@@ -20,6 +20,7 @@ export type DatePickerData = {
   block: boolean;
   isoWeek: boolean;
   showWeekNumbers: boolean;
+  locale?: string | null;
 };
 
 type Props = {

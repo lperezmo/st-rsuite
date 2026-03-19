@@ -114,6 +114,7 @@ date_picker(
     block=False,          # full width
     iso_week=False,       # Monday-start weeks
     show_week_numbers=False,
+    locale=None,          # e.g. 'ja_JP', 'zh_CN', 'es_ES'
     on_change=None,
     key=None,
 ) -> date | None
@@ -139,6 +140,7 @@ date_range_picker(
     show_one_calendar=False,  # single calendar panel
     one_tap=False,
     hover_range=None,     # 'week' | 'month' | None
+    locale=None,          # e.g. 'ja_JP', 'zh_CN', 'es_ES'
     on_change=None,
     key=None,
 ) -> tuple[date | None, date | None]
@@ -159,6 +161,7 @@ time_picker(
     cleanable=True,
     block=False,
     show_meridiem=False,  # AM/PM toggle
+    locale=None,          # e.g. 'ja_JP', 'zh_CN', 'es_ES'
     on_change=None,
     key=None,
 ) -> time | None
@@ -180,6 +183,7 @@ time_range_picker(
     cleanable=True,
     block=False,
     show_meridiem=False,
+    locale=None,          # e.g. 'ja_JP', 'zh_CN', 'es_ES'
     on_change=None,
     key=None,
 ) -> tuple[time | None, time | None]
@@ -199,6 +203,7 @@ date_input(
     size="md",            # 'lg' | 'md' | 'sm' | 'xs'
     placeholder=None,
     disabled=False,
+    locale=None,          # e.g. 'ja_JP', 'zh_CN', 'es_ES'
     on_change=None,
     key=None,
 ) -> date | None
@@ -215,10 +220,32 @@ date_range_input(
     size="md",
     placeholder=None,
     disabled=False,
+    locale=None,          # e.g. 'ja_JP', 'zh_CN', 'es_ES'
     on_change=None,
     key=None,
 ) -> tuple[date | None, date | None]
 ```
+
+## Locale / i18n
+
+All components accept a `locale` parameter to switch calendar labels, month/day names, and button text to the target language. RSuite ships 29 locales out of the box.
+
+When `locale` is not set, the component automatically detects the browser's language (`navigator.language`) and uses the closest matching RSuite locale. For example, a browser set to Japanese will show Japanese calendar labels without any code changes.
+
+```python
+from st_rsuite import date_picker
+
+# Japanese
+date_picker(label="日付を選択", locale="ja_JP", one_tap=True, key="jp")
+
+# Chinese (Simplified)
+date_picker(label="选择日期", locale="zh_CN", one_tap=True, key="cn")
+
+# Spanish
+date_picker(label="Elegir fecha", locale="es_ES", one_tap=True, key="es")
+```
+
+**Available locales:** `ar_EG`, `ca_ES`, `cs_CZ`, `da_DK`, `de_DE`, `en_GB`, `en_US`, `es_AR`, `es_ES`, `fa_IR`, `fi_FI`, `fr_FR`, `gu_IN`, `hu_HU`, `it_IT`, `ja_JP`, `kk_KZ`, `ko_KR`, `ne_NP`, `nl_NL`, `pl_PL`, `pt_BR`, `ru_RU`, `sv_SE`, `th_TH`, `tr_TR`, `uk_UA`, `zh_CN`, `zh_TW`
 
 ## Running the example
 

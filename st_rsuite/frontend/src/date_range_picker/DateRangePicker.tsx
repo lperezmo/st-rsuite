@@ -26,6 +26,7 @@ export type DateRangePickerData = {
   showOneCalendar: boolean;
   oneTap: boolean;
   hoverRange: "week" | "month" | null;
+  locale?: string | null;
 };
 
 type Props = {

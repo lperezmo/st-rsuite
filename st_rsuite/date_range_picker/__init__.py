@@ -33,6 +33,7 @@ def date_range_picker(
     show_one_calendar: bool = False,
     one_tap: bool = False,
     hover_range: str | None = None,
+    locale: str | None = None,
     on_change: Callable | None = None,
     key: str | None = None,
 ) -> tuple[date | None, date | None]:
@@ -72,6 +73,8 @@ def date_range_picker(
         Single-click select.
     hover_range : str or None
         Hover highlight mode: 'week', 'month', or None.
+    locale : str or None
+        RSuite locale key (e.g. 'ja_JP', 'zh_CN', 'es_ES'). None for English.
     on_change : callable or None
         Callback when the selected date range changes.
     key : str or None
@@ -119,6 +122,7 @@ def date_range_picker(
             "showOneCalendar": show_one_calendar,
             "oneTap": one_tap,
             "hoverRange": hover_range,
+            "locale": locale,
         },
         on_start_date_change=on_change or _noop,
         on_end_date_change=_noop,

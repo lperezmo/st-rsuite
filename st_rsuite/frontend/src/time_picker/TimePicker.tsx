@@ -18,6 +18,7 @@ export type TimePickerData = {
   cleanable: boolean;
   block: boolean;
   showMeridiem: boolean;
+  locale?: string | null;
 };
 
 type Props = {
