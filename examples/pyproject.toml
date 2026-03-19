@@ -1,9 +1,0 @@
-[project]
-name = "st-rsuite-examples"
-version = "0.1.0"
-description = "Showcase app for st-rsuite"
-requires-python = ">=3.10"
-dependencies = [
-    "streamlit>=1.55",
-    "st-rsuite>=0.1.0",
-]
