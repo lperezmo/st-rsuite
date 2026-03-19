@@ -1,6 +1,25 @@
 # CHANGELOG
 
 
+## v0.2.1 (2026-03-19)
+
+### Bug Fixes
+
+- Resolve subpackage shadowing that made all component imports return modules instead of functions
+  ([`00ef45e`](https://github.com/lperezmo/st-rsuite/commit/00ef45eec65393b3faba3d339972facb8f05498c))
+
+The lazy __getattr__ loader was never triggered because Python's import machinery registers
+  subpackage directories as module attributes before __getattr__ is consulted. Now setattr
+  overwrites the subpackage reference with the actual function on first access.
+
+Co-Authored-By: Claude Opus 4.6 <noreply@anthropic.com>
+
+### Chores
+
+- Bump version requirement for demo app
+  ([`f541ee6`](https://github.com/lperezmo/st-rsuite/commit/f541ee6d699841a31b9fb73d4e0ee44d8ab12d89))
+
+
 ## v0.2.0 (2026-03-19)
 
 ### Chores
