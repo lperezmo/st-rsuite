@@ -1,0 +1,7 @@
+recursive-include st_rsuite/date_input/frontend/build *
+recursive-include st_rsuite/date_picker/frontend/build *
+recursive-include st_rsuite/date_range_input/frontend/build *
+recursive-include st_rsuite/date_range_picker/frontend/build *
+recursive-include st_rsuite/time_picker/frontend/build *
+recursive-include st_rsuite/time_range_picker/frontend/build *
+include st_rsuite/pyproject.toml

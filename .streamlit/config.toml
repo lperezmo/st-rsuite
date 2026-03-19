@@ -1,0 +1,73 @@
+# st-rsuite — Violet/Pink theme
+# Distinct from st-mui's blue palette; warm violet tones with a pink accent
+
+# ─── Light mode ──────────────────────────────────────────────────────────────
+[theme.light]
+primaryColor = "#7c3aed"
+backgroundColor = "#ffffff"
+secondaryBackgroundColor = "#f5f3ff"
+textColor = "#1e1b4b"
+linkColor = "#7c3aed"
+borderColor = "#ddd6fe"
+codeBackgroundColor = "#f5f3ff"
+codeTextColor = "#3b0764"
+
+blueColor = "#3b82f6"
+greenColor = "#10b981"
+yellowColor = "#eab308"
+orangeColor = "#f97316"
+redColor = "#ef4444"
+violetColor = "#8b5cf6"
+grayColor = "#6b7280"
+
+dataframeBorderColor = "#ddd6fe"
+dataframeHeaderBackgroundColor = "#f5f3ff"
+
+[theme.light.sidebar]
+backgroundColor = "#f5f3ff"
+secondaryBackgroundColor = "#ede9fe"
+textColor = "#1e1b4b"
+borderColor = "#ddd6fe"
+
+# ─── Dark mode ───────────────────────────────────────────────────────────────
+[theme.dark]
+primaryColor = "#a78bfa"
+backgroundColor = "#0c0a14"
+secondaryBackgroundColor = "#16132a"
+textColor = "#ede9fe"
+linkColor = "#c4b5fd"
+borderColor = "#312e81"
+codeBackgroundColor = "#16132a"
+codeTextColor = "#e0dffe"
+
+blueColor = "#60a5fa"
+greenColor = "#34d399"
+yellowColor = "#fbbf24"
+orangeColor = "#fb923c"
+redColor = "#f87171"
+violetColor = "#a78bfa"
+grayColor = "#9ca3af"
+
+dataframeBorderColor = "#312e81"
+dataframeHeaderBackgroundColor = "#16132a"
+
+[theme.dark.sidebar]
+backgroundColor = "#16132a"
+secondaryBackgroundColor = "#0c0a14"
+textColor = "#ede9fe"
+borderColor = "#312e81"
+
+# ─── Shared typography & shape ───────────────────────────────────────────────
+[theme]
+font = "Inter:https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
+codeFont = "'JetBrains Mono':https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&display=swap"
+baseFontSize = 14
+baseFontWeight = 400
+codeFontSize = "0.875rem"
+headingFontSizes = ["32px", "24px", "20px", "16px", "14px", "12px"]
+headingFontWeights = [600, 600, 600, 500, 500, 500]
+baseRadius = "8px"
+buttonRadius = "8px"
+showWidgetBorder = true
+showSidebarBorder = true
+linkUnderline = false

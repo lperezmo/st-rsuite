@@ -1,0 +1,28 @@
+# Component metadata picked up by Streamlit at runtime.
+[project]
+name = "st-rsuite"
+version = "0.1.0"
+
+[[tool.streamlit.component.components]]
+name = "date_input"
+asset_dir = "date_input/frontend/build"
+
+[[tool.streamlit.component.components]]
+name = "date_picker"
+asset_dir = "date_picker/frontend/build"
+
+[[tool.streamlit.component.components]]
+name = "date_range_input"
+asset_dir = "date_range_input/frontend/build"
+
+[[tool.streamlit.component.components]]
+name = "date_range_picker"
+asset_dir = "date_range_picker/frontend/build"
+
+[[tool.streamlit.component.components]]
+name = "time_picker"
+asset_dir = "time_picker/frontend/build"
+
+[[tool.streamlit.component.components]]
+name = "time_range_picker"
+asset_dir = "time_range_picker/frontend/build"

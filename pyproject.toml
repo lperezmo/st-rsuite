@@ -1,0 +1,60 @@
+[build-system]
+requires = ["setuptools>=70,<77", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "st-rsuite"
+version = "0.1.0"
+description = "RSuite date & time components for Streamlit, built with Components v2."
+readme = "README.md"
+requires-python = ">=3.10"
+license = {text = "MIT"}
+authors = [{ name = "Luis Perez", email = "lperezmo@users.noreply.github.com" }]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Developers",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+    "Topic :: Software Development :: User Interfaces",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Operating System :: OS Independent",
+    "Environment :: Web Environment",
+]
+keywords = ["streamlit", "rsuite", "datepicker", "timepicker", "daterangepicker", "components"]
+dependencies = [
+    "streamlit>=1.51",
+]
+
+[project.urls]
+Homepage = "https://github.com/lperezmo/st-rsuite"
+Repository = "https://github.com/lperezmo/st-rsuite"
+Issues = "https://github.com/lperezmo/st-rsuite/issues"
+
+[tool.setuptools.packages.find]
+include = ["st_rsuite*"]
+
+[tool.setuptools]
+include-package-data = true
+
+[tool.setuptools.package-data]
+"st_rsuite" = ["pyproject.toml"]
+"st_rsuite.date_input" = ["frontend/build/**/*"]
+"st_rsuite.date_picker" = ["frontend/build/**/*"]
+"st_rsuite.date_range_input" = ["frontend/build/**/*"]
+"st_rsuite.date_range_picker" = ["frontend/build/**/*"]
+"st_rsuite.time_picker" = ["frontend/build/**/*"]
+"st_rsuite.time_range_picker" = ["frontend/build/**/*"]
+
+[tool.semantic_release]
+version_toml = [
+    "pyproject.toml:project.version",
+    "st_rsuite/pyproject.toml:project.version",
+]
+tag_format = "v{version}"
+commit_message = "chore(release): v{version}"
+
+[tool.ruff]
+extend-exclude = ["references/"]
