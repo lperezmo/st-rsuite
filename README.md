@@ -1,6 +1,6 @@
 <div align="center">
   <h1>st-rsuite</h1>
-  <p>RSuite date &amp; time components for Streamlit, built with <a href="https://docs.streamlit.io/develop/api-reference/custom-components/st.components.v2.component">Components v2</a></p>
+  <p>Built using <a href="https://rsuitejs.com/">RSuite</a> · Streamlit <a href="https://docs.streamlit.io/develop/api-reference/custom-components/st.components.v2.component">Components v2</a></p>
 
   <a href="https://pypi.org/project/st-rsuite/"><img src="https://img.shields.io/pypi/v/st-rsuite" alt="PyPI version"></a>
   <a href="https://www.python.org/"><img src="https://img.shields.io/badge/python-%E2%89%A53.10-blue" alt="Python >=3.10"></a>

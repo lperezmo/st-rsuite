@@ -244,7 +244,6 @@ elif selected == ":material/date_range: DateRangePicker":
         drp = date_range_picker(
             label="Trip dates",
             value=(date.today(), date.today() + timedelta(days=7)),
-            one_tap=True,
             disabled=disabled,
             key="drp_basic",
         )
@@ -555,6 +554,7 @@ start, end = date_range_input(
 # -- Footer ------------------------------------------------------------------
 st.divider()
 st.caption(
-    "Built with [st-rsuite](https://github.com/lperezmo/st-rsuite) | "
-    "RSuite v6.1.2 (MIT) | Streamlit Components v2"
+    "Built with [st-rsuite](https://github.com/lperezmo/st-rsuite) · "
+    "Based on [RSuite](https://rsuitejs.com/) · "
+    "Streamlit Components v2"
 )
