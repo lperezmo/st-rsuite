@@ -1,6 +1,37 @@
 # CHANGELOG
 
 
+## v0.2.0 (2026-03-19)
+
+### Chores
+
+- Added a links to rsuite everywhere, removed one tap on date range picker on example because
+  tapping on it twice is annoying,
+  ([`fdbca8a`](https://github.com/lperezmo/st-rsuite/commit/fdbca8a8f2053204c39ed9022c9d61f3ece60032))
+
+- Enable one tap for date pickers because the okay button gets covered by the streamlit cloud logo
+  on the bottom right. also added disclaimer on time pickers and time range picker that okay button
+  gets covered by hosted with streamlit cloud logo
+  ([`f63e565`](https://github.com/lperezmo/st-rsuite/commit/f63e565a9eeb9e5511178068c7cf8f8e3711b1ad))
+
+- Switch examples to requirements.txt for Streamlit Cloud
+  ([`47a0e3a`](https://github.com/lperezmo/st-rsuite/commit/47a0e3a30f5d35abc1dbb838413b1c74f0a18366))
+
+Streamlit Cloud uses Poetry internally and tried to install the pyproject.toml as a package. A plain
+  requirements.txt avoids this.
+
+Co-Authored-By: Claude Opus 4.6 <noreply@anthropic.com>
+
+### Features
+
+- Add locale support with browser auto-detection
+  ([`56f1d5e`](https://github.com/lperezmo/st-rsuite/commit/56f1d5e24c6f4240c1a9fa26a0b7367707651c1a))
+
+Add `locale` parameter to all 6 components (29 RSuite locales). When unset, automatically detects
+  browser language via navigator.language. Also exposes `__version__` via lazy imports and adds
+  locale showcase tab.
+
+
 ## v0.1.0 (2026-03-19)
 
 ### Features

@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "st-rsuite"
-version = "0.1.0"
+version = "0.2.0"
 description = "RSuite date & time components for Streamlit, built with Components v2."
 readme = "README.md"
 requires-python = ">=3.10"
