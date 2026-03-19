@@ -167,6 +167,7 @@ if selected == ":material/event: DatePicker":
         dp = date_picker(
             label="Pick any date",
             value=date.today(),
+            one_tap=True,
             disabled=disabled,
             key="dp_basic",
         )
@@ -243,6 +244,7 @@ elif selected == ":material/date_range: DateRangePicker":
         drp = date_range_picker(
             label="Trip dates",
             value=(date.today(), date.today() + timedelta(days=7)),
+            one_tap=True,
             disabled=disabled,
             key="drp_basic",
         )
@@ -314,6 +316,11 @@ elif selected == ":material/schedule: TimePicker":
     st.markdown(
         "A time picker with scrolling time panel and optional AM/PM."
     )
+    st.caption(
+        "Note: On Streamlit Community Cloud, the \"Hosted with Streamlit\" badge "
+        "may cover the OK button on time pickers. This is not an issue on "
+        "self-hosted or locally-hosted apps."
+    )
 
     st.markdown("#### 24-hour format")
 
@@ -375,6 +382,11 @@ elif selected == ":material/schedule: TimeRangePicker":
     st.subheader("TimeRangePicker")
     st.markdown(
         "Select a time range with start and end time panels."
+    )
+    st.caption(
+        "Note: On Streamlit Community Cloud, the \"Hosted with Streamlit\" badge "
+        "may cover the OK button on time pickers. This is not an issue on "
+        "self-hosted or locally-hosted apps."
     )
 
     st.markdown("#### Basic")
