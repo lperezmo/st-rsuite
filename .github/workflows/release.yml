@@ -26,6 +26,17 @@ jobs:
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
 
+      - name: Bump demo app version requirement
+        if: steps.release.outputs.released == 'true'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          VERSION=${{ steps.release.outputs.version }}
+          sed -i "s/st-rsuite>=.*/st-rsuite>=${VERSION}/" examples/requirements.txt
+          git add examples/requirements.txt
+          git commit -m "chore: bump demo app requirement to v${VERSION}"
+          git push
+
   publish:
     needs: [release]
     if: needs.release.outputs.released == 'true'
