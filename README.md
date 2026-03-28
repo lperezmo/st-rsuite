@@ -14,7 +14,7 @@
 
 ### Pickers — rich popups with full interaction
 
-These are the main attraction. Calendar popups, scrolling time panels, range selection with hover highlighting — everything you'd expect from a production date/time picker.
+Calendar popups, scrolling time panels, range selection with hover highlighting — everything you'd expect from a production date/time picker.
 
 | Component | Description | Streamlit equivalent |
 |-----------|-------------|----------------------|
@@ -25,12 +25,34 @@ These are the main attraction. Calendar popups, scrolling time panels, range sel
 
 ### Inputs — simple keyboard-only entry
 
-Lightweight alternatives with no popup. Users navigate date segments with arrow keys and typing — useful for compact forms where a full picker would be overkill.
+Lightweight alternatives with no popup. Users navigate date segments with arrow keys and typing.
 
 | Component | Description | Streamlit equivalent |
 |-----------|-------------|----------------------|
 | `date_input` | Keyboard-only date input (no popup) | `st.date_input` |
 | `date_range_input` | Keyboard-only date range input (no popup) | `st.date_input` (range mode) |
+
+### Selection
+
+| Component | Description | Streamlit equivalent |
+|-----------|-------------|----------------------|
+| `radio_tile` | Tile-based radio group with icons and descriptions | `st.radio` |
+
+### Tree — hierarchical data selection
+
+| Component | Description | Streamlit equivalent |
+|-----------|-------------|----------------------|
+| `check_tree` | Standalone tree with checkboxes, searchable | -- |
+| `check_tree_picker` | Dropdown picker with checkbox tree inside | `st.multiselect` (flat) |
+| `multi_cascade_tree` | Multi-select cascading column navigation | -- |
+
+### Display & Input
+
+| Component | Description | Streamlit equivalent |
+|-----------|-------------|----------------------|
+| `carousel` | Content/image carousel with autoplay, local files & URLs | -- |
+| `timeline` | Timeline with custom react-icons | -- |
+| `pin_input` | PIN/verification code input with masking | `st.text_input` |
 
 All components are **MIT licensed** (RSuite is fully open-source).
 
@@ -54,14 +76,14 @@ from datetime import date, time, timedelta
 from st_rsuite import (
     date_picker, date_range_picker, time_picker,
     time_range_picker, date_input, date_range_input,
+    radio_tile, check_tree, check_tree_picker,
+    multi_cascade_tree, carousel, timeline, pin_input,
 )
 
-# ── Pickers — the star of the show ──────────────────────────────────────────
+# ── Pickers ───────────────────────────────────────────────────────────────────
 
-# Calendar popup with one-tap selection
 d = date_picker(label="Pick a date", value=date.today(), one_tap=True, key="my_dp")
 
-# Dual-calendar range picker with week hover highlighting
 start, end = date_range_picker(
     label="Trip dates",
     value=(date.today(), date.today() + timedelta(days=7)),
@@ -69,20 +91,18 @@ start, end = date_range_picker(
     key="my_drp",
 )
 
-# Time picker with AM/PM
 t = time_picker(
     label="Pick a time", value=time(9, 30),
     format="hh:mm aa", show_meridiem=True, key="my_tp",
 )
 
-# Time range — great for scheduling
 t_start, t_end = time_range_picker(
     label="Shift hours",
     value=(time(9, 0), time(17, 0)),
     key="my_trp",
 )
 
-# ── Inputs — simple keyboard-only entry (no popups) ─────────────────────────
+# ── Inputs ────────────────────────────────────────────────────────────────────
 
 d2 = date_input(label="Type a date", value=date.today(), key="my_di")
 
@@ -91,6 +111,74 @@ start, end = date_range_input(
     value=(date.today(), date.today() + timedelta(days=7)),
     key="my_dri",
 )
+
+# ── Selection ─────────────────────────────────────────────────────────────────
+
+selected = radio_tile(
+    options=[
+        {"value": "a", "label": "Option A", "description": "First option", "icon": "☀️"},
+        {"value": "b", "label": "Option B", "description": "Second option", "icon": "🌙"},
+    ],
+    value="a",
+    inline=True,
+    key="my_tile",
+)
+
+# ── Tree components ───────────────────────────────────────────────────────────
+
+tree_data = [
+    {"value": "frontend", "label": "Frontend", "children": [
+        {"value": "react", "label": "React"},
+        {"value": "vue", "label": "Vue"},
+    ]},
+    {"value": "backend", "label": "Backend", "children": [
+        {"value": "python", "label": "Python"},
+        {"value": "go", "label": "Go"},
+    ]},
+]
+
+checked = check_tree(data=tree_data, searchable=True, default_expand_all=True, key="my_ct")
+
+picked = check_tree_picker(
+    data=tree_data, placeholder="Select items", key="my_ctp",
+)
+
+cascade_data = [
+    {"value": "us", "label": "US", "children": [
+        {"value": "ca", "label": "California", "children": [
+            {"value": "sf", "label": "San Francisco"},
+        ]},
+    ]},
+]
+
+cascade_selected = multi_cascade_tree(data=cascade_data, key="my_mct")
+
+# ── Carousel ──────────────────────────────────────────────────────────────────
+
+active = carousel(
+    items=[
+        {"content": "Slide 1", "background": "#7c3aed"},
+        {"content": "Slide 2", "background": "#6d28d9"},
+    ],
+    autoplay=True,
+    key="my_carousel",
+)
+
+# ── Timeline ──────────────────────────────────────────────────────────────────
+
+timeline(
+    items=[
+        {"content": "Order placed", "time": "10:00", "icon": "FaCreditCard", "color": "#7c3aed"},
+        {"content": "Shipped", "time": "14:30", "icon": "FaTruck", "color": "#0891b2"},
+        {"content": "Delivered", "time": "11:30", "icon": "FaCheck", "color": "#059669"},
+    ],
+    align="left",
+    key="my_timeline",
+)
+
+# ── PinInput ──────────────────────────────────────────────────────────────────
+
+code = pin_input(length=6, mask=False, otp=True, key="my_pin")
 ```
 
 ## API
@@ -140,7 +228,7 @@ date_range_picker(
     show_one_calendar=False,  # single calendar panel
     one_tap=False,
     hover_range=None,     # 'week' | 'month' | None
-    locale=None,          # e.g. 'ja_JP', 'zh_CN', 'es_ES'
+    locale=None,
     on_change=None,
     key=None,
 ) -> tuple[date | None, date | None]
@@ -161,7 +249,7 @@ time_picker(
     cleanable=True,
     block=False,
     show_meridiem=False,  # AM/PM toggle
-    locale=None,          # e.g. 'ja_JP', 'zh_CN', 'es_ES'
+    locale=None,
     on_change=None,
     key=None,
 ) -> time | None
@@ -183,7 +271,7 @@ time_range_picker(
     cleanable=True,
     block=False,
     show_meridiem=False,
-    locale=None,          # e.g. 'ja_JP', 'zh_CN', 'es_ES'
+    locale=None,
     on_change=None,
     key=None,
 ) -> tuple[time | None, time | None]
@@ -199,11 +287,11 @@ Simple keyboard-only components — no popups, designed for compact quick-entry 
 date_input(
     label="",
     value=None,           # date object or YYYY-MM-DD string
-    format="yyyy-MM-dd",  # Unicode date format tokens
-    size="md",            # 'lg' | 'md' | 'sm' | 'xs'
+    format="yyyy-MM-dd",
+    size="md",
     placeholder=None,
     disabled=False,
-    locale=None,          # e.g. 'ja_JP', 'zh_CN', 'es_ES'
+    locale=None,
     on_change=None,
     key=None,
 ) -> date | None
@@ -220,17 +308,150 @@ date_range_input(
     size="md",
     placeholder=None,
     disabled=False,
-    locale=None,          # e.g. 'ja_JP', 'zh_CN', 'es_ES'
+    locale=None,
     on_change=None,
     key=None,
 ) -> tuple[date | None, date | None]
+```
+
+### Selection
+
+#### `radio_tile`
+
+```python
+radio_tile(
+    options=[...],        # list of dicts: {value, label, description?, icon?}
+    value=None,           # default selected value
+    inline=False,         # horizontal layout
+    disabled=False,
+    locale=None,
+    on_change=None,
+    key=None,
+) -> str | None
+```
+
+### Tree / Hierarchical
+
+#### `check_tree`
+
+```python
+check_tree(
+    data=[...],           # [{value, label, children?: [...]}]
+    value=None,           # list of selected values
+    cascade=True,         # parent/child cascade selection
+    searchable=True,      # show search input
+    default_expand_all=False,
+    show_indent_line=False,
+    height=360,           # tree height in px
+    disabled=False,
+    uncheckable_values=None,
+    locale=None,
+    on_change=None,
+    key=None,
+) -> list[str]
+```
+
+#### `check_tree_picker`
+
+```python
+check_tree_picker(
+    data=[...],           # [{value, label, children?: [...]}]
+    value=None,           # list of selected values
+    cascade=True,
+    searchable=True,
+    countable=True,       # show selected count in toggle
+    appearance="default",
+    size="md",
+    placeholder="Select",
+    placement="bottomStart",
+    disabled=False,
+    cleanable=True,
+    block=False,
+    default_expand_all=False,
+    show_indent_line=False,
+    height=320,
+    uncheckable_values=None,
+    locale=None,
+    on_change=None,
+    key=None,
+) -> list[str]
+```
+
+#### `multi_cascade_tree`
+
+```python
+multi_cascade_tree(
+    data=[...],           # [{value, label, children?: [...]}]
+    value=None,           # list of selected values
+    cascade=True,
+    searchable=False,
+    column_width=156,     # width of each cascade column
+    column_height=320,    # height of each cascade column
+    disabled=False,
+    uncheckable_values=None,
+    locale=None,
+    on_change=None,
+    key=None,
+) -> list[str]
+```
+
+### Display & Input
+
+#### `carousel`
+
+```python
+carousel(
+    items=[...],          # [{content?, src?, alt?, background?, color?}]  # src: URL or local file path
+    autoplay=True,
+    autoplay_interval=4000,  # ms between slides
+    placement="bottom",   # indicator: 'top' | 'bottom' | 'left' | 'right'
+    shape="dot",          # indicator: 'dot' | 'bar'
+    active_index=0,
+    locale=None,
+    on_change=None,
+    key=None,
+) -> int                  # active slide index
+```
+
+#### `timeline`
+
+```python
+timeline(
+    items=[...],          # [{content, time?, icon?, color?}]
+    align="left",         # 'left' | 'right' | 'alternate'
+    endless=False,        # continuous timeline line
+    locale=None,
+    key=None,
+) -> None                 # display-only
+```
+
+The `icon` field accepts react-icons names (e.g. `"FaCheck"`, `"FaTruck"`, `"MdEmail"`) or emoji strings as fallback. 150+ icons from Font Awesome 5 and Material Design are included.
+
+#### `pin_input`
+
+```python
+pin_input(
+    length=6,
+    value="",
+    mask=False,           # password-style masking
+    type="number",        # 'number' | 'alphabetic' | 'alphanumeric'
+    size="md",
+    placeholder="",
+    disabled=False,
+    read_only=False,
+    otp=False,            # one-time password autocomplete
+    attached=False,       # remove spacing between fields
+    locale=None,
+    on_change=None,
+    key=None,
+) -> str                  # current PIN value
 ```
 
 ## Locale / i18n
 
 All components accept a `locale` parameter to switch calendar labels, month/day names, and button text to the target language. RSuite ships 29 locales out of the box.
 
-When `locale` is not set, the component automatically detects the browser's language (`navigator.language`) and uses the closest matching RSuite locale. For example, a browser set to Japanese will show Japanese calendar labels without any code changes.
+When `locale` is not set, the component automatically detects the browser's language (`navigator.language`) and uses the closest matching RSuite locale.
 
 ```python
 from st_rsuite import date_picker

@@ -5,7 +5,7 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "st-rsuite"
 version = "0.2.1"
-description = "RSuite date & time components for Streamlit, built with Components v2."
+description = "RSuite UI components for Streamlit — pickers, trees, carousel, timeline, and more."
 readme = "README.md"
 requires-python = ">=3.10"
 license = {text = "MIT"}
@@ -47,6 +47,13 @@ include-package-data = true
 "st_rsuite.date_range_picker" = ["frontend/build/**/*"]
 "st_rsuite.time_picker" = ["frontend/build/**/*"]
 "st_rsuite.time_range_picker" = ["frontend/build/**/*"]
+"st_rsuite.radio_tile" = ["frontend/build/**/*"]
+"st_rsuite.check_tree" = ["frontend/build/**/*"]
+"st_rsuite.check_tree_picker" = ["frontend/build/**/*"]
+"st_rsuite.multi_cascade_tree" = ["frontend/build/**/*"]
+"st_rsuite.carousel" = ["frontend/build/**/*"]
+"st_rsuite.timeline" = ["frontend/build/**/*"]
+"st_rsuite.pin_input" = ["frontend/build/**/*"]
 
 [tool.semantic_release]
 version_toml = [

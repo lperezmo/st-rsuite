@@ -20,6 +20,13 @@ const components = [
   { name: "date_range_picker", entry: "./src/date_range_picker/index.tsx" },
   { name: "time_picker", entry: "./src/time_picker/index.tsx" },
   { name: "time_range_picker", entry: "./src/time_range_picker/index.tsx" },
+  { name: "radio_tile", entry: "./src/radio_tile/index.tsx" },
+  { name: "check_tree", entry: "./src/check_tree/index.tsx" },
+  { name: "check_tree_picker", entry: "./src/check_tree_picker/index.tsx" },
+  { name: "multi_cascade_tree", entry: "./src/multi_cascade_tree/index.tsx" },
+  { name: "carousel", entry: "./src/carousel/index.tsx" },
+  { name: "timeline", entry: "./src/timeline/index.tsx" },
+  { name: "pin_input", entry: "./src/pin_input/index.tsx" },
 ];
 
 async function buildComponent(component) {

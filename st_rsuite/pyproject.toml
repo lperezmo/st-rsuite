@@ -26,3 +26,31 @@ asset_dir = "time_picker/frontend/build"
 [[tool.streamlit.component.components]]
 name = "time_range_picker"
 asset_dir = "time_range_picker/frontend/build"
+
+[[tool.streamlit.component.components]]
+name = "radio_tile"
+asset_dir = "radio_tile/frontend/build"
+
+[[tool.streamlit.component.components]]
+name = "check_tree"
+asset_dir = "check_tree/frontend/build"
+
+[[tool.streamlit.component.components]]
+name = "check_tree_picker"
+asset_dir = "check_tree_picker/frontend/build"
+
+[[tool.streamlit.component.components]]
+name = "multi_cascade_tree"
+asset_dir = "multi_cascade_tree/frontend/build"
+
+[[tool.streamlit.component.components]]
+name = "carousel"
+asset_dir = "carousel/frontend/build"
+
+[[tool.streamlit.component.components]]
+name = "timeline"
+asset_dir = "timeline/frontend/build"
+
+[[tool.streamlit.component.components]]
+name = "pin_input"
+asset_dir = "pin_input/frontend/build"

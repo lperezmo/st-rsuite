@@ -11,6 +11,13 @@ _COMPONENT_IMPORTS = {
     "time_range_picker": "st_rsuite.time_range_picker",
     "date_input": "st_rsuite.date_input",
     "date_range_input": "st_rsuite.date_range_input",
+    "radio_tile": "st_rsuite.radio_tile",
+    "check_tree": "st_rsuite.check_tree",
+    "check_tree_picker": "st_rsuite.check_tree_picker",
+    "multi_cascade_tree": "st_rsuite.multi_cascade_tree",
+    "carousel": "st_rsuite.carousel",
+    "timeline": "st_rsuite.timeline",
+    "pin_input": "st_rsuite.pin_input",
 }
 
 
@@ -35,4 +42,11 @@ __all__ = [
     "time_range_picker",
     "date_input",
     "date_range_input",
+    "radio_tile",
+    "check_tree",
+    "check_tree_picker",
+    "multi_cascade_tree",
+    "carousel",
+    "timeline",
+    "pin_input",
 ]
