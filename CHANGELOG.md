@@ -1,6 +1,30 @@
 # CHANGELOG
 
 
+## v0.3.0 (2026-03-28)
+
+### Chores
+
+- Add automatically bumping versions of demo app part of the semantic release workflow
+  ([`8e56349`](https://github.com/lperezmo/st-rsuite/commit/8e56349cdf89dbeb77006794594d47aa34fbb7ad))
+
+### Features
+
+- Add 7 new components — RadioTile, CheckTree, CheckTreePicker, MultiCascadeTree, Carousel,
+  Timeline, PinInput
+  ([`f611a35`](https://github.com/lperezmo/st-rsuite/commit/f611a3553a3cc654001f2ef842085580b2f27e6e))
+
+New components: - RadioTile: tile-based radio group with icons and descriptions - CheckTree:
+  standalone searchable tree with checkboxes - CheckTreePicker: dropdown picker with checkbox tree -
+  MultiCascadeTree: multi-select cascading column navigation - Carousel: image/content carousel with
+  autoplay, supports local files and URLs - Timeline: timeline display with 150+ react-icons (Font
+  Awesome 5 + Material Design) - PinInput: PIN/verification code input with mask, OTP, and type
+  filtering
+
+Also includes: - Refactored showcase into multipage Streamlit app with 9 page modules - Added public
+  domain art images for carousel demos - Updated README with full API docs for all 13 components
+
+
 ## v0.2.1 (2026-03-19)
 
 ### Bug Fixes
