@@ -1,6 +1,14 @@
 # CHANGELOG
 
 
+## v0.3.1 (2026-03-29)
+
+### Bug Fixes
+
+- Configure git identity for demo app version bump in CI
+  ([`30ab02c`](https://github.com/lperezmo/st-rsuite/commit/30ab02c23adc6cb42b73f89115fb558e027c2c2b))
+
+
 ## v0.3.0 (2026-03-28)
 
 ### Chores
