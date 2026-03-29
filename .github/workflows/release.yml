@@ -31,6 +31,8 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
           VERSION=${{ steps.release.outputs.version }}
           sed -i "s/st-rsuite>=.*/st-rsuite>=${VERSION}/" examples/requirements.txt
           git add examples/requirements.txt
