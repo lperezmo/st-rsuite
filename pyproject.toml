@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "st-rsuite"
-version = "0.3.1"
+version = "0.3.2"
 description = "RSuite UI components for Streamlit — pickers, trees, carousel, timeline, and more."
 readme = "README.md"
 requires-python = ">=3.10"

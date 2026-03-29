@@ -1,6 +1,18 @@
 # CHANGELOG
 
 
+## v0.3.2 (2026-03-29)
+
+### Bug Fixes
+
+- Separate demo version bump into its own CI job to avoid permission errors
+  ([`dbf634f`](https://github.com/lperezmo/st-rsuite/commit/dbf634f0d1f5412ae6d213359adb74bd6b96c308))
+
+The python-semantic-release action left .git files with different ownership, causing 'Permission
+  denied' on COMMIT_EDITMSG in the bump step. Moving the bump to its own job with a fresh checkout
+  fixes this. Also decouples bump from publish so a bump failure can never block PyPI publishing.
+
+
 ## v0.3.1 (2026-03-29)
 
 ### Bug Fixes
