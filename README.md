@@ -5,7 +5,7 @@
   <a href="https://pypi.org/project/st-rsuite/"><img src="https://img.shields.io/pypi/v/st-rsuite" alt="PyPI version"></a>
   <a href="https://www.python.org/"><img src="https://img.shields.io/badge/python-%E2%89%A53.10-blue" alt="Python >=3.10"></a>
   <a href="https://github.com/lperezmo/st-rsuite/blob/main/LICENSE"><img src="https://img.shields.io/github/license/lperezmo/st-rsuite" alt="License"></a>
-  <a href="https://rsuite.streamlit.app/"><img src="https://static.streamlit.io/badges/streamlit_badge_black_white.svg" alt="Open in Streamlit"></a>
+  <a href="https://rsuite.streamlit.app/"><img src="https://img.shields.io/badge/Streamlit-App-FF4B4B?logo=streamlit&logoColor=white" alt="Open in Streamlit"></a>
 </div>
 
 ---
