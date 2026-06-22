@@ -1,7 +1,6 @@
-# Component metadata picked up by Streamlit at runtime.
 [project]
 name = "st-rsuite"
-version = "0.3.2"
+version = "0.3.3"
 
 [[tool.streamlit.component.components]]
 name = "date_input"

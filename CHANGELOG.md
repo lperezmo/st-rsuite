@@ -1,6 +1,56 @@
 # CHANGELOG
 
 
+## v0.3.3 (2026-06-22)
+
+### Bug Fixes
+
+- Require Streamlit >= 1.53, add CCv2 e2e tests and CI
+  ([#1](https://github.com/lperezmo/st-rsuite/pull/1),
+  [`ecd49b0`](https://github.com/lperezmo/st-rsuite/commit/ecd49b079c5797360fa6f14d78a66e8bd4272d3f))
+
+* fix: require Streamlit >= 1.53
+
+st-rsuite components pass isolate_styles to st.components.v2.component(), and that option only
+  exists in Streamlit 1.53 and newer. On older Streamlit the component cannot register, which
+  surfaces as "Component 'st-rsuite.<name>' must be declared in pyproject.toml with asset_dir to use
+  file-backed js" (or an isolate_styles TypeError). The package advertised streamlit>=1.51, so users
+  on 1.51 and 1.52 hit this.
+
+Raise the floor to streamlit>=1.53, keep the examples on the newest Streamlit, and document the
+  requirement with a Requirements section, a Troubleshooting note, and a badge in the README. Also
+  add a dev dependency group for the test suite.
+
+* test: add CCv2 e2e and registration smoke suite
+
+test/test_ccv2_e2e.py drives a real Streamlit server with Playwright and checks that all 13
+  components mount a Components v2 node (never an iframe), render RSuite markup, and round-trip
+  their values. test/test_registration_smoke.py is a fast, browser-less guard that mirrors the
+  runtime startup discovery and asserts every component asset_dir resolves and isolate_styles is
+  available.
+
+streamlit.testing.v1.AppTest cannot test this: it never runs component discovery, so it reports
+  every file-backed component as unregistered.
+
+* ci: run the test suite across a Streamlit version matrix
+
+Build the frontend once, run the smoke suite on every supported Streamlit minor (1.53 through
+  latest), and run the Playwright e2e suite on 1.53, 1.55, and latest. A package job asserts the
+  wheel ships the component manifest and built JS so a packaging regression that would break
+  registration for everyone is caught.
+
+### Chores
+
+- Bump demo app requirement to v0.3.2
+  ([`912b4e8`](https://github.com/lperezmo/st-rsuite/commit/912b4e887c1aa323eede71552dc655427e20b420))
+
+- Remove faulty badge
+  ([`16b63a1`](https://github.com/lperezmo/st-rsuite/commit/16b63a1175d4091a0a5a7bf6de90710a7844a498))
+
+- Replace broken static.streamlit.io badge with shields.io
+  ([`ff05dcc`](https://github.com/lperezmo/st-rsuite/commit/ff05dcc4f3596b93afbb77a2c8ba8e6bdfcdb8f7))
+
+
 ## v0.3.2 (2026-03-29)
 
 ### Bug Fixes
