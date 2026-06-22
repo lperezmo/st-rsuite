@@ -4,6 +4,8 @@
 
   <a href="https://pypi.org/project/st-rsuite/"><img src="https://img.shields.io/pypi/v/st-rsuite" alt="PyPI version"></a>
   <a href="https://www.python.org/"><img src="https://img.shields.io/badge/python-%E2%89%A53.10-blue" alt="Python >=3.10"></a>
+  <a href="https://streamlit.io/"><img src="https://img.shields.io/badge/Streamlit-%E2%89%A51.53-FF4B4B?logo=streamlit&logoColor=white" alt="Streamlit >=1.53"></a>
+  <a href="https://github.com/lperezmo/st-rsuite/actions/workflows/tests.yml"><img src="https://github.com/lperezmo/st-rsuite/actions/workflows/tests.yml/badge.svg" alt="Tests"></a>
   <a href="https://rsuite.streamlit.app/"><img src="https://img.shields.io/badge/Streamlit-App-FF4B4B?logo=streamlit&logoColor=white" alt="Open in Streamlit"></a>
 </div>
 
@@ -54,6 +56,11 @@ Lightweight alternatives with no popup. Users navigate date segments with arrow 
 | `pin_input` | PIN/verification code input with masking | `st.text_input` |
 
 All components are **MIT licensed** (RSuite is fully open-source).
+
+## Requirements
+
+- **Streamlit >= 1.53** — these components are built on Streamlit [Components v2](https://docs.streamlit.io/develop/api-reference/custom-components/st.components.v2.component), and 1.53 is the first release with the `isolate_styles` option they rely on. On older Streamlit the component cannot register and you get a `must be declared ... with asset_dir` error (see [Troubleshooting](#troubleshooting)).
+- **Python >= 3.10**
 
 ## Installation
 
@@ -491,6 +498,18 @@ cd ../..
 # Run showcase
 uv run streamlit run examples/showcase.py
 ```
+
+## Troubleshooting
+
+**`streamlit.errors.StreamlitAPIException: Component 'st-rsuite.<name>' must be declared in pyproject.toml with asset_dir to use file-backed js`** (or `component() got an unexpected keyword argument 'isolate_styles'`)
+
+Your Streamlit is older than 1.53. st-rsuite needs **Streamlit >= 1.53**; on older versions Streamlit cannot register the component's frontend assets, so it reports the asset_dir error even though the package is installed correctly. Upgrade Streamlit and restart the app:
+
+```bash
+uv add "streamlit>=1.53"      # or: pip install -U "streamlit>=1.53"
+```
+
+Also make sure st-rsuite itself is current: `uv add -U st-rsuite` (or `pip install -U st-rsuite`).
 
 ## Disclaimer
 

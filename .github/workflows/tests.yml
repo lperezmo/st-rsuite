@@ -1,0 +1,149 @@
+name: Tests
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: tests-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  # Build the frontend once and share the built assets with every test leg.
+  # build/ is gitignored, so without this the package can't register components.
+  build-frontend:
+    name: Build frontend
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v6
+        with:
+          node-version: '22'
+          cache: 'npm'
+          cache-dependency-path: st_rsuite/frontend/package-lock.json
+      - run: npm ci && npm run build
+        working-directory: st_rsuite/frontend
+      - run: tar czf frontend-build.tgz st_rsuite/*/frontend/build
+      - uses: actions/upload-artifact@v5
+        with:
+          name: frontend-build
+          path: frontend-build.tgz
+          retention-days: 1
+
+  # Fast, browser-less guard across every supported Streamlit minor: a real
+  # `streamlit run` would register all 13 components, and isolate_styles exists.
+  smoke:
+    name: Smoke (Streamlit ${{ matrix.streamlit || 'latest' }})
+    needs: build-frontend
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        streamlit: ['1.53.*', '1.54.*', '1.55.*', '1.56.*', '1.57.*', '1.58.*', '']
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/download-artifact@v5
+        with:
+          name: frontend-build
+      - run: tar xzf frontend-build.tgz
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.13'
+      - uses: astral-sh/setup-uv@v7
+        with:
+          enable-cache: true
+      - run: uv sync --group dev
+      - name: Select Streamlit version
+        run: |
+          if [ -n "${{ matrix.streamlit }}" ]; then
+            uv pip install "streamlit==${{ matrix.streamlit }}"
+          else
+            uv pip install -U streamlit
+          fi
+      - run: uv run --no-sync python -c "import streamlit; print('streamlit', streamlit.__version__)"
+      - run: uv run --no-sync pytest test/test_registration_smoke.py -v
+
+  # Real-browser coverage: every component renders and round-trips on a real
+  # Streamlit server. Authoritative guard for the asset_dir registration bug.
+  e2e:
+    name: e2e (Streamlit ${{ matrix.streamlit || 'latest' }})
+    needs: build-frontend
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    strategy:
+      fail-fast: false
+      matrix:
+        streamlit: ['1.53.*', '1.55.*', '']
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/download-artifact@v5
+        with:
+          name: frontend-build
+      - run: tar xzf frontend-build.tgz
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.13'
+      - uses: astral-sh/setup-uv@v7
+        with:
+          enable-cache: true
+      - run: uv sync --group dev
+      - name: Select Streamlit version
+        run: |
+          if [ -n "${{ matrix.streamlit }}" ]; then
+            uv pip install "streamlit==${{ matrix.streamlit }}"
+          else
+            uv pip install -U streamlit
+          fi
+      - run: uv run --no-sync playwright install --with-deps chromium
+      - run: uv run --no-sync python -c "import streamlit; print('streamlit', streamlit.__version__)"
+      - run: uv run --no-sync pytest test/test_ccv2_e2e.py -v
+      - uses: actions/upload-artifact@v5
+        if: failure()
+        with:
+          name: playwright-results-st${{ matrix.streamlit || 'latest' }}
+          path: test-results/
+          retention-days: 7
+
+  # Guard the wheel itself: the runtime manifest and built JS must ship, or
+  # every user hits "must be declared ... with asset_dir" regardless of version.
+  package:
+    name: Wheel contents
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v6
+        with:
+          node-version: '22'
+          cache: 'npm'
+          cache-dependency-path: st_rsuite/frontend/package-lock.json
+      - run: npm ci && npm run build
+        working-directory: st_rsuite/frontend
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.13'
+      - uses: astral-sh/setup-uv@v7
+      - run: uv build --wheel
+      - name: Assert wheel ships the manifest and built assets
+        run: |
+          uv run --no-project python - <<'PY'
+          import glob, zipfile
+          whl = sorted(glob.glob("dist/*.whl"))[-1]
+          names = set(zipfile.ZipFile(whl).namelist())
+          assert "st_rsuite/pyproject.toml" in names, "wheel is missing st_rsuite/pyproject.toml"
+          components = [
+              "date_picker", "date_range_picker", "time_picker", "time_range_picker",
+              "date_input", "date_range_input", "radio_tile", "check_tree",
+              "check_tree_picker", "multi_cascade_tree", "carousel", "timeline", "pin_input",
+          ]
+          for c in components:
+              prefix = f"st_rsuite/{c}/frontend/build/"
+              assert any(n.startswith(prefix) and n.endswith(".js") for n in names), \
+                  f"wheel is missing built JS for {c}"
+          print(f"OK: {whl} ships the manifest and built JS for all {len(components)} components")
+          PY

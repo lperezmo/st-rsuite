@@ -25,13 +25,22 @@ classifiers = [
 ]
 keywords = ["streamlit", "rsuite", "datepicker", "timepicker", "daterangepicker", "components"]
 dependencies = [
-    "streamlit>=1.51",
+    "streamlit>=1.53",
 ]
 
 [project.urls]
 Homepage = "https://github.com/lperezmo/st-rsuite"
 Repository = "https://github.com/lperezmo/st-rsuite"
 Issues = "https://github.com/lperezmo/st-rsuite/issues"
+
+[dependency-groups]
+dev = [
+    "pytest>=8",
+    "playwright>=1.49",
+    "pytest-playwright>=0.6",
+    "requests>=2.32",
+    "build>=1.2",
+]
 
 [tool.setuptools.packages.find]
 include = ["st_rsuite*"]
