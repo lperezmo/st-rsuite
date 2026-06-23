@@ -5,14 +5,13 @@ from __future__ import annotations
 from datetime import date, datetime
 from typing import Callable
 
-import streamlit as st
+from st_rsuite._compat import component
 
-_component = st.components.v2.component(
+_component = component(
     "st-rsuite.date_picker",
     js="index-*.js",
 
     html='<div class="react-root"></div>',
-    isolate_styles=False,
 )
 
 

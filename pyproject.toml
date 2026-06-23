@@ -25,7 +25,7 @@ classifiers = [
 ]
 keywords = ["streamlit", "rsuite", "datepicker", "timepicker", "daterangepicker", "components"]
 dependencies = [
-    "streamlit>=1.53",
+    "streamlit>=1.51",
 ]
 
 [project.urls]
