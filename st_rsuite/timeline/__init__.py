@@ -2,13 +2,12 @@
 
 from __future__ import annotations
 
-import streamlit as st
+from st_rsuite._compat import component
 
-_component = st.components.v2.component(
+_component = component(
     "st-rsuite.timeline",
     js="index-*.js",
     html='<div class="react-root"></div>',
-    isolate_styles=False,
 )
 
 

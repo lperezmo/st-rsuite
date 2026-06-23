@@ -37,7 +37,8 @@ jobs:
           retention-days: 1
 
   # Fast, browser-less guard across every supported Streamlit minor: a real
-  # `streamlit run` would register all 13 components, and isolate_styles exists.
+  # `streamlit run` would register all 13 components, and the compat layer can
+  # disable style isolation (at registration on >=1.53, call site on 1.51/1.52).
   smoke:
     name: Smoke (Streamlit ${{ matrix.streamlit || 'latest' }})
     needs: build-frontend
@@ -45,7 +46,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        streamlit: ['1.53.*', '1.54.*', '1.55.*', '1.56.*', '1.57.*', '1.58.*', '']
+        streamlit: ['1.51.*', '1.52.*', '1.53.*', '1.54.*', '1.55.*', '1.56.*', '1.57.*', '1.58.*', '']
     steps:
       - uses: actions/checkout@v6
       - uses: actions/download-artifact@v7
@@ -79,7 +80,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        streamlit: ['1.53.*', '1.55.*', '']
+        streamlit: ['1.51.*', '1.52.*', '1.53.*', '1.55.*', '']
     steps:
       - uses: actions/checkout@v6
       - uses: actions/download-artifact@v7
