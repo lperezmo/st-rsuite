@@ -1,6 +1,34 @@
 # CHANGELOG
 
 
+## v0.3.4 (2026-06-23)
+
+### Bug Fixes
+
+- Support Streamlit 1.51 and 1.52 via an isolate_styles compat shim
+  ([`bacd632`](https://github.com/lperezmo/st-rsuite/commit/bacd6323290eb881e321d7ddc8f6f55ecc4ff4b6))
+
+Register all 13 components through st_rsuite/_compat.py, which applies isolate_styles=False at
+  registration (Streamlit >=1.53) or on the per-call renderer (1.51/1.52). Lower the floor to
+  streamlit>=1.51 and extend the smoke and e2e CI matrices to cover 1.51 and 1.52.
+
+### Chores
+
+- Bump artifact actions to v7 for the Node 24 runtime
+  ([#2](https://github.com/lperezmo/st-rsuite/pull/2),
+  [`453ca76`](https://github.com/lperezmo/st-rsuite/commit/453ca76f2156573a4c0063076252d94d6b4b04c8))
+
+actions/upload-artifact@v5 and actions/download-artifact@v5 run on Node.js 20, which GitHub Actions
+  has deprecated, so every Tests run logged a Node 20 warning.
+
+Pin both to @v7, which declares runs.using: node24 (verified in each action.yml). The two actions
+  reached their Node 24 default at different majors (upload-artifact in v6, download-artifact in
+  v7), so v7 is the safe floor for both. No behavior change, only the runtime.
+
+- Bump demo app requirement to v0.3.3
+  ([`6943ed7`](https://github.com/lperezmo/st-rsuite/commit/6943ed71f9605e6f5ce7f7fd352dd11d96af62b1))
+
+
 ## v0.3.3 (2026-06-22)
 
 ### Bug Fixes
