@@ -30,7 +30,7 @@ jobs:
       - run: npm ci && npm run build
         working-directory: st_rsuite/frontend
       - run: tar czf frontend-build.tgz st_rsuite/*/frontend/build
-      - uses: actions/upload-artifact@v5
+      - uses: actions/upload-artifact@v7
         with:
           name: frontend-build
           path: frontend-build.tgz
@@ -48,7 +48,7 @@ jobs:
         streamlit: ['1.53.*', '1.54.*', '1.55.*', '1.56.*', '1.57.*', '1.58.*', '']
     steps:
       - uses: actions/checkout@v6
-      - uses: actions/download-artifact@v5
+      - uses: actions/download-artifact@v7
         with:
           name: frontend-build
       - run: tar xzf frontend-build.tgz
@@ -82,7 +82,7 @@ jobs:
         streamlit: ['1.53.*', '1.55.*', '']
     steps:
       - uses: actions/checkout@v6
-      - uses: actions/download-artifact@v5
+      - uses: actions/download-artifact@v7
         with:
           name: frontend-build
       - run: tar xzf frontend-build.tgz
@@ -103,7 +103,7 @@ jobs:
       - run: uv run --no-sync playwright install --with-deps chromium
       - run: uv run --no-sync python -c "import streamlit; print('streamlit', streamlit.__version__)"
       - run: uv run --no-sync pytest test/test_ccv2_e2e.py -v
-      - uses: actions/upload-artifact@v5
+      - uses: actions/upload-artifact@v7
         if: failure()
         with:
           name: playwright-results-st${{ matrix.streamlit || 'latest' }}
