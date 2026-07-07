@@ -1,7 +1,8 @@
-import { FC, useCallback } from "react";
+import { FC, useCallback, useMemo } from "react";
 import { FrontendRendererArgs } from "@streamlit/component-v2-lib";
 import { DatePicker as RsuiteDatePicker } from "rsuite";
 import { useSyncedValue, keyOfScalar } from "../shared/useSyncedValue";
+import { buildShouldDisableDate } from "../shared/dateConstraints";
 
 export type DatePickerState = {
   selected_date: string | null;
@@ -21,6 +22,12 @@ export type DatePickerData = {
   block: boolean;
   isoWeek: boolean;
   showWeekNumbers: boolean;
+  minDate?: string | null;
+  maxDate?: string | null;
+  disabledDates?: string[];
+  disabledWeekdays?: number[];
+  limitStartYear?: number | null;
+  limitEndYear?: number | null;
   locale?: string | null;
 };
 
@@ -61,11 +68,28 @@ const DatePickerComponent: FC<Props> = ({ data, setStateValue }) => {
     block,
     isoWeek,
     showWeekNumbers,
+    minDate,
+    maxDate,
+    disabledDates,
+    disabledWeekdays,
+    limitStartYear,
+    limitEndYear,
   } = data;
 
   const [selected, emitSelected] = useSyncedValue<Date | null>(
     keyOfScalar(value),
     () => parseDate(value)
+  );
+
+  const shouldDisableDate = useMemo(
+    () =>
+      buildShouldDisableDate({
+        minDate,
+        maxDate,
+        disabledDates,
+        disabledWeekdays,
+      }),
+    [minDate, maxDate, disabledDates, disabledWeekdays]
   );
 
   const handleChange = useCallback(
@@ -105,6 +129,9 @@ const DatePickerComponent: FC<Props> = ({ data, setStateValue }) => {
         block={block}
         isoWeek={isoWeek}
         showWeekNumbers={showWeekNumbers}
+        shouldDisableDate={shouldDisableDate}
+        limitStartYear={limitStartYear ?? undefined}
+        limitEndYear={limitEndYear ?? undefined}
         style={{ width: "100%" }}
       />
     </div>
