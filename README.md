@@ -208,6 +208,8 @@ date_picker(
     block=False,          # full width
     iso_week=False,       # Monday-start weeks
     show_week_numbers=False,
+    editable=True,        # allow keyboard entry (False = toggle-only)
+    loading=False,        # show a loading indicator
     min_date=None,        # earliest selectable date (inclusive)
     max_date=None,        # latest selectable date (inclusive)
     disabled_dates=None,  # list of individual dates to disable
@@ -240,6 +242,8 @@ date_range_picker(
     show_one_calendar=False,  # single calendar panel
     one_tap=False,
     hover_range=None,     # 'week' | 'month' | None
+    editable=True,        # allow keyboard entry (False = toggle-only)
+    loading=False,        # show a loading indicator
     min_date=None,        # earliest selectable date (inclusive)
     max_date=None,        # latest selectable date (inclusive)
     disabled_dates=None,  # list of individual dates to disable
@@ -267,6 +271,13 @@ time_picker(
     cleanable=True,
     block=False,
     show_meridiem=False,  # AM/PM toggle
+    editable=True,        # allow keyboard entry (False = toggle-only)
+    loading=False,        # show a loading indicator
+    min_hour=None,        # earliest selectable hour, 0-23 (hides earlier)
+    max_hour=None,        # latest selectable hour, 0-23 (hides later)
+    hidden_hours=None,    # list of hours 0-23 to hide
+    hidden_minutes=None,  # list of minutes 0-59 to hide
+    hidden_seconds=None,  # list of seconds 0-59 to hide
     locale=None,
     on_change=None,
     key=None,
@@ -289,6 +300,13 @@ time_range_picker(
     cleanable=True,
     block=False,
     show_meridiem=False,
+    editable=True,
+    loading=False,
+    min_hour=None,        # earliest selectable hour, 0-23 (hides earlier)
+    max_hour=None,        # latest selectable hour, 0-23 (hides later)
+    hidden_hours=None,
+    hidden_minutes=None,
+    hidden_seconds=None,
     locale=None,
     on_change=None,
     key=None,

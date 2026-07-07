@@ -22,6 +22,8 @@ export type DatePickerData = {
   block: boolean;
   isoWeek: boolean;
   showWeekNumbers: boolean;
+  editable: boolean;
+  loading: boolean;
   minDate?: string | null;
   maxDate?: string | null;
   disabledDates?: string[];
@@ -68,6 +70,8 @@ const DatePickerComponent: FC<Props> = ({ data, setStateValue }) => {
     block,
     isoWeek,
     showWeekNumbers,
+    editable,
+    loading,
     minDate,
     maxDate,
     disabledDates,
@@ -129,6 +133,8 @@ const DatePickerComponent: FC<Props> = ({ data, setStateValue }) => {
         block={block}
         isoWeek={isoWeek}
         showWeekNumbers={showWeekNumbers}
+        editable={editable}
+        loading={loading}
         shouldDisableDate={shouldDisableDate}
         limitStartYear={limitStartYear ?? undefined}
         limitEndYear={limitEndYear ?? undefined}

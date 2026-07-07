@@ -54,6 +54,23 @@ with st.container(horizontal=True):
     )
     st.code(f"Selected: {tp2}")
 
+st.divider()
+
+st.markdown("#### Business hours only (min/max hour, toggle-only)")
+
+with st.container(horizontal=True):
+    banner_rsuite()
+    tp3 = time_picker(
+        label="09:00 - 17:00",
+        value=time(9, 0),
+        min_hour=9,
+        max_hour=17,
+        editable=False,  # toggle-only, no keyboard entry
+        disabled=disabled,
+        key="tp_business",
+    )
+    st.code(f"Selected: {tp3}")
+
 with st.expander("Usage code", icon=":material/code:"):
     st.code(
         '''from st_rsuite import time_picker
@@ -64,6 +81,9 @@ selected = time_picker(
     value=time(9, 30),
     format="hh:mm aa",
     show_meridiem=True,
+    min_hour=9,       # hours outside 9-17 are hidden
+    max_hour=17,
+    editable=False,   # toggle-only (no keyboard entry)
     key="my_time",
 )''',
         language="python",
