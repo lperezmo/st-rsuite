@@ -1,2 +1,2 @@
 streamlit>=1.58
-st-rsuite>=0.3.5
+st-rsuite>=0.3.6

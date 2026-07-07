@@ -1,6 +1,6 @@
 [project]
 name = "st-rsuite"
-version = "0.3.5"
+version = "0.3.6"
 
 [[tool.streamlit.component.components]]
 name = "date_input"
