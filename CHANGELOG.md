@@ -1,6 +1,37 @@
 # CHANGELOG
 
 
+## v0.5.0 (2026-07-07)
+
+### Chores
+
+- Bump demo app requirement to v0.4.0
+  ([`13940cd`](https://github.com/lperezmo/st-rsuite/commit/13940cdf4ee00a483837dbe2555266b3299f8ce3))
+
+### Features
+
+- Time constraints, editable, and loading
+  ([`f8dde1e`](https://github.com/lperezmo/st-rsuite/commit/f8dde1e2c89683d4402a6780989180c7f46f43ba))
+
+time_picker and time_range_picker gain min_hour, max_hour, hidden_hours, hidden_minutes, and
+  hidden_seconds, mapped to RSuite's hideHours/hideMinutes/ hideSeconds via a shared frontend helper
+  (timeConstraints.ts). This makes business-hours pickers (hide everything outside 09:00-17:00)
+  possible, which they were not before.
+
+Scope note: the standalone TimePicker/TimeRangePicker expose only the hide* family, not
+  shouldDisableHour (that is DatePicker-in-time-mode only, verified against the RSuite v6 type
+  defs), so hidden units are removed from the panel rather than shown-but-disabled.
+
+All four popup pickers (date_picker, date_range_picker, time_picker, time_range_picker) also gain
+  editable= (default True; False makes the field toggle-only) and loading= (default False)
+  passthroughs. The keyboard-only date_input/date_range_input support neither in RSuite, so they are
+  unchanged.
+
+- test/test_time_constraints_e2e.py opens a 09:00-17:00 picker and asserts the hour column hides
+  out-of-window hours while keeping in-window ones - README and the showcase gain a business-hours
+  example
+
+
 ## v0.4.0 (2026-07-07)
 
 ### Chores
