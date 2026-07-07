@@ -505,6 +505,10 @@ carousel(
 ) -> int                  # active slide index
 ```
 
+> A non-URL `src` is read from the local filesystem and inlined as a base64
+> data URI, so it must be a trusted path chosen by the app, not unsanitized
+> user input.
+
 #### `timeline`
 
 ```python

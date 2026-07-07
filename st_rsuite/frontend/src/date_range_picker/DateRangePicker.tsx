@@ -1,10 +1,11 @@
-import { FC, useCallback, useMemo } from "react";
+import { FC, useCallback, useId, useMemo } from "react";
 import { FrontendRendererArgs } from "@streamlit/component-v2-lib";
 import { DateRangePicker as RsuiteDateRangePicker } from "rsuite";
 import type { DateRange } from "rsuite/DateRangePicker";
 import { useSyncedValue, keyOfPair } from "../shared/useSyncedValue";
 import { buildShouldDisableDate } from "../shared/dateConstraints";
 import { buildRanges, SerializedRange } from "../shared/rangePresets";
+import { FieldLabel } from "../shared/FieldLabel";
 
 export type DateRangePickerState = {
   start_date: string | null;
@@ -31,6 +32,7 @@ export type DateRangePickerData = {
   hoverRange: "week" | "month" | null;
   editable: boolean;
   loading: boolean;
+  help?: string | null;
   minDate?: string | null;
   maxDate?: string | null;
   disabledDates?: string[];
@@ -85,6 +87,7 @@ const DateRangePickerComponent: FC<Props> = ({ data, setStateValue }) => {
     hoverRange,
     editable,
     loading,
+    help,
     minDate,
     maxDate,
     disabledDates,
@@ -94,6 +97,8 @@ const DateRangePickerComponent: FC<Props> = ({ data, setStateValue }) => {
     ranges,
     defaultCalendarValue,
   } = data;
+
+  const fieldId = useId();
 
   const [selected, emitSelected] = useSyncedValue<DateRange | null>(
     keyOfPair(startValue, endValue),
@@ -136,19 +141,9 @@ const DateRangePickerComponent: FC<Props> = ({ data, setStateValue }) => {
 
   return (
     <div style={{ width: "100%", padding: "4px 0" }}>
-      {label && (
-        <label
-          style={{
-            display: "block",
-            marginBottom: 4,
-            fontSize: 14,
-            fontWeight: 500,
-          }}
-        >
-          {label}
-        </label>
-      )}
+      <FieldLabel htmlFor={fieldId} label={label} help={help} />
       <RsuiteDateRangePicker
+        id={fieldId}
         value={selected}
         onChange={handleChange}
         format={format}

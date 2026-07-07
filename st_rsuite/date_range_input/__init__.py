@@ -23,6 +23,7 @@ def date_range_input(
     size: str = "md",
     placeholder: str | None = None,
     disabled: bool = False,
+    help: str | None = None,
     locale: str | None = None,
     on_change: Callable | None = None,
     key: str | None = None,
@@ -48,6 +49,9 @@ def date_range_input(
         Placeholder text when empty.
     disabled : bool
         Whether the input is disabled.
+    help : str or None
+        Tooltip shown on an info marker next to the label (like Streamlit's
+        ``help=``). Requires a label to attach to.
     locale : str or None
         RSuite locale key (e.g. 'ja_JP', 'zh_CN', 'es_ES'). None for English.
     on_change : callable or None
@@ -88,6 +92,7 @@ def date_range_input(
             "size": size,
             "placeholder": placeholder or "",
             "disabled": disabled,
+            "help": help,
             "locale": locale,
         },
         on_start_date_change=on_change or _noop,

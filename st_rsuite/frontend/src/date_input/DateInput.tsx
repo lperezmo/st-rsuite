@@ -1,7 +1,8 @@
-import { FC, useCallback } from "react";
+import { FC, useCallback, useId } from "react";
 import { FrontendRendererArgs } from "@streamlit/component-v2-lib";
 import { DateInput as RsuiteDateInput } from "rsuite";
 import { useSyncedValue, keyOfScalar } from "../shared/useSyncedValue";
+import { FieldLabel } from "../shared/FieldLabel";
 
 export type DateInputState = {
   selected_date: string | null;
@@ -14,6 +15,7 @@ export type DateInputData = {
   size: "lg" | "md" | "sm" | "xs";
   placeholder: string;
   disabled: boolean;
+  help?: string | null;
   locale?: string | null;
 };
 
@@ -40,7 +42,9 @@ function parseDate(val: string | null): Date | null {
 }
 
 const DateInputComponent: FC<Props> = ({ data, setStateValue }) => {
-  const { label, value, format, size, placeholder, disabled } = data;
+  const { label, value, format, size, placeholder, disabled, help } = data;
+
+  const fieldId = useId();
 
   const [selected, emitSelected] = useSyncedValue<Date | null>(
     keyOfScalar(value),
@@ -58,19 +62,9 @@ const DateInputComponent: FC<Props> = ({ data, setStateValue }) => {
 
   return (
     <div style={{ width: "100%", padding: "4px 0" }}>
-      {label && (
-        <label
-          style={{
-            display: "block",
-            marginBottom: 4,
-            fontSize: 14,
-            fontWeight: 500,
-          }}
-        >
-          {label}
-        </label>
-      )}
+      <FieldLabel htmlFor={fieldId} label={label} help={help} />
       <RsuiteDateInput
+        id={fieldId}
         value={selected}
         onChange={handleChange}
         format={format}

@@ -1,7 +1,8 @@
-import { FC, useCallback } from "react";
+import { FC, useCallback, useId } from "react";
 import { FrontendRendererArgs } from "@streamlit/component-v2-lib";
 import { DateRangeInput as RsuiteDateRangeInput } from "rsuite";
 import { useSyncedValue, keyOfPair } from "../shared/useSyncedValue";
+import { FieldLabel } from "../shared/FieldLabel";
 
 // RSuite's DateRangeInput onChange/value use a nullable-element tuple, unlike
 // DateRangePicker's [Date, Date].
@@ -21,6 +22,7 @@ export type DateRangeInputData = {
   size: "lg" | "md" | "sm" | "xs";
   placeholder: string;
   disabled: boolean;
+  help?: string | null;
   locale?: string | null;
 };
 
@@ -47,8 +49,19 @@ function parseDate(val: string | null): Date | null {
 }
 
 const DateRangeInputComponent: FC<Props> = ({ data, setStateValue }) => {
-  const { label, startValue, endValue, format, character, size, placeholder, disabled } =
-    data;
+  const {
+    label,
+    startValue,
+    endValue,
+    format,
+    character,
+    size,
+    placeholder,
+    disabled,
+    help,
+  } = data;
+
+  const fieldId = useId();
 
   const [selected, emitSelected] = useSyncedValue<DateRangeValue>(
     keyOfPair(startValue, endValue),
@@ -72,19 +85,9 @@ const DateRangeInputComponent: FC<Props> = ({ data, setStateValue }) => {
 
   return (
     <div style={{ width: "100%", padding: "4px 0" }}>
-      {label && (
-        <label
-          style={{
-            display: "block",
-            marginBottom: 4,
-            fontSize: 14,
-            fontWeight: 500,
-          }}
-        >
-          {label}
-        </label>
-      )}
+      <FieldLabel htmlFor={fieldId} label={label} help={help} />
       <RsuiteDateRangeInput
+        id={fieldId}
         value={selected}
         onChange={handleChange}
         format={format}
