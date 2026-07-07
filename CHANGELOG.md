@@ -1,6 +1,40 @@
 # CHANGELOG
 
 
+## v0.3.6 (2026-07-07)
+
+### Bug Fixes
+
+- Sync Python value changes into mounted components
+  ([`7ca48f5`](https://github.com/lperezmo/st-rsuite/commit/7ca48f5a998644e04f1a2c2bec5bea8f60aca6b8))
+
+Every component seeded local React state once with useState(initialValue) and never reconciled, so
+  any later change to the Python-side value= was silently ignored (reset buttons, dependent widgets,
+  and Session-State-driven updates all failed). This is the initial-only-hydration pitfall the
+  repo's own CCv2 state-sync reference warns about.
+
+- add shared useSyncedValue hook: it remembers the last incoming value key and adopts a new value
+  only when that key changes, so Python-driven changes propagate while user edits are preserved.
+  Tracking the incoming key (not the user's emission) is what stops a static value= from reverting
+  an edit on the next rerun, and makes the controlled-pattern echo a no-op that never fights an
+  in-progress edit. - convert all 12 stateful components to the hook (timeline is display-only) -
+  add test/test_value_sync_e2e.py: drives value= at runtime via a button and asserts the date_picker
+  and check_tree adopt it, plus that a user edit still round-trips and is not reverted by the echo
+
+Also fixes the 4 pre-existing frontend type errors this surfaced and adds a typecheck CI gate so
+  they cannot recur: - CheckTree/CheckTreePicker onChange now types the RSuite ValueType
+  ((string|number)[]) and coerces to string[] - DateRangeInput uses RSuite's nullable-element tuple
+  value type - CheckTree and MultiCascadeTree have no RSuite disabled prop (it was a silent no-op);
+  disabled is now honored via a wrapper that blocks interaction and dims the control, so the Python
+  disabled= actually works - new typecheck job in tests.yml runs tsc --noEmit (the Vite build
+  transpiles without type-checking, so nothing caught these before)
+
+### Chores
+
+- Bump demo app requirement to v0.3.5
+  ([`6f1c5b1`](https://github.com/lperezmo/st-rsuite/commit/6f1c5b1e178e56db18613deb261864966ecc0a87))
+
+
 ## v0.3.5 (2026-07-07)
 
 ### Bug Fixes
