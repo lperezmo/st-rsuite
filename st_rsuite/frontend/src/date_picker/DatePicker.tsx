@@ -30,6 +30,7 @@ export type DatePickerData = {
   disabledWeekdays?: number[];
   limitStartYear?: number | null;
   limitEndYear?: number | null;
+  calendarDefaultDate?: string | null;
   locale?: string | null;
 };
 
@@ -78,6 +79,7 @@ const DatePickerComponent: FC<Props> = ({ data, setStateValue }) => {
     disabledWeekdays,
     limitStartYear,
     limitEndYear,
+    calendarDefaultDate,
   } = data;
 
   const [selected, emitSelected] = useSyncedValue<Date | null>(
@@ -94,6 +96,11 @@ const DatePickerComponent: FC<Props> = ({ data, setStateValue }) => {
         disabledWeekdays,
       }),
     [minDate, maxDate, disabledDates, disabledWeekdays]
+  );
+
+  const calDefaultDate = useMemo(
+    () => (calendarDefaultDate ? parseDate(calendarDefaultDate) ?? undefined : undefined),
+    [calendarDefaultDate]
   );
 
   const handleChange = useCallback(
@@ -138,6 +145,7 @@ const DatePickerComponent: FC<Props> = ({ data, setStateValue }) => {
         shouldDisableDate={shouldDisableDate}
         limitStartYear={limitStartYear ?? undefined}
         limitEndYear={limitEndYear ?? undefined}
+        calendarDefaultDate={calDefaultDate}
         style={{ width: "100%" }}
       />
     </div>

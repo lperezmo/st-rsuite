@@ -4,6 +4,7 @@ import { DateRangePicker as RsuiteDateRangePicker } from "rsuite";
 import type { DateRange } from "rsuite/DateRangePicker";
 import { useSyncedValue, keyOfPair } from "../shared/useSyncedValue";
 import { buildShouldDisableDate } from "../shared/dateConstraints";
+import { buildRanges, SerializedRange } from "../shared/rangePresets";
 
 export type DateRangePickerState = {
   start_date: string | null;
@@ -36,6 +37,8 @@ export type DateRangePickerData = {
   disabledWeekdays?: number[];
   limitStartYear?: number | null;
   limitEndYear?: number | null;
+  ranges?: SerializedRange[] | null;
+  defaultCalendarValue?: [string, string] | null;
   locale?: string | null;
 };
 
@@ -88,6 +91,8 @@ const DateRangePickerComponent: FC<Props> = ({ data, setStateValue }) => {
     disabledWeekdays,
     limitStartYear,
     limitEndYear,
+    ranges,
+    defaultCalendarValue,
   } = data;
 
   const [selected, emitSelected] = useSyncedValue<DateRange | null>(
@@ -109,6 +114,14 @@ const DateRangePickerComponent: FC<Props> = ({ data, setStateValue }) => {
       }),
     [minDate, maxDate, disabledDates, disabledWeekdays]
   );
+
+  const rangePresets = useMemo(() => buildRanges(ranges), [ranges]);
+  const defaultCalValue = useMemo<DateRange | undefined>(() => {
+    if (!defaultCalendarValue) return undefined;
+    const s = parseDate(defaultCalendarValue[0]);
+    const e = parseDate(defaultCalendarValue[1]);
+    return s && e ? [s, e] : undefined;
+  }, [defaultCalendarValue]);
 
   const handleChange = useCallback(
     (newValue: DateRange | null) => {
@@ -157,6 +170,8 @@ const DateRangePickerComponent: FC<Props> = ({ data, setStateValue }) => {
         shouldDisableDate={shouldDisableDate}
         limitStartYear={limitStartYear ?? undefined}
         limitEndYear={limitEndYear ?? undefined}
+        ranges={rangePresets}
+        defaultCalendarValue={defaultCalValue}
         style={{ width: "100%" }}
       />
     </div>

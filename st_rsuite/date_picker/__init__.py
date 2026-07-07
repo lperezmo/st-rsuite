@@ -37,6 +37,7 @@ def date_picker(
     disabled_weekdays: list[int] | None = None,
     limit_start_year: int | None = None,
     limit_end_year: int | None = None,
+    calendar_default_date: date | str | None = None,
     locale: str | None = None,
     on_change: Callable | None = None,
     key: str | None = None,
@@ -90,6 +91,9 @@ def date_picker(
     limit_end_year : int or None
         Upper bound on the year navigable in the calendar, relative to the
         current selection.
+    calendar_default_date : date or str or None
+        Which month the calendar opens on when there is no selection. Does not
+        select a value.
     locale : str or None
         RSuite locale key (e.g. 'ja_JP', 'zh_CN', 'es_ES'). None for English.
     on_change : callable or None
@@ -139,6 +143,7 @@ def date_picker(
             "disabledWeekdays": disabled_weekdays or [],
             "limitStartYear": limit_start_year,
             "limitEndYear": limit_end_year,
+            "calendarDefaultDate": _serialize(calendar_default_date),
             "locale": locale,
         },
         on_selected_date_change=on_change or _noop,

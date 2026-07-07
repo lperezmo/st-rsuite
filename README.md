@@ -216,6 +216,7 @@ date_picker(
     disabled_weekdays=None,  # list of ints, 0=Monday .. 6=Sunday
     limit_start_year=None,   # lower year bound in the calendar
     limit_end_year=None,     # upper year bound in the calendar
+    calendar_default_date=None,  # month the calendar opens on
     locale=None,          # e.g. 'ja_JP', 'zh_CN', 'es_ES'
     on_change=None,
     key=None,
@@ -250,6 +251,8 @@ date_range_picker(
     disabled_weekdays=None,  # list of ints, 0=Monday .. 6=Sunday
     limit_start_year=None,
     limit_end_year=None,
+    ranges=None,          # shortcut presets; [] removes RSuite defaults
+    default_calendar_value=None,  # (start, end) month the panels open on
     locale=None,
     on_change=None,
     key=None,
@@ -339,6 +342,32 @@ picked = date_picker(
 numbering as Python's `date.weekday()` (Monday is 0). `limit_start_year` /
 `limit_end_year` bound the years reachable in the calendar, relative to the
 current selection.
+
+#### Shortcut ranges
+
+`date_range_picker` shows shortcut presets beside the calendar. It ships RSuite's
+defaults (Today, Yesterday, Last 7 days); pass your own with `ranges`, or
+`ranges=[]` to hide the sidebar entirely.
+
+```python
+from datetime import date, timedelta
+from st_rsuite import date_range_picker
+
+today = date.today()
+start, end = date_range_picker(
+    label="Report window",
+    ranges=[
+        {"label": "Last 7 days", "value": (today - timedelta(days=6), today)},
+        {"label": "Last 30 days", "value": (today - timedelta(days=29), today)},
+        {"label": "This month", "value": (today.replace(day=1), today)},
+    ],
+    key="report",
+)
+```
+
+Each preset is `{"label": str, "value": (start, end)}`, with optional
+`"close_overlay": True` (commit and close on click) and
+`"placement": "bottom" | "left"`.
 
 ### Inputs
 

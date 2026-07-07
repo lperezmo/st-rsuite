@@ -40,6 +40,8 @@ def date_range_picker(
     disabled_weekdays: list[int] | None = None,
     limit_start_year: int | None = None,
     limit_end_year: int | None = None,
+    ranges: list[dict] | None = None,
+    default_calendar_value: tuple[date | str, date | str] | None = None,
     locale: str | None = None,
     on_change: Callable | None = None,
     key: str | None = None,
@@ -99,6 +101,16 @@ def date_range_picker(
     limit_end_year : int or None
         Upper bound on the year navigable in the calendar, relative to the
         current selection.
+    ranges : list of dict or None
+        Shortcut presets shown beside the calendar. Each dict is
+        ``{"label": str, "value": (start, end)}`` where start/end are date
+        objects or ISO strings; optional keys ``close_overlay`` (bool) and
+        ``placement`` ('bottom' | 'left'). ``None`` keeps RSuite's built-in
+        shortcuts (Today, Yesterday, Last 7 days); an empty list ``[]`` removes
+        them and shows no shortcut sidebar.
+    default_calendar_value : tuple of (date/str, date/str) or None
+        Which month pair the calendar panels open on when there is no
+        selection. Does not select a value.
     locale : str or None
         RSuite locale key (e.g. 'ja_JP', 'zh_CN', 'es_ES'). None for English.
     on_change : callable or None
@@ -125,6 +137,29 @@ def date_range_picker(
     if value is not None:
         start_val = _serialize(value[0])
         end_val = _serialize(value[1])
+
+    # ranges: None keeps RSuite's defaults; a list (incl. empty) replaces them.
+    serialized_ranges = None
+    if ranges is not None:
+        serialized_ranges = []
+        for r in ranges:
+            r_start, r_end = r["value"]
+            preset = {
+                "label": r["label"],
+                "value": [_serialize(r_start), _serialize(r_end)],
+            }
+            if "close_overlay" in r:
+                preset["closeOverlay"] = r["close_overlay"]
+            if "placement" in r:
+                preset["placement"] = r["placement"]
+            serialized_ranges.append(preset)
+
+    default_cal = None
+    if default_calendar_value is not None:
+        default_cal = [
+            _serialize(default_calendar_value[0]),
+            _serialize(default_calendar_value[1]),
+        ]
 
     def _noop():
         pass
@@ -158,6 +193,8 @@ def date_range_picker(
             "disabledWeekdays": disabled_weekdays or [],
             "limitStartYear": limit_start_year,
             "limitEndYear": limit_end_year,
+            "ranges": serialized_ranges,
+            "defaultCalendarValue": default_cal,
             "locale": locale,
         },
         on_start_date_change=on_change or _noop,
