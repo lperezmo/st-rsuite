@@ -29,6 +29,8 @@ def date_picker(
     block: bool = False,
     iso_week: bool = False,
     show_week_numbers: bool = False,
+    editable: bool = True,
+    loading: bool = False,
     min_date: date | str | None = None,
     max_date: date | str | None = None,
     disabled_dates: list[date | str] | None = None,
@@ -69,6 +71,11 @@ def date_picker(
         Weeks start on Monday (ISO 8601).
     show_week_numbers : bool
         Show week numbers in the calendar.
+    editable : bool
+        Allow typing the date into the input. When False the field is
+        toggle-only (opens the calendar; no keyboard entry). Default True.
+    loading : bool
+        Show a loading-state indicator on the control. Default False.
     min_date : date or str or None
         Earliest selectable date (inclusive). Earlier dates are disabled.
     max_date : date or str or None
@@ -124,6 +131,8 @@ def date_picker(
             "block": block,
             "isoWeek": iso_week,
             "showWeekNumbers": show_week_numbers,
+            "editable": editable,
+            "loading": loading,
             "minDate": _serialize(min_date),
             "maxDate": _serialize(max_date),
             "disabledDates": [_serialize(d) for d in (disabled_dates or [])],

@@ -32,6 +32,8 @@ def date_range_picker(
     show_one_calendar: bool = False,
     one_tap: bool = False,
     hover_range: str | None = None,
+    editable: bool = True,
+    loading: bool = False,
     min_date: date | str | None = None,
     max_date: date | str | None = None,
     disabled_dates: list[date | str] | None = None,
@@ -78,6 +80,11 @@ def date_range_picker(
         Single-click select.
     hover_range : str or None
         Hover highlight mode: 'week', 'month', or None.
+    editable : bool
+        Allow typing the dates into the input. When False the field is
+        toggle-only. Default True.
+    loading : bool
+        Show a loading-state indicator on the control. Default False.
     min_date : date or str or None
         Earliest selectable date (inclusive). Earlier dates are disabled.
     max_date : date or str or None
@@ -143,6 +150,8 @@ def date_range_picker(
             "showOneCalendar": show_one_calendar,
             "oneTap": one_tap,
             "hoverRange": hover_range,
+            "editable": editable,
+            "loading": loading,
             "minDate": _serialize(min_date),
             "maxDate": _serialize(max_date),
             "disabledDates": [_serialize(d) for d in (disabled_dates or [])],

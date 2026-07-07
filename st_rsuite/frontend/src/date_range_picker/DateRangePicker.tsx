@@ -28,6 +28,8 @@ export type DateRangePickerData = {
   showOneCalendar: boolean;
   oneTap: boolean;
   hoverRange: "week" | "month" | null;
+  editable: boolean;
+  loading: boolean;
   minDate?: string | null;
   maxDate?: string | null;
   disabledDates?: string[];
@@ -78,6 +80,8 @@ const DateRangePickerComponent: FC<Props> = ({ data, setStateValue }) => {
     showOneCalendar,
     oneTap,
     hoverRange,
+    editable,
+    loading,
     minDate,
     maxDate,
     disabledDates,
@@ -148,6 +152,8 @@ const DateRangePickerComponent: FC<Props> = ({ data, setStateValue }) => {
         showOneCalendar={showOneCalendar}
         oneTap={oneTap}
         hoverRange={hoverRange || undefined}
+        editable={editable}
+        loading={loading}
         shouldDisableDate={shouldDisableDate}
         limitStartYear={limitStartYear ?? undefined}
         limitEndYear={limitEndYear ?? undefined}

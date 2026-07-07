@@ -28,6 +28,13 @@ def time_range_picker(
     cleanable: bool = True,
     block: bool = False,
     show_meridiem: bool = False,
+    editable: bool = True,
+    loading: bool = False,
+    min_hour: int | None = None,
+    max_hour: int | None = None,
+    hidden_hours: list[int] | None = None,
+    hidden_minutes: list[int] | None = None,
+    hidden_seconds: list[int] | None = None,
     locale: str | None = None,
     on_change: Callable | None = None,
     key: str | None = None,
@@ -60,6 +67,21 @@ def time_range_picker(
         Full width.
     show_meridiem : bool
         Show AM/PM for 12-hour format.
+    editable : bool
+        Allow typing the times into the input. When False the field is
+        toggle-only. Default True.
+    loading : bool
+        Show a loading-state indicator on the control. Default False.
+    min_hour : int or None
+        Earliest selectable hour (0-23, inclusive). Earlier hours are hidden.
+    max_hour : int or None
+        Latest selectable hour (0-23, inclusive). Later hours are hidden.
+    hidden_hours : list of int or None
+        Specific hours (0-23) to hide from the panels.
+    hidden_minutes : list of int or None
+        Specific minutes (0-59) to hide from the panels.
+    hidden_seconds : list of int or None
+        Specific seconds (0-59) to hide from the panels.
     locale : str or None
         RSuite locale key (e.g. 'ja_JP', 'zh_CN', 'es_ES'). None for English.
     on_change : callable or None
@@ -105,6 +127,13 @@ def time_range_picker(
             "cleanable": cleanable,
             "block": block,
             "showMeridiem": show_meridiem,
+            "editable": editable,
+            "loading": loading,
+            "minHour": min_hour,
+            "maxHour": max_hour,
+            "hiddenHours": hidden_hours or [],
+            "hiddenMinutes": hidden_minutes or [],
+            "hiddenSeconds": hidden_seconds or [],
             "locale": locale,
         },
         on_start_time_change=on_change or _noop,

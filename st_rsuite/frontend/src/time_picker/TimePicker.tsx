@@ -1,7 +1,12 @@
-import { FC, useCallback } from "react";
+import { FC, useCallback, useMemo } from "react";
 import { FrontendRendererArgs } from "@streamlit/component-v2-lib";
 import { TimePicker as RsuiteTimePicker } from "rsuite";
 import { useSyncedValue, keyOfScalar } from "../shared/useSyncedValue";
+import {
+  buildHideHours,
+  buildHideMinutes,
+  buildHideSeconds,
+} from "../shared/timeConstraints";
 
 export type TimePickerState = {
   selected_time: string | null;
@@ -19,6 +24,13 @@ export type TimePickerData = {
   cleanable: boolean;
   block: boolean;
   showMeridiem: boolean;
+  editable: boolean;
+  loading: boolean;
+  hiddenHours?: number[];
+  hiddenMinutes?: number[];
+  hiddenSeconds?: number[];
+  minHour?: number | null;
+  maxHour?: number | null;
   locale?: string | null;
 };
 
@@ -57,6 +69,13 @@ const TimePickerComponent: FC<Props> = ({ data, setStateValue }) => {
     cleanable,
     block,
     showMeridiem,
+    editable,
+    loading,
+    hiddenHours,
+    hiddenMinutes,
+    hiddenSeconds,
+    minHour,
+    maxHour,
   } = data;
 
   const [selected, emitSelected] = useSyncedValue<Date | null>(
@@ -72,6 +91,14 @@ const TimePickerComponent: FC<Props> = ({ data, setStateValue }) => {
     },
     [emitSelected, setStateValue]
   );
+
+  const constraints = { hiddenHours, hiddenMinutes, hiddenSeconds, minHour, maxHour };
+  const hideHours = useMemo(
+    () => buildHideHours(constraints),
+    [hiddenHours, minHour, maxHour]
+  );
+  const hideMinutes = useMemo(() => buildHideMinutes(constraints), [hiddenMinutes]);
+  const hideSeconds = useMemo(() => buildHideSeconds(constraints), [hiddenSeconds]);
 
   // If showMeridiem is true, use 12-hour format
   const effectiveFormat = showMeridiem && format === "HH:mm" ? "hh:mm aa" : format;
@@ -102,6 +129,11 @@ const TimePickerComponent: FC<Props> = ({ data, setStateValue }) => {
         cleanable={cleanable}
         block={block}
         showMeridiem={showMeridiem}
+        editable={editable}
+        loading={loading}
+        hideHours={hideHours}
+        hideMinutes={hideMinutes}
+        hideSeconds={hideSeconds}
         style={{ width: "100%" }}
       />
     </div>

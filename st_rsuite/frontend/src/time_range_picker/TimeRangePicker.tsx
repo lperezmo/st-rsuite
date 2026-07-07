@@ -1,8 +1,13 @@
-import { FC, useCallback } from "react";
+import { FC, useCallback, useMemo } from "react";
 import { FrontendRendererArgs } from "@streamlit/component-v2-lib";
 import { TimeRangePicker as RsuiteTimeRangePicker } from "rsuite";
 import type { DateRange } from "rsuite/DateRangePicker";
 import { useSyncedValue, keyOfPair } from "../shared/useSyncedValue";
+import {
+  buildHideHours,
+  buildHideMinutes,
+  buildHideSeconds,
+} from "../shared/timeConstraints";
 
 export type TimeRangePickerState = {
   start_time: string | null;
@@ -23,6 +28,13 @@ export type TimeRangePickerData = {
   cleanable: boolean;
   block: boolean;
   showMeridiem: boolean;
+  editable: boolean;
+  loading: boolean;
+  hiddenHours?: number[];
+  hiddenMinutes?: number[];
+  hiddenSeconds?: number[];
+  minHour?: number | null;
+  maxHour?: number | null;
   locale?: string | null;
 };
 
@@ -63,6 +75,13 @@ const TimeRangePickerComponent: FC<Props> = ({ data, setStateValue }) => {
     cleanable,
     block,
     showMeridiem,
+    editable,
+    loading,
+    hiddenHours,
+    hiddenMinutes,
+    hiddenSeconds,
+    minHour,
+    maxHour,
   } = data;
 
   const [selected, emitSelected] = useSyncedValue<DateRange | null>(
@@ -84,6 +103,14 @@ const TimeRangePickerComponent: FC<Props> = ({ data, setStateValue }) => {
     },
     [emitSelected, setStateValue]
   );
+
+  const constraints = { hiddenHours, hiddenMinutes, hiddenSeconds, minHour, maxHour };
+  const hideHours = useMemo(
+    () => buildHideHours(constraints),
+    [hiddenHours, minHour, maxHour]
+  );
+  const hideMinutes = useMemo(() => buildHideMinutes(constraints), [hiddenMinutes]);
+  const hideSeconds = useMemo(() => buildHideSeconds(constraints), [hiddenSeconds]);
 
   const effectiveFormat = showMeridiem && format === "HH:mm" ? "hh:mm aa" : format;
 
@@ -114,6 +141,11 @@ const TimeRangePickerComponent: FC<Props> = ({ data, setStateValue }) => {
         cleanable={cleanable}
         block={block}
         showMeridiem={showMeridiem}
+        editable={editable}
+        loading={loading}
+        hideHours={hideHours}
+        hideMinutes={hideMinutes}
+        hideSeconds={hideSeconds}
         style={{ width: "100%" }}
       />
     </div>
