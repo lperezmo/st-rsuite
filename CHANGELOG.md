@@ -1,6 +1,33 @@
 # CHANGELOG
 
 
+## v0.3.5 (2026-07-07)
+
+### Bug Fixes
+
+- Ship minified production frontend builds without sourcemaps
+  ([`9daff1e`](https://github.com/lperezmo/st-rsuite/commit/9daff1eb70b7984d2c8c69c0bf97ee5a960bee68))
+
+Every published wheel so far contained unminified dev bundles plus sourcemaps because build.mjs
+  keyed on NODE_ENV=production and no workflow ever set it (v0.3.4 wheel: 9.2 MB, 19.5 MB of
+  unminified JS and 30.3 MB of maps unpacked).
+
+- build.mjs now defaults to production; dev builds are opt-in through the existing build:dev / dev
+  scripts that set NODE_ENV=development - switch production minify from esbuild to terser: Vite
+  disables esbuild whitespace minification for lib-mode ES output, which left bundles at 1.3 MB+
+  even with minify enabled - exclude *.js.map from the sdist (MANIFEST.in) and the wheel
+  (exclude-package-data) as a guard - add scripts/assert_prod_build.sh and run it after every
+  frontend build in tests.yml, release.yml, and publish.yml so a dev build can never ship again
+
+Result: wheel drops from 9.2 MB to 2.8 MB, largest bundle from 1.66 MB to 1.07 MB (187 KB gzipped
+  over the wire), no sourcemaps shipped.
+
+### Chores
+
+- Bump demo app requirement to v0.3.4
+  ([`e9f748b`](https://github.com/lperezmo/st-rsuite/commit/e9f748bd84522864d7f5825e32651aebff413987))
+
+
 ## v0.3.4 (2026-06-23)
 
 ### Bug Fixes
