@@ -163,16 +163,37 @@ with st.container(horizontal=True):
     )
     st.code(f"Start: {drp3[0]}  End: {drp3[1]}")
 
+st.divider()
+
+st.markdown("#### Shortcut ranges")
+
+_today = date.today()
+with st.container(horizontal=True):
+    banner_rsuite()
+    drp4 = date_range_picker(
+        label="Report window",
+        ranges=[
+            {"label": "Last 7 days", "value": (_today - timedelta(days=6), _today)},
+            {"label": "Last 30 days", "value": (_today - timedelta(days=29), _today)},
+            {"label": "This month", "value": (_today.replace(day=1), _today)},
+        ],
+        key="drp_ranges",
+    )
+    st.code(f"Start: {drp4[0]}  End: {drp4[1]}")
+
 with st.expander("Usage code", icon=":material/code:"):
     st.code(
         '''from st_rsuite import date_range_picker
 from datetime import date, timedelta
 
+today = date.today()
 start, end = date_range_picker(
-    label="Trip dates",
-    value=(date.today(), date.today() + timedelta(days=7)),
+    label="Report window",
     hover_range="week",
-    one_tap=True,
+    ranges=[
+        {"label": "Last 7 days", "value": (today - timedelta(days=6), today)},
+        {"label": "This month", "value": (today.replace(day=1), today)},
+    ],
     key="my_range",
 )''',
         language="python",
