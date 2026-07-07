@@ -29,6 +29,8 @@ jobs:
           cache-dependency-path: st_rsuite/frontend/package-lock.json
       - run: npm ci && npm run build
         working-directory: st_rsuite/frontend
+      - name: Assert production build
+        run: bash scripts/assert_prod_build.sh
       - run: tar czf frontend-build.tgz st_rsuite/*/frontend/build
       - uses: actions/upload-artifact@v7
         with:

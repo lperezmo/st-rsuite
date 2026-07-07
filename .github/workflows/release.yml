@@ -46,6 +46,9 @@ jobs:
       - run: npm ci && npm run build
         working-directory: st_rsuite/frontend
 
+      - name: Assert production build
+        run: bash scripts/assert_prod_build.sh
+
       # Build Python package
       - uses: actions/setup-python@v6
         with: { python-version: '3.13' }

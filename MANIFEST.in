@@ -12,3 +12,4 @@ recursive-include st_rsuite/carousel/frontend/build *
 recursive-include st_rsuite/timeline/frontend/build *
 recursive-include st_rsuite/pin_input/frontend/build *
 include st_rsuite/pyproject.toml
+recursive-exclude st_rsuite *.js.map
