@@ -1,8 +1,9 @@
-import { FC, useCallback } from "react";
+import { FC, useCallback, useMemo } from "react";
 import { FrontendRendererArgs } from "@streamlit/component-v2-lib";
 import { DateRangePicker as RsuiteDateRangePicker } from "rsuite";
 import type { DateRange } from "rsuite/DateRangePicker";
 import { useSyncedValue, keyOfPair } from "../shared/useSyncedValue";
+import { buildShouldDisableDate } from "../shared/dateConstraints";
 
 export type DateRangePickerState = {
   start_date: string | null;
@@ -27,6 +28,12 @@ export type DateRangePickerData = {
   showOneCalendar: boolean;
   oneTap: boolean;
   hoverRange: "week" | "month" | null;
+  minDate?: string | null;
+  maxDate?: string | null;
+  disabledDates?: string[];
+  disabledWeekdays?: number[];
+  limitStartYear?: number | null;
+  limitEndYear?: number | null;
   locale?: string | null;
 };
 
@@ -71,6 +78,12 @@ const DateRangePickerComponent: FC<Props> = ({ data, setStateValue }) => {
     showOneCalendar,
     oneTap,
     hoverRange,
+    minDate,
+    maxDate,
+    disabledDates,
+    disabledWeekdays,
+    limitStartYear,
+    limitEndYear,
   } = data;
 
   const [selected, emitSelected] = useSyncedValue<DateRange | null>(
@@ -80,6 +93,17 @@ const DateRangePickerComponent: FC<Props> = ({ data, setStateValue }) => {
       const e = parseDate(endValue);
       return s && e ? [s, e] : null;
     }
+  );
+
+  const shouldDisableDate = useMemo(
+    () =>
+      buildShouldDisableDate({
+        minDate,
+        maxDate,
+        disabledDates,
+        disabledWeekdays,
+      }),
+    [minDate, maxDate, disabledDates, disabledWeekdays]
   );
 
   const handleChange = useCallback(
@@ -124,6 +148,9 @@ const DateRangePickerComponent: FC<Props> = ({ data, setStateValue }) => {
         showOneCalendar={showOneCalendar}
         oneTap={oneTap}
         hoverRange={hoverRange || undefined}
+        shouldDisableDate={shouldDisableDate}
+        limitStartYear={limitStartYear ?? undefined}
+        limitEndYear={limitEndYear ?? undefined}
         style={{ width: "100%" }}
       />
     </div>

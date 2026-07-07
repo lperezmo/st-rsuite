@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from datetime import date
+from datetime import date, datetime
 from typing import Callable
 
 from st_rsuite._compat import component
@@ -32,6 +32,12 @@ def date_range_picker(
     show_one_calendar: bool = False,
     one_tap: bool = False,
     hover_range: str | None = None,
+    min_date: date | str | None = None,
+    max_date: date | str | None = None,
+    disabled_dates: list[date | str] | None = None,
+    disabled_weekdays: list[int] | None = None,
+    limit_start_year: int | None = None,
+    limit_end_year: int | None = None,
     locale: str | None = None,
     on_change: Callable | None = None,
     key: str | None = None,
@@ -72,6 +78,20 @@ def date_range_picker(
         Single-click select.
     hover_range : str or None
         Hover highlight mode: 'week', 'month', or None.
+    min_date : date or str or None
+        Earliest selectable date (inclusive). Earlier dates are disabled.
+    max_date : date or str or None
+        Latest selectable date (inclusive). Later dates are disabled.
+    disabled_dates : list of date or str or None
+        Individual dates to disable.
+    disabled_weekdays : list of int or None
+        Weekdays to disable, 0=Monday .. 6=Sunday (matching date.weekday()).
+    limit_start_year : int or None
+        Lower bound on the year navigable in the calendar, relative to the
+        current selection.
+    limit_end_year : int or None
+        Upper bound on the year navigable in the calendar, relative to the
+        current selection.
     locale : str or None
         RSuite locale key (e.g. 'ja_JP', 'zh_CN', 'es_ES'). None for English.
     on_change : callable or None
@@ -87,6 +107,8 @@ def date_range_picker(
     def _serialize(d):
         if d is None:
             return None
+        if isinstance(d, datetime):
+            return d.date().isoformat()
         if isinstance(d, date):
             return d.isoformat()
         return str(d)
@@ -121,6 +143,12 @@ def date_range_picker(
             "showOneCalendar": show_one_calendar,
             "oneTap": one_tap,
             "hoverRange": hover_range,
+            "minDate": _serialize(min_date),
+            "maxDate": _serialize(max_date),
+            "disabledDates": [_serialize(d) for d in (disabled_dates or [])],
+            "disabledWeekdays": disabled_weekdays or [],
+            "limitStartYear": limit_start_year,
+            "limitEndYear": limit_end_year,
             "locale": locale,
         },
         on_start_date_change=on_change or _noop,

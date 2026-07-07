@@ -208,6 +208,12 @@ date_picker(
     block=False,          # full width
     iso_week=False,       # Monday-start weeks
     show_week_numbers=False,
+    min_date=None,        # earliest selectable date (inclusive)
+    max_date=None,        # latest selectable date (inclusive)
+    disabled_dates=None,  # list of individual dates to disable
+    disabled_weekdays=None,  # list of ints, 0=Monday .. 6=Sunday
+    limit_start_year=None,   # lower year bound in the calendar
+    limit_end_year=None,     # upper year bound in the calendar
     locale=None,          # e.g. 'ja_JP', 'zh_CN', 'es_ES'
     on_change=None,
     key=None,
@@ -234,6 +240,12 @@ date_range_picker(
     show_one_calendar=False,  # single calendar panel
     one_tap=False,
     hover_range=None,     # 'week' | 'month' | None
+    min_date=None,        # earliest selectable date (inclusive)
+    max_date=None,        # latest selectable date (inclusive)
+    disabled_dates=None,  # list of individual dates to disable
+    disabled_weekdays=None,  # list of ints, 0=Monday .. 6=Sunday
+    limit_start_year=None,
+    limit_end_year=None,
     locale=None,
     on_change=None,
     key=None,
@@ -282,6 +294,33 @@ time_range_picker(
     key=None,
 ) -> tuple[time | None, time | None]
 ```
+
+#### Restricting selectable dates
+
+`date_picker` and `date_range_picker` accept declarative constraints (the
+keyboard-only `date_input` / `date_range_input` do not, as RSuite has no calendar
+to disable). Callables can't cross the Python/JS boundary, so pass plain values
+and the frontend builds the `shouldDisableDate` predicate for you:
+
+```python
+from datetime import date
+from st_rsuite import date_picker
+
+# Only weekdays in a fixed window, with a couple of holidays blocked out.
+picked = date_picker(
+    label="Appointment",
+    min_date=date(2026, 6, 1),
+    max_date=date(2026, 6, 30),
+    disabled_dates=[date(2026, 6, 19)],   # individual dates
+    disabled_weekdays=[5, 6],             # 0=Monday .. 6=Sunday, so Sat/Sun
+    key="appt",
+)
+```
+
+`min_date` / `max_date` are inclusive. `disabled_weekdays` uses the same
+numbering as Python's `date.weekday()` (Monday is 0). `limit_start_year` /
+`limit_end_year` bound the years reachable in the calendar, relative to the
+current selection.
 
 ### Inputs
 

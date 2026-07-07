@@ -1,5 +1,5 @@
 import streamlit as st
-from datetime import date
+from datetime import date, timedelta
 
 from st_rsuite import date_picker, date_range_picker
 from utils.ui import banner_rsuite, banner_st
@@ -66,6 +66,25 @@ with st.container(horizontal=True):
     )
     st.code(f"Selected: {dp3}")
 
+st.divider()
+
+st.markdown("#### Constraints (min/max, disabled weekdays)")
+
+_today = date.today()
+with st.container(horizontal=True):
+    banner_rsuite()
+    dp4 = date_picker(
+        label="Weekdays only, next 30 days",
+        value=_today,
+        min_date=_today,
+        max_date=_today + timedelta(days=30),
+        disabled_weekdays=[5, 6],  # 0=Monday .. 6=Sunday, so Sat/Sun
+        one_tap=True,
+        disabled=disabled,
+        key="dp_constrained",
+    )
+    st.code(f"Selected: {dp4}")
+
 with st.expander("Usage code", icon=":material/code:"):
     st.code(
         '''from st_rsuite import date_picker
@@ -88,8 +107,6 @@ st.markdown(
     "Full-featured dual-calendar popup for selecting date ranges. "
     "Supports hover highlighting, one-tap mode, and single-calendar mode."
 )
-
-from datetime import timedelta
 
 st.markdown("#### Basic")
 
