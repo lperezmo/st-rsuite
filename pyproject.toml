@@ -50,6 +50,9 @@ include = ["st_rsuite*"]
 [tool.setuptools]
 include-package-data = true
 
+[tool.setuptools.exclude-package-data]
+"*" = ["*.js.map"]
+
 [tool.setuptools.package-data]
 "st_rsuite" = ["pyproject.toml"]
 "st_rsuite.date_input" = ["frontend/build/**/*"]

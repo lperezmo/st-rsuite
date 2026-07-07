@@ -10,7 +10,10 @@ import { fileURLToPath } from "node:url";
 import process from "node:process";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const isProd = process.env.NODE_ENV === "production";
+// Production is the default: a bare `npm run build` (locally or in CI) must
+// always produce minified bundles without sourcemaps. Dev builds are opt-in
+// via `npm run build:dev` / `npm run dev`, which set NODE_ENV=development.
+const isProd = process.env.NODE_ENV !== "development";
 const isWatch = process.argv.includes("--watch");
 
 const components = [
@@ -43,7 +46,14 @@ async function buildComponent(component) {
       ),
     },
     build: {
-      minify: isProd ? "esbuild" : false,
+      // Lib-mode ES output skips esbuild whitespace minification (Vite keeps
+      // pure annotations intact), so production uses terser for a full minify.
+      minify: isProd ? "terser" : false,
+      ...(isProd && {
+        terserOptions: {
+          compress: { drop_console: true, drop_debugger: true },
+        },
+      }),
       outDir,
       emptyOutDir: true,
       sourcemap: !isProd,
@@ -54,14 +64,6 @@ async function buildComponent(component) {
         formats: ["es"],
         fileName: "index-[hash]",
       },
-      ...(isProd && {
-        esbuild: {
-          drop: ["console", "debugger"],
-          minifyIdentifiers: true,
-          minifySyntax: true,
-          minifyWhitespace: true,
-        },
-      }),
     },
     logLevel: "info",
   });
