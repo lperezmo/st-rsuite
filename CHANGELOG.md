@@ -1,6 +1,14 @@
 # CHANGELOG
 
 
+## v0.4.0 (2026-07-07)
+
+### Chores
+
+- Bump demo app requirement to v0.3.6
+  ([`e637c51`](https://github.com/lperezmo/st-rsuite/commit/e637c51420a92fe8a3297a3d3623688d14846049))
+
+
 ## v0.3.6 (2026-07-07)
 
 ### Bug Fixes
@@ -33,6 +41,29 @@ Also fixes the 4 pre-existing frontend type errors this surfaced and adds a type
 
 - Bump demo app requirement to v0.3.5
   ([`6f1c5b1`](https://github.com/lperezmo/st-rsuite/commit/6f1c5b1e178e56db18613deb261864966ecc0a87))
+
+### Features
+
+- Declarative date constraints for the calendar pickers
+  ([`f9f9a52`](https://github.com/lperezmo/st-rsuite/commit/f9f9a52ca1d67dc5119b4e3e5e7d18aafdb8ce7f))
+
+date_picker and date_range_picker gain min_date, max_date, disabled_dates, disabled_weekdays,
+  limit_start_year, and limit_end_year. Even st.date_input has min/max; the pickers had no way to
+  restrict selectable dates at all.
+
+Callables cannot cross the Python/JS boundary, so the wrappers send plain serialized values and a
+  shared frontend helper (dateConstraints.ts) builds the RSuite shouldDisableDate predicate.
+  disabled_weekdays uses Python's Monday-0 numbering (converted from JS Sunday-0 in the predicate).
+  The keyboard-only date_input / date_range_input are intentionally excluded: RSuite has no calendar
+  there to disable.
+
+Also serialize a passed datetime as its .date() (a datetime previously produced a full timestamp
+  that the frontend date parser could not read), which resolves the dead branch in
+  date_picker._serialize.
+
+- test/test_date_constraints_e2e.py opens the calendar and asserts min/max, disabled_dates, and
+  disabled_weekdays render non-selectable cells while an in-range weekday stays selectable - README
+  and the showcase gain a constraints example
 
 
 ## v0.3.5 (2026-07-07)
