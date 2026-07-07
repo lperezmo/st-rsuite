@@ -31,6 +31,7 @@ def date_picker(
     show_week_numbers: bool = False,
     editable: bool = True,
     loading: bool = False,
+    help: str | None = None,
     min_date: date | str | None = None,
     max_date: date | str | None = None,
     disabled_dates: list[date | str] | None = None,
@@ -77,6 +78,9 @@ def date_picker(
         toggle-only (opens the calendar; no keyboard entry). Default True.
     loading : bool
         Show a loading-state indicator on the control. Default False.
+    help : str or None
+        Tooltip shown on an info marker next to the label (like Streamlit's
+        ``help=``). Requires a label to attach to.
     min_date : date or str or None
         Earliest selectable date (inclusive). Earlier dates are disabled.
     max_date : date or str or None
@@ -137,6 +141,7 @@ def date_picker(
             "showWeekNumbers": show_week_numbers,
             "editable": editable,
             "loading": loading,
+            "help": help,
             "minDate": _serialize(min_date),
             "maxDate": _serialize(max_date),
             "disabledDates": [_serialize(d) for d in (disabled_dates or [])],

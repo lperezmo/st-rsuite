@@ -1,8 +1,9 @@
-import { FC, useCallback, useMemo } from "react";
+import { FC, useCallback, useId, useMemo } from "react";
 import { FrontendRendererArgs } from "@streamlit/component-v2-lib";
 import { DatePicker as RsuiteDatePicker } from "rsuite";
 import { useSyncedValue, keyOfScalar } from "../shared/useSyncedValue";
 import { buildShouldDisableDate } from "../shared/dateConstraints";
+import { FieldLabel } from "../shared/FieldLabel";
 
 export type DatePickerState = {
   selected_date: string | null;
@@ -24,6 +25,7 @@ export type DatePickerData = {
   showWeekNumbers: boolean;
   editable: boolean;
   loading: boolean;
+  help?: string | null;
   minDate?: string | null;
   maxDate?: string | null;
   disabledDates?: string[];
@@ -73,6 +75,7 @@ const DatePickerComponent: FC<Props> = ({ data, setStateValue }) => {
     showWeekNumbers,
     editable,
     loading,
+    help,
     minDate,
     maxDate,
     disabledDates,
@@ -81,6 +84,8 @@ const DatePickerComponent: FC<Props> = ({ data, setStateValue }) => {
     limitEndYear,
     calendarDefaultDate,
   } = data;
+
+  const fieldId = useId();
 
   const [selected, emitSelected] = useSyncedValue<Date | null>(
     keyOfScalar(value),
@@ -114,19 +119,9 @@ const DatePickerComponent: FC<Props> = ({ data, setStateValue }) => {
 
   return (
     <div style={{ width: "100%", padding: "4px 0" }}>
-      {label && (
-        <label
-          style={{
-            display: "block",
-            marginBottom: 4,
-            fontSize: 14,
-            fontWeight: 500,
-          }}
-        >
-          {label}
-        </label>
-      )}
+      <FieldLabel htmlFor={fieldId} label={label} help={help} />
       <RsuiteDatePicker
+        id={fieldId}
         value={selected}
         onChange={handleChange}
         format={format}

@@ -29,6 +29,7 @@ def time_picker(
     show_meridiem: bool = False,
     editable: bool = True,
     loading: bool = False,
+    help: str | None = None,
     min_hour: int | None = None,
     max_hour: int | None = None,
     hidden_hours: list[int] | None = None,
@@ -69,6 +70,9 @@ def time_picker(
         toggle-only (opens the panel; no keyboard entry). Default True.
     loading : bool
         Show a loading-state indicator on the control. Default False.
+    help : str or None
+        Tooltip shown on an info marker next to the label (like Streamlit's
+        ``help=``). Requires a label to attach to.
     min_hour : int or None
         Earliest selectable hour (0-23, inclusive). Earlier hours are hidden
         from the panel.
@@ -119,6 +123,7 @@ def time_picker(
             "showMeridiem": show_meridiem,
             "editable": editable,
             "loading": loading,
+            "help": help,
             "minHour": min_hour,
             "maxHour": max_hour,
             "hiddenHours": hidden_hours or [],

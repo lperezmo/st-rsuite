@@ -22,6 +22,7 @@ with st.container(horizontal=True):
         label="Pick any date",
         value=date.today(),
         one_tap=True,
+        help="Click to open the calendar, or type the date.",
         disabled=disabled,
         key="dp_basic",
     )

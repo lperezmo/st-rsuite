@@ -1,4 +1,4 @@
-import { FC, useCallback, useMemo } from "react";
+import { FC, useCallback, useId, useMemo } from "react";
 import { FrontendRendererArgs } from "@streamlit/component-v2-lib";
 import { TimeRangePicker as RsuiteTimeRangePicker } from "rsuite";
 import type { DateRange } from "rsuite/DateRangePicker";
@@ -8,6 +8,7 @@ import {
   buildHideMinutes,
   buildHideSeconds,
 } from "../shared/timeConstraints";
+import { FieldLabel } from "../shared/FieldLabel";
 
 export type TimeRangePickerState = {
   start_time: string | null;
@@ -30,6 +31,7 @@ export type TimeRangePickerData = {
   showMeridiem: boolean;
   editable: boolean;
   loading: boolean;
+  help?: string | null;
   hiddenHours?: number[];
   hiddenMinutes?: number[];
   hiddenSeconds?: number[];
@@ -77,12 +79,15 @@ const TimeRangePickerComponent: FC<Props> = ({ data, setStateValue }) => {
     showMeridiem,
     editable,
     loading,
+    help,
     hiddenHours,
     hiddenMinutes,
     hiddenSeconds,
     minHour,
     maxHour,
   } = data;
+
+  const fieldId = useId();
 
   const [selected, emitSelected] = useSyncedValue<DateRange | null>(
     keyOfPair(startValue, endValue),
@@ -116,19 +121,9 @@ const TimeRangePickerComponent: FC<Props> = ({ data, setStateValue }) => {
 
   return (
     <div style={{ width: "100%", padding: "4px 0" }}>
-      {label && (
-        <label
-          style={{
-            display: "block",
-            marginBottom: 4,
-            fontSize: 14,
-            fontWeight: 500,
-          }}
-        >
-          {label}
-        </label>
-      )}
+      <FieldLabel htmlFor={fieldId} label={label} help={help} />
       <RsuiteTimeRangePicker
+        id={fieldId}
         value={selected}
         onChange={handleChange}
         format={effectiveFormat}

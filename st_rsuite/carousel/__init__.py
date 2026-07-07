@@ -51,6 +51,10 @@ def carousel(
         - 'alt' (str): image alt text
         - 'background' (str): background color (default '#8b5cf6')
         - 'color' (str): text color (default '#fff')
+
+        A non-URL 'src' is read from the local filesystem and inlined as a
+        base64 data URI, so 'src' must be a trusted path chosen by the app, not
+        unsanitized user input (it would otherwise be an arbitrary-file read).
     autoplay : bool
         Auto-transition between slides.
     autoplay_interval : int
