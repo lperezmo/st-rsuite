@@ -1,6 +1,33 @@
 # CHANGELOG
 
 
+## v0.6.0 (2026-07-07)
+
+### Chores
+
+- Bump demo app requirement to v0.5.0
+  ([`db72940`](https://github.com/lperezmo/st-rsuite/commit/db72940bedd5720b0d507857d7d2a553108e56aa))
+
+### Features
+
+- Daterangepicker shortcut presets and calendar default month
+  ([`4d625f0`](https://github.com/lperezmo/st-rsuite/commit/4d625f086254c5baa8aafe1c5bd213f148bca49e))
+
+date_range_picker gains ranges= (custom shortcut presets beside the calendar) and
+  default_calendar_value= (which month pair the panels open on). date_picker gains
+  calendar_default_date=.
+
+ranges follows RSuite's three-state contract: None keeps the built-in defaults (Today / Yesterday /
+  Last 7 days), an explicit list replaces them, and an empty list removes the sidebar. Each preset
+  is {"label", "value": (start, end)} with optional close_overlay and placement. A shared frontend
+  helper (rangePresets.ts) converts the serialized ISO pairs into the [Date, Date] presets RSuite
+  expects.
+
+- test/test_range_shortcuts_e2e.py opens the overlay, asserts the custom presets render, clicks one,
+  and checks the declared range round-trips to Python - README and the showcase gain a
+  shortcut-ranges example
+
+
 ## v0.5.0 (2026-07-07)
 
 ### Chores
