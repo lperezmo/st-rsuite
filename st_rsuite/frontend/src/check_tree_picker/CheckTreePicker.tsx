@@ -1,6 +1,7 @@
-import { FC, useCallback, useState } from "react";
+import { FC, useCallback } from "react";
 import { FrontendRendererArgs } from "@streamlit/component-v2-lib";
 import { CheckTreePicker as RsuiteCheckTreePicker } from "rsuite";
+import { useSyncedValue, keyOfList } from "../shared/useSyncedValue";
 
 export type CheckTreePickerState = {
   selected_values: string[];
@@ -60,14 +61,18 @@ const CheckTreePickerComponent: FC<Props> = ({ data, setStateValue }) => {
     uncheckableValues,
   } = data;
 
-  const [selected, setSelected] = useState<string[]>(value || []);
+  const [selected, emitSelected] = useSyncedValue<string[]>(
+    keyOfList(value),
+    () => value || []
+  );
 
   const handleChange = useCallback(
-    (newValues: string[]) => {
-      setSelected(newValues);
-      setStateValue("selected_values", newValues);
+    (newValues: (string | number)[]) => {
+      const vals = newValues.map(String);
+      emitSelected(vals);
+      setStateValue("selected_values", vals);
     },
-    [setStateValue]
+    [emitSelected, setStateValue]
   );
 
   return (

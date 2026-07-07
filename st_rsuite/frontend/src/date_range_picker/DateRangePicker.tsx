@@ -1,7 +1,8 @@
-import { FC, useCallback, useMemo, useState } from "react";
+import { FC, useCallback } from "react";
 import { FrontendRendererArgs } from "@streamlit/component-v2-lib";
 import { DateRangePicker as RsuiteDateRangePicker } from "rsuite";
 import type { DateRange } from "rsuite/DateRangePicker";
+import { useSyncedValue, keyOfPair } from "../shared/useSyncedValue";
 
 export type DateRangePickerState = {
   start_date: string | null;
@@ -72,27 +73,24 @@ const DateRangePickerComponent: FC<Props> = ({ data, setStateValue }) => {
     hoverRange,
   } = data;
 
-  const initialValue = useMemo<DateRange | null>(() => {
-    const s = parseDate(startValue);
-    const e = parseDate(endValue);
-    if (s && e) return [s, e];
-    return null;
-  }, [startValue, endValue]);
-
-  const [selected, setSelected] = useState<DateRange | null>(initialValue);
+  const [selected, emitSelected] = useSyncedValue<DateRange | null>(
+    keyOfPair(startValue, endValue),
+    () => {
+      const s = parseDate(startValue);
+      const e = parseDate(endValue);
+      return s && e ? [s, e] : null;
+    }
+  );
 
   const handleChange = useCallback(
     (newValue: DateRange | null) => {
-      setSelected(newValue);
-      if (newValue) {
-        setStateValue("start_date", toISODate(newValue[0]));
-        setStateValue("end_date", toISODate(newValue[1]));
-      } else {
-        setStateValue("start_date", null);
-        setStateValue("end_date", null);
-      }
+      const s = newValue ? toISODate(newValue[0]) : null;
+      const e = newValue ? toISODate(newValue[1]) : null;
+      emitSelected(newValue);
+      setStateValue("start_date", s);
+      setStateValue("end_date", e);
     },
-    [setStateValue]
+    [emitSelected, setStateValue]
   );
 
   return (

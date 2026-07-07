@@ -1,6 +1,7 @@
-import { FC, useCallback, useState } from "react";
+import { FC, useCallback } from "react";
 import { FrontendRendererArgs } from "@streamlit/component-v2-lib";
 import { MultiCascadeTree as RsuiteMultiCascadeTree } from "rsuite";
+import { useSyncedValue, keyOfList } from "../shared/useSyncedValue";
 
 export type MultiCascadeTreeState = {
   selected_values: string[];
@@ -44,19 +45,32 @@ const MultiCascadeTreeComponent: FC<Props> = ({ data, setStateValue }) => {
     uncheckableValues,
   } = data;
 
-  const [selected, setSelected] = useState<string[]>(value || []);
+  const [selected, emitSelected] = useSyncedValue<string[]>(
+    keyOfList(value),
+    () => value || []
+  );
 
   const handleChange = useCallback(
     (newValues: string[] | null) => {
       const vals = newValues || [];
-      setSelected(vals);
+      emitSelected(vals);
       setStateValue("selected_values", vals);
     },
-    [setStateValue]
+    [emitSelected, setStateValue]
   );
 
+  // MultiCascadeTree has no `disabled` prop (only per-item disabling), so honor
+  // the wrapper-level flag by blocking interaction and dimming the control.
   return (
-    <div style={{ width: "100%", padding: "4px 0" }}>
+    <div
+      style={{
+        width: "100%",
+        padding: "4px 0",
+        opacity: disabled ? 0.5 : 1,
+        pointerEvents: disabled ? "none" : "auto",
+      }}
+      aria-disabled={disabled || undefined}
+    >
       <RsuiteMultiCascadeTree
         data={cascadeData}
         value={selected}
@@ -65,7 +79,6 @@ const MultiCascadeTreeComponent: FC<Props> = ({ data, setStateValue }) => {
         searchable={searchable}
         columnWidth={columnWidth}
         columnHeight={columnHeight}
-        disabled={disabled}
         uncheckableItemValues={uncheckableValues || []}
       />
     </div>

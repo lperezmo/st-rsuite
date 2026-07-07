@@ -1,6 +1,7 @@
-import { FC, useCallback, useMemo, useState } from "react";
+import { FC, useCallback } from "react";
 import { FrontendRendererArgs } from "@streamlit/component-v2-lib";
 import { TimePicker as RsuiteTimePicker } from "rsuite";
+import { useSyncedValue, keyOfScalar } from "../shared/useSyncedValue";
 
 export type TimePickerState = {
   selected_time: string | null;
@@ -58,15 +59,18 @@ const TimePickerComponent: FC<Props> = ({ data, setStateValue }) => {
     showMeridiem,
   } = data;
 
-  const initialValue = useMemo(() => parseTime(value), [value]);
-  const [selected, setSelected] = useState<Date | null>(initialValue);
+  const [selected, emitSelected] = useSyncedValue<Date | null>(
+    keyOfScalar(value),
+    () => parseTime(value)
+  );
 
   const handleChange = useCallback(
     (newValue: Date | null) => {
-      setSelected(newValue);
-      setStateValue("selected_time", toISOTime(newValue));
+      const iso = toISOTime(newValue);
+      emitSelected(newValue);
+      setStateValue("selected_time", iso);
     },
-    [setStateValue]
+    [emitSelected, setStateValue]
   );
 
   // If showMeridiem is true, use 12-hour format

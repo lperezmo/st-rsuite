@@ -1,6 +1,7 @@
-import { FC, useCallback, useState } from "react";
+import { FC, useCallback } from "react";
 import { FrontendRendererArgs } from "@streamlit/component-v2-lib";
 import { RadioTile as RsuiteRadioTile, RadioTileGroup } from "rsuite";
+import { useSyncedValue, keyOfScalar } from "../shared/useSyncedValue";
 
 export type RadioTileState = {
   selected_value: string | null;
@@ -32,15 +33,18 @@ type Props = {
 const RadioTileComponent: FC<Props> = ({ data, setStateValue }) => {
   const { options, value, inline, disabled } = data;
 
-  const [selected, setSelected] = useState<string | null>(value);
+  const [selected, emitSelected] = useSyncedValue<string | null>(
+    keyOfScalar(value),
+    () => value
+  );
 
   const handleChange = useCallback(
     (newValue: string | number | undefined) => {
       const val = newValue != null ? String(newValue) : null;
-      setSelected(val);
+      emitSelected(val);
       setStateValue("selected_value", val);
     },
-    [setStateValue]
+    [emitSelected, setStateValue]
   );
 
   return (

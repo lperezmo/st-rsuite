@@ -1,6 +1,7 @@
-import { FC, useCallback, useState } from "react";
+import { FC, useCallback } from "react";
 import { FrontendRendererArgs } from "@streamlit/component-v2-lib";
 import { Carousel as RsuiteCarousel } from "rsuite";
+import { useSyncedValue } from "../shared/useSyncedValue";
 
 export type CarouselState = {
   active_index: number;
@@ -42,14 +43,17 @@ const CarouselComponent: FC<Props> = ({ data, setStateValue }) => {
     activeIndex,
   } = data;
 
-  const [active, setActive] = useState<number>(activeIndex || 0);
+  const [active, emitActive] = useSyncedValue<number>(
+    String(activeIndex || 0),
+    () => activeIndex || 0
+  );
 
   const handleSelect = useCallback(
     (index: number) => {
-      setActive(index);
+      emitActive(index);
       setStateValue("active_index", index);
     },
-    [setStateValue]
+    [emitActive, setStateValue]
   );
 
   return (

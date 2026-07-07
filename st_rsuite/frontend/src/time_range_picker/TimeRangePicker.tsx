@@ -1,7 +1,8 @@
-import { FC, useCallback, useMemo, useState } from "react";
+import { FC, useCallback } from "react";
 import { FrontendRendererArgs } from "@streamlit/component-v2-lib";
 import { TimeRangePicker as RsuiteTimeRangePicker } from "rsuite";
 import type { DateRange } from "rsuite/DateRangePicker";
+import { useSyncedValue, keyOfPair } from "../shared/useSyncedValue";
 
 export type TimeRangePickerState = {
   start_time: string | null;
@@ -64,27 +65,24 @@ const TimeRangePickerComponent: FC<Props> = ({ data, setStateValue }) => {
     showMeridiem,
   } = data;
 
-  const initialValue = useMemo<DateRange | null>(() => {
-    const s = parseTime(startValue);
-    const e = parseTime(endValue);
-    if (s && e) return [s, e];
-    return null;
-  }, [startValue, endValue]);
-
-  const [selected, setSelected] = useState<DateRange | null>(initialValue);
+  const [selected, emitSelected] = useSyncedValue<DateRange | null>(
+    keyOfPair(startValue, endValue),
+    () => {
+      const s = parseTime(startValue);
+      const e = parseTime(endValue);
+      return s && e ? [s, e] : null;
+    }
+  );
 
   const handleChange = useCallback(
     (newValue: DateRange | null) => {
-      setSelected(newValue);
-      if (newValue) {
-        setStateValue("start_time", toISOTime(newValue[0]));
-        setStateValue("end_time", toISOTime(newValue[1]));
-      } else {
-        setStateValue("start_time", null);
-        setStateValue("end_time", null);
-      }
+      const s = newValue ? toISOTime(newValue[0]) : null;
+      const e = newValue ? toISOTime(newValue[1]) : null;
+      emitSelected(newValue);
+      setStateValue("start_time", s);
+      setStateValue("end_time", e);
     },
-    [setStateValue]
+    [emitSelected, setStateValue]
   );
 
   const effectiveFormat = showMeridiem && format === "HH:mm" ? "hh:mm aa" : format;
