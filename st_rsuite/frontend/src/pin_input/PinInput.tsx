@@ -1,6 +1,7 @@
-import { FC, useCallback, useState } from "react";
+import { FC, useCallback } from "react";
 import { FrontendRendererArgs } from "@streamlit/component-v2-lib";
 import { PinInput as RsuitePinInput } from "rsuite";
+import { useSyncedValue, keyOfScalar } from "../shared/useSyncedValue";
 
 export type PinInputState = {
   pin_value: string;
@@ -42,14 +43,17 @@ const PinInputComponent: FC<Props> = ({ data, setStateValue }) => {
     attached,
   } = data;
 
-  const [pinValue, setPinValue] = useState<string>(value || "");
+  const [pinValue, emitPinValue] = useSyncedValue<string>(
+    keyOfScalar(value),
+    () => value || ""
+  );
 
   const handleChange = useCallback(
     (newValue: string) => {
-      setPinValue(newValue);
+      emitPinValue(newValue);
       setStateValue("pin_value", newValue);
     },
-    [setStateValue]
+    [emitPinValue, setStateValue]
   );
 
   // Map string type to PinInput's type prop

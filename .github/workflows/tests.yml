@@ -15,6 +15,24 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  # TypeScript type check of the frontend. Runs independently of the build
+  # (Vite/esbuild transpiles without type-checking), so this is the only gate
+  # that catches type regressions such as passing a prop RSuite does not accept.
+  typecheck:
+    name: Typecheck frontend
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v6
+        with:
+          node-version: '22'
+          cache: 'npm'
+          cache-dependency-path: st_rsuite/frontend/package-lock.json
+      - run: npm ci
+        working-directory: st_rsuite/frontend
+      - run: npm run typecheck
+        working-directory: st_rsuite/frontend
+
   # Build the frontend once and share the built assets with every test leg.
   # build/ is gitignored, so without this the package can't register components.
   build-frontend:

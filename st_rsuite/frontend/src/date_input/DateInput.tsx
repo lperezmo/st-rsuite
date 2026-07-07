@@ -1,6 +1,7 @@
-import { FC, useCallback, useMemo, useState } from "react";
+import { FC, useCallback } from "react";
 import { FrontendRendererArgs } from "@streamlit/component-v2-lib";
 import { DateInput as RsuiteDateInput } from "rsuite";
+import { useSyncedValue, keyOfScalar } from "../shared/useSyncedValue";
 
 export type DateInputState = {
   selected_date: string | null;
@@ -32,22 +33,27 @@ function toISODate(d: Date | null): string | null {
   return `${y}-${m}-${day}`;
 }
 
+function parseDate(val: string | null): Date | null {
+  if (!val) return null;
+  const d = new Date(val + "T00:00:00");
+  return isNaN(d.getTime()) ? null : d;
+}
+
 const DateInputComponent: FC<Props> = ({ data, setStateValue }) => {
   const { label, value, format, size, placeholder, disabled } = data;
 
-  const initialValue = useMemo(
-    () => (value ? new Date(value + "T00:00:00") : null),
-    [value]
+  const [selected, emitSelected] = useSyncedValue<Date | null>(
+    keyOfScalar(value),
+    () => parseDate(value)
   );
-
-  const [selected, setSelected] = useState<Date | null>(initialValue);
 
   const handleChange = useCallback(
     (newValue: Date | null) => {
-      setSelected(newValue);
-      setStateValue("selected_date", toISODate(newValue));
+      const iso = toISODate(newValue);
+      emitSelected(newValue);
+      setStateValue("selected_date", iso);
     },
-    [setStateValue]
+    [emitSelected, setStateValue]
   );
 
   return (

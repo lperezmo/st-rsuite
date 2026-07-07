@@ -1197,7 +1197,7 @@ wheels = [
 
 [[package]]
 name = "st-rsuite"
-version = "0.3.2"
+version = "0.3.4"
 source = { editable = "." }
 dependencies = [
     { name = "streamlit" },
@@ -1213,7 +1213,7 @@ dev = [
 ]
 
 [package.metadata]
-requires-dist = [{ name = "streamlit", specifier = ">=1.53" }]
+requires-dist = [{ name = "streamlit", specifier = ">=1.51" }]
 
 [package.metadata.requires-dev]
 dev = [
