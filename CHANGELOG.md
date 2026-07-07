@@ -1,6 +1,37 @@
 # CHANGELOG
 
 
+## v0.7.0 (2026-07-07)
+
+### Chores
+
+- Bump demo app requirement to v0.6.0
+  ([`14bc436`](https://github.com/lperezmo/st-rsuite/commit/14bc436de3fdd6ad3f3a3013ceedf8ba5436902d))
+
+### Features
+
+- Associate labels with controls and add help tooltips
+  ([`c437b65`](https://github.com/lperezmo/st-rsuite/commit/c437b656b7e72c2cce73b85b9448ed8b8dc9183d))
+
+The six labeled date/time components rendered a bare <label> with no htmlFor, so screen readers did
+  not connect it to the control and clicking the label did nothing. A shared FieldLabel now renders
+  the label with htmlFor tied to the control's id (via React useId, forwarded to the RSuite input),
+  which the e2e confirms by checking a label click focuses the input.
+
+FieldLabel also adds an optional help tooltip, exposed as help= on all six components to match the
+  st.* builtin convention: an info marker beside the label with the help text as its title.
+
+Also documents that carousel item 'src' is read from the local filesystem and inlined, so it must be
+  a trusted path, not unsanitized user input (a review finding).
+
+Deferred (attempted, both need real work, both low priority): RTL layout (the CustomProvider rtl
+  prop does not flip the portaled popups in the CCv2 no-shadow-DOM setup) and a high-contrast theme
+  (no reliable host signal to auto-detect; wants an explicit opt-in). Both noted in the plan.
+
+- test/test_a11y_e2e.py asserts every labeled component associates its label to a present control id
+  and renders the help tooltip
+
+
 ## v0.6.0 (2026-07-07)
 
 ### Chores
