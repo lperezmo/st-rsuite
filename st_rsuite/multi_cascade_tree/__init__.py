@@ -4,13 +4,9 @@ from __future__ import annotations
 
 from typing import Callable
 
-from st_rsuite._compat import component
+from st_rsuite._component import bind_kind
 
-_component = component(
-    "st-rsuite.multi_cascade_tree",
-    js="index-*.js",
-    html='<div class="react-root"></div>',
-)
+_component = bind_kind("multi_cascade_tree")
 
 
 def multi_cascade_tree(

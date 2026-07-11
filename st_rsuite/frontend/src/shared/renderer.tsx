@@ -4,30 +4,57 @@
  * With isolate_styles=False, the component renders directly in the DOM (no
  * Shadow DOM). RSuite styles inject into document.head and popups portal
  * to document.body — both work correctly in this mode.
+ *
+ * Locales load lazily: each RSuite locale is its own chunk (see build.mjs),
+ * so a page downloads only the locale it actually renders. The first paint of
+ * a localized widget goes out with RSuite's built-in English strings and
+ * re-renders when the locale chunk arrives.
  */
 import {
   FrontendRenderer,
   FrontendRendererArgs,
 } from "@streamlit/component-v2-lib";
-import { StrictMode, FC } from "react";
+import { ComponentProps, StrictMode, FC } from "react";
 import { createRoot, Root } from "react-dom/client";
 import { CustomProvider } from "rsuite";
-import {
-  arEG, caES, csCZ, daDK, deDE, enGB, enUS, esAR, esES, faIR, fiFI, frFR,
-  guIN, huHU, itIT, jaJP, kkKZ, koKR, neNP, nlNL, plPL, ptBR, ruRU, svSE,
-  thTH, trTR, ukUA, zhCN, zhTW,
-} from "rsuite/locales";
 import { getStreamlitRsuiteTheme } from "./theme";
 
-// Map Python-side locale strings to RSuite locale objects
-const localeMap: Record<string, typeof enUS> = {
-  ar_EG: arEG, ca_ES: caES, cs_CZ: csCZ, da_DK: daDK, de_DE: deDE,
-  en_GB: enGB, en_US: enUS, es_AR: esAR, es_ES: esES, fa_IR: faIR,
-  fi_FI: fiFI, fr_FR: frFR, gu_IN: guIN, hu_HU: huHU, it_IT: itIT,
-  ja_JP: jaJP, kk_KZ: kkKZ, ko_KR: koKR, ne_NP: neNP, nl_NL: nlNL,
-  pl_PL: plPL, pt_BR: ptBR, ru_RU: ruRU, sv_SE: svSE, th_TH: thTH,
-  tr_TR: trTR, uk_UA: ukUA, zh_CN: zhCN, zh_TW: zhTW,
-};
+type RsuiteLocale = ComponentProps<typeof CustomProvider>["locale"];
+
+// Map Python-side locale strings to lazy locale imports. Static literal paths
+// keep each locale statically analyzable so Rollup emits one chunk per locale.
+const localeLoaders: Record<string, () => Promise<{ default: RsuiteLocale }>> =
+  {
+    ar_EG: () => import("rsuite/locales/ar_EG"),
+    ca_ES: () => import("rsuite/locales/ca_ES"),
+    cs_CZ: () => import("rsuite/locales/cs_CZ"),
+    da_DK: () => import("rsuite/locales/da_DK"),
+    de_DE: () => import("rsuite/locales/de_DE"),
+    en_GB: () => import("rsuite/locales/en_GB"),
+    en_US: () => import("rsuite/locales/en_US"),
+    es_AR: () => import("rsuite/locales/es_AR"),
+    es_ES: () => import("rsuite/locales/es_ES"),
+    fa_IR: () => import("rsuite/locales/fa_IR"),
+    fi_FI: () => import("rsuite/locales/fi_FI"),
+    fr_FR: () => import("rsuite/locales/fr_FR"),
+    gu_IN: () => import("rsuite/locales/gu_IN"),
+    hu_HU: () => import("rsuite/locales/hu_HU"),
+    it_IT: () => import("rsuite/locales/it_IT"),
+    ja_JP: () => import("rsuite/locales/ja_JP"),
+    kk_KZ: () => import("rsuite/locales/kk_KZ"),
+    ko_KR: () => import("rsuite/locales/ko_KR"),
+    ne_NP: () => import("rsuite/locales/ne_NP"),
+    nl_NL: () => import("rsuite/locales/nl_NL"),
+    pl_PL: () => import("rsuite/locales/pl_PL"),
+    pt_BR: () => import("rsuite/locales/pt_BR"),
+    ru_RU: () => import("rsuite/locales/ru_RU"),
+    sv_SE: () => import("rsuite/locales/sv_SE"),
+    th_TH: () => import("rsuite/locales/th_TH"),
+    tr_TR: () => import("rsuite/locales/tr_TR"),
+    uk_UA: () => import("rsuite/locales/uk_UA"),
+    zh_CN: () => import("rsuite/locales/zh_CN"),
+    zh_TW: () => import("rsuite/locales/zh_TW"),
+  };
 
 // Fallback from language code to default locale for that language
 const langFallback: Record<string, string> = {
@@ -39,37 +66,48 @@ const langFallback: Record<string, string> = {
   zh: "zh_CN",
 };
 
-// Detect browser locale and map to closest RSuite locale key.
-// e.g. "ja-JP" → "ja_JP", "ja" → "ja_JP", "zh-TW" → "zh_TW"
-function detectBrowserLocale(): typeof enUS | undefined {
+/**
+ * Resolve the locale key to load: an explicit key from Python wins, otherwise
+ * the browser locale maps to the closest RSuite key.
+ * e.g. "ja-JP" → "ja_JP", "ja" → "ja_JP", "zh-TW" → "zh_TW"
+ */
+function resolveLocaleKey(explicit: string | undefined): string | undefined {
+  if (explicit) return localeLoaders[explicit] ? explicit : undefined;
   const tag = navigator?.language;
   if (!tag) return undefined;
   // Try exact match: "ja-JP" → "ja_JP"
   const exact = tag.replace("-", "_");
-  if (localeMap[exact]) return localeMap[exact];
+  if (localeLoaders[exact]) return exact;
   // Try language-only fallback: "ja" → "ja_JP"
   const lang = tag.split("-")[0].toLowerCase();
   const fallbackKey = langFallback[lang];
-  return fallbackKey ? localeMap[fallbackKey] : undefined;
+  return fallbackKey && localeLoaders[fallbackKey] ? fallbackKey : undefined;
 }
 
-const browserLocale = detectBrowserLocale();
+// Locales already fetched this page; shared across every widget instance.
+const loadedLocales = new Map<string, RsuiteLocale>();
 
 const reactRoots: WeakMap<FrontendRendererArgs["parentElement"], Root> =
   new WeakMap();
 
+/** Props the wrapped React component receives from the renderer. */
+export type RendererProps<
+  TState extends Record<string, unknown> = Record<string, unknown>,
+  TData extends Record<string, unknown> = Record<string, unknown>,
+> = {
+  data: TData;
+  setStateValue: FrontendRendererArgs<TState, TData>["setStateValue"];
+};
+
 /**
  * Creates a FrontendRenderer that wraps a React component with RSuite CustomProvider.
- * Handles root management, theme injection, and cleanup.
+ * Handles root management, theme injection, locale loading, and cleanup.
  */
 export function createRsuiteRenderer<
   TState extends Record<string, unknown>,
   TData extends Record<string, unknown>,
 >(
-  Component: FC<{
-    data: TData;
-    setStateValue: FrontendRendererArgs<TState, TData>["setStateValue"];
-  }>
+  Component: FC<RendererProps<TState, TData>>
 ): FrontendRenderer<TState, TData> {
   return (args) => {
     const { data, parentElement, setStateValue } = args;
@@ -86,16 +124,31 @@ export function createRsuiteRenderer<
     }
 
     const theme = getStreamlitRsuiteTheme();
-    const locale = (data as Record<string, unknown>).locale as string | undefined;
-    const rsuiteLocale = locale ? localeMap[locale] : browserLocale;
+    const explicit = (data as Record<string, unknown>).locale as
+      | string
+      | undefined;
+    const localeKey = resolveLocaleKey(explicit);
 
-    reactRoot.render(
-      <StrictMode>
-        <CustomProvider theme={theme} locale={rsuiteLocale}>
-          <Component data={data} setStateValue={setStateValue} />
-        </CustomProvider>
-      </StrictMode>
-    );
+    const renderTree = () => {
+      const locale = localeKey ? loadedLocales.get(localeKey) : undefined;
+      reactRoot!.render(
+        <StrictMode>
+          <CustomProvider theme={theme} locale={locale}>
+            <Component data={data} setStateValue={setStateValue} />
+          </CustomProvider>
+        </StrictMode>
+      );
+    };
+
+    if (localeKey && !loadedLocales.has(localeKey)) {
+      localeLoaders[localeKey]().then((mod) => {
+        loadedLocales.set(localeKey, mod.default);
+        // Skip the re-render if this instance unmounted while the chunk loaded.
+        if (reactRoots.get(parentElement) === reactRoot) renderTree();
+      });
+    }
+
+    renderTree();
 
     return () => {
       const root = reactRoots.get(parentElement);

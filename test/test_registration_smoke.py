@@ -1,12 +1,14 @@
-"""Fast, browser-less guard that a real ``streamlit run`` would register every
-st-rsuite component on the installed Streamlit.
+"""Fast, browser-less guard that a real ``streamlit run`` would register the
+shared st-rsuite component on the installed Streamlit.
 
 This mirrors what the Streamlit runtime does at startup: it calls
 ``discover_and_register_components`` (see ``streamlit/runtime/runtime.py``) and
-then resolves each component's ``asset_dir``. If discovery does not register a
-component, a real app raises the reporter's
-``Component 'st-rsuite.<name>' must be declared in pyproject.toml with asset_dir``
-error. We assert all 13 resolve, and that the installed Streamlit lets the compat
+then resolves the component's ``asset_dir``. If discovery does not register it,
+a real app raises the reporter's
+``Component 'st-rsuite.rsuite' must be declared in pyproject.toml with asset_dir``
+error for every widget (all 13 render through this single registration; the
+frontend routes on the ``kind`` discriminator). We assert it resolves, that every
+widget module binds a kind, and that the installed Streamlit lets the compat
 layer disable style isolation (at registration on Streamlit >= 1.53, or on the
 per-call renderer on 1.51 / 1.52).
 
@@ -26,7 +28,7 @@ from streamlit.components.v2.get_bidi_component_manager import (
 import st_rsuite  # noqa: F401  (import must not raise)
 from st_rsuite import _compat
 
-COMPONENTS = [
+WIDGETS = [
     "date_picker",
     "date_range_picker",
     "time_picker",
@@ -69,7 +71,7 @@ def test_compat_shim_registers_without_error():
     assert callable(renderer)
 
 
-def test_discovery_registers_all_components():
+def test_discovery_registers_shared_component():
     mgr = get_bidi_component_manager()
     try:
         mgr.discover_and_register_components(start_file_watching=False)
@@ -77,12 +79,50 @@ def test_discovery_registers_all_components():
         # Older signatures without the keyword argument.
         mgr.discover_and_register_components()
 
-    missing = [
-        name
-        for name in COMPONENTS
-        if mgr.get_component_asset_root(f"st-rsuite.{name}") is None
-    ]
-    assert not missing, (
-        f"discovery did not register {missing} on Streamlit {st.__version__}; "
-        "a real app would raise 'must be declared ... with asset_dir' for these"
+    assert mgr.get_component_asset_root("st-rsuite.rsuite") is not None, (
+        f"discovery did not register st-rsuite.rsuite on Streamlit "
+        f"{st.__version__}; a real app would raise 'must be declared ... with "
+        "asset_dir' for every widget"
     )
+
+
+def test_every_widget_binds_a_kind():
+    """Each widget module's _component must inject its own kind so the shared
+    frontend bundle dispatches to the right React component.
+
+    File-backed registration raises outside a real ``streamlit run`` (pytest
+    never runs asset discovery), so the shared registration is stubbed BEFORE
+    st_rsuite._component first imports; the widget modules then bind their
+    kinds against the stub.
+    """
+    import importlib
+    import sys
+    from unittest.mock import patch
+
+    calls: list[dict] = []
+
+    def fake_registration(name, **kwargs):
+        assert name == "st-rsuite.rsuite"
+
+        def render(**call_kwargs):
+            calls.append(call_kwargs)
+
+        return render
+
+    # Force a clean import of the shared component and the widget modules so
+    # they wire up against the stub, whatever ran earlier in the session.
+    for mod in ["st_rsuite._component", *(f"st_rsuite.{w}" for w in WIDGETS)]:
+        sys.modules.pop(mod, None)
+
+    with patch.object(_compat, "component", fake_registration):
+        for name in WIDGETS:
+            module = importlib.import_module(f"st_rsuite.{name}")
+            calls.clear()
+            module._component(data={"probe": 1}, key="k")
+            assert len(calls) == 1, f"{name} did not call the shared component"
+            sent = calls[0]["data"]
+            assert sent["kind"] == name, (
+                f"{name} sent kind={sent.get('kind')!r}; the frontend would "
+                "dispatch to the wrong widget"
+            )
+            assert sent["probe"] == 1, f"{name} dropped the caller's data"

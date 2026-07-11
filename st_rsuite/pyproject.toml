@@ -2,54 +2,8 @@
 name = "st-rsuite"
 version = "0.7.0"
 
+# One component (one asset_dir, one bundle) serves every widget; the frontend
+# routes on the `kind` discriminator in `data`. See st_rsuite/_component.py.
 [[tool.streamlit.component.components]]
-name = "date_input"
-asset_dir = "date_input/frontend/build"
-
-[[tool.streamlit.component.components]]
-name = "date_picker"
-asset_dir = "date_picker/frontend/build"
-
-[[tool.streamlit.component.components]]
-name = "date_range_input"
-asset_dir = "date_range_input/frontend/build"
-
-[[tool.streamlit.component.components]]
-name = "date_range_picker"
-asset_dir = "date_range_picker/frontend/build"
-
-[[tool.streamlit.component.components]]
-name = "time_picker"
-asset_dir = "time_picker/frontend/build"
-
-[[tool.streamlit.component.components]]
-name = "time_range_picker"
-asset_dir = "time_range_picker/frontend/build"
-
-[[tool.streamlit.component.components]]
-name = "radio_tile"
-asset_dir = "radio_tile/frontend/build"
-
-[[tool.streamlit.component.components]]
-name = "check_tree"
-asset_dir = "check_tree/frontend/build"
-
-[[tool.streamlit.component.components]]
-name = "check_tree_picker"
-asset_dir = "check_tree_picker/frontend/build"
-
-[[tool.streamlit.component.components]]
-name = "multi_cascade_tree"
-asset_dir = "multi_cascade_tree/frontend/build"
-
-[[tool.streamlit.component.components]]
-name = "carousel"
-asset_dir = "carousel/frontend/build"
-
-[[tool.streamlit.component.components]]
-name = "timeline"
-asset_dir = "timeline/frontend/build"
-
-[[tool.streamlit.component.components]]
-name = "pin_input"
-asset_dir = "pin_input/frontend/build"
+name = "rsuite"
+asset_dir = "frontend/build"

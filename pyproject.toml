@@ -54,20 +54,7 @@ include-package-data = true
 "*" = ["*.js.map"]
 
 [tool.setuptools.package-data]
-"st_rsuite" = ["pyproject.toml"]
-"st_rsuite.date_input" = ["frontend/build/**/*"]
-"st_rsuite.date_picker" = ["frontend/build/**/*"]
-"st_rsuite.date_range_input" = ["frontend/build/**/*"]
-"st_rsuite.date_range_picker" = ["frontend/build/**/*"]
-"st_rsuite.time_picker" = ["frontend/build/**/*"]
-"st_rsuite.time_range_picker" = ["frontend/build/**/*"]
-"st_rsuite.radio_tile" = ["frontend/build/**/*"]
-"st_rsuite.check_tree" = ["frontend/build/**/*"]
-"st_rsuite.check_tree_picker" = ["frontend/build/**/*"]
-"st_rsuite.multi_cascade_tree" = ["frontend/build/**/*"]
-"st_rsuite.carousel" = ["frontend/build/**/*"]
-"st_rsuite.timeline" = ["frontend/build/**/*"]
-"st_rsuite.pin_input" = ["frontend/build/**/*"]
+"st_rsuite" = ["pyproject.toml", "frontend/build/**/*"]
 
 [tool.semantic_release]
 version_toml = [

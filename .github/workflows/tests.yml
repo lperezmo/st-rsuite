@@ -49,7 +49,7 @@ jobs:
         working-directory: st_rsuite/frontend
       - name: Assert production build
         run: bash scripts/assert_prod_build.sh
-      - run: tar czf frontend-build.tgz st_rsuite/*/frontend/build
+      - run: tar czf frontend-build.tgz st_rsuite/frontend/build
       - uses: actions/upload-artifact@v7
         with:
           name: frontend-build
@@ -57,8 +57,9 @@ jobs:
           retention-days: 1
 
   # Fast, browser-less guard across every supported Streamlit minor: a real
-  # `streamlit run` would register all 13 components, and the compat layer can
-  # disable style isolation (at registration on >=1.53, call site on 1.51/1.52).
+  # `streamlit run` would register the shared component every widget renders
+  # through, and the compat layer can disable style isolation (at registration
+  # on >=1.53, call site on 1.51/1.52).
   smoke:
     name: Smoke (Streamlit ${{ matrix.streamlit || 'latest' }})
     needs: build-frontend
@@ -123,7 +124,7 @@ jobs:
           fi
       - run: uv run --no-sync playwright install --with-deps chromium
       - run: uv run --no-sync python -c "import streamlit; print('streamlit', streamlit.__version__)"
-      - run: uv run --no-sync pytest test/test_ccv2_e2e.py -v
+      - run: uv run --no-sync pytest test/test_ccv2_e2e.py test/test_single_bundle_e2e.py -v
       - uses: actions/upload-artifact@v7
         if: failure()
         with:
@@ -153,18 +154,21 @@ jobs:
       - name: Assert wheel ships the manifest and built assets
         run: |
           uv run --no-project python - <<'PY'
-          import glob, zipfile
+          import fnmatch, glob, zipfile
           whl = sorted(glob.glob("dist/*.whl"))[-1]
           names = set(zipfile.ZipFile(whl).namelist())
           assert "st_rsuite/pyproject.toml" in names, "wheel is missing st_rsuite/pyproject.toml"
-          components = [
-              "date_picker", "date_range_picker", "time_picker", "time_range_picker",
-              "date_input", "date_range_input", "radio_tile", "check_tree",
-              "check_tree_picker", "multi_cascade_tree", "carousel", "timeline", "pin_input",
-          ]
-          for c in components:
-              prefix = f"st_rsuite/{c}/frontend/build/"
-              assert any(n.startswith(prefix) and n.endswith(".js") for n in names), \
-                  f"wheel is missing built JS for {c}"
-          print(f"OK: {whl} ships the manifest and built JS for all {len(components)} components")
+          prefix = "st_rsuite/frontend/build/"
+          built = [n[len(prefix):] for n in names if n.startswith(prefix)]
+          entries = fnmatch.filter(built, "index-*.js")
+          assert len(entries) == 1, \
+              f"wheel must ship exactly one index-*.js entry (js glob), found {entries}"
+          locales = fnmatch.filter(built, "chunk-*.js")
+          assert locales, "wheel is missing the shared/locale chunks"
+          maps = fnmatch.filter(built, "*.js.map")
+          assert not maps, f"wheel must not ship sourcemaps, found {maps}"
+          stale = [n for n in names if "/frontend/" in n and not n.startswith(prefix)]
+          assert not stale, \
+              f"wheel ships stale per-component frontend files (wipe build/lib): {stale[:5]}"
+          print(f"OK: {whl} ships the manifest, one entry, and {len(locales)} chunks")
           PY

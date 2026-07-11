@@ -6,8 +6,9 @@ RSuite renders `rs-*` elements inside it. The fixture app echoes each return
 value so we can assert the Python <-> JS round-trip.
 
 This is the authoritative regression guard for the reporter's bug
-(`Component 'st-rsuite.<name>' must be declared ... with asset_dir`): if a
-component fails to register on a given Streamlit version it never mounts here.
+(`Component 'st-rsuite.rsuite' must be declared ... with asset_dir`): if the
+shared component fails to register on a given Streamlit version, nothing
+mounts here.
 """
 
 from pathlib import Path
@@ -63,8 +64,8 @@ def streamlit_app():
 def go_to_app(page: Page, streamlit_app: StreamlitRunner):
     page.goto(streamlit_app.server_url)
     # Wait for the whole first script run to finish: the LAST component renders
-    # and echoes its value. Each of the 13 components loads a ~1.3MB JS bundle,
-    # so the first render can take a while; asserting earlier races the render.
+    # and echoes its value. All 13 widgets share one bundle, but the first
+    # render still takes a while; asserting earlier races the render.
     expect(page.get_by_test_id("echo-pin_input")).to_contain_text("123456", timeout=60000)
     expect(page.locator(".st-key-pin_input .stBidiComponent")).to_be_attached()
 

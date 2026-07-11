@@ -564,6 +564,8 @@ date_picker(label="Elegir fecha", locale="es_ES", one_tap=True, key="es")
 
 **Available locales:** `ar_EG`, `ca_ES`, `cs_CZ`, `da_DK`, `de_DE`, `en_GB`, `en_US`, `es_AR`, `es_ES`, `fa_IR`, `fi_FI`, `fr_FR`, `gu_IN`, `hu_HU`, `it_IT`, `ja_JP`, `kk_KZ`, `ko_KR`, `ne_NP`, `nl_NL`, `pl_PL`, `pt_BR`, `ru_RU`, `sv_SE`, `th_TH`, `tr_TR`, `uk_UA`, `zh_CN`, `zh_TW`
 
+Locales load lazily: a page downloads only the locale it actually renders (a few KB), never the whole set.
+
 ## Running the example
 
 ```bash
@@ -591,7 +593,7 @@ uv run streamlit run examples/showcase.py
 
 ## Troubleshooting
 
-**`streamlit.errors.StreamlitAPIException: Component 'st-rsuite.<name>' must be declared in pyproject.toml with asset_dir to use file-backed js`**
+**`streamlit.errors.StreamlitAPIException: Component 'st-rsuite.rsuite' must be declared in pyproject.toml with asset_dir to use file-backed js`**
 
 Streamlit could not find st-rsuite's bundled frontend assets when it started. Check two things:
 
