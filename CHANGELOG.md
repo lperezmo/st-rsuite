@@ -1,6 +1,33 @@
 # CHANGELOG
 
 
+## v0.7.1 (2026-07-11)
+
+### Chores
+
+- Bump demo app requirement to v0.7.0
+  ([`3497c5f`](https://github.com/lperezmo/st-rsuite/commit/3497c5f5ade5e2b484bf4c8d5660c097792f274d))
+
+### Performance Improvements
+
+- Single-bundle architecture
+  ([`ffe50f7`](https://github.com/lperezmo/st-rsuite/commit/ffe50f720eb87c8b4932183121d34724f0d2fe67))
+
+Register ONE CCv2 component (st-rsuite.rsuite) serving every widget from a single asset_dir; each
+  widget module injects a kind discriminator into data via bind_kind and the bundle entry routes it
+  to the matching React component. Public Python API unchanged.
+
+- One Vite build: 12.52 MB of per-widget JS (13 copies of React, RSuite, and the injected
+  stylesheet) collapses to 1.23 MB on disk; the wheel drops from 2.78 MB to 0.35 MB. - RSuite
+  locales split into lazy chunks (chunk-<locale>-*.js) so a page downloads only the locale it
+  renders; chunk names stay out of the js=index-*.js glob, which must match exactly one file. - A
+  page mixing widgets fetches the entry bundle once instead of once per widget type; the new e2e
+  asserts the single fetch and that the ja_JP chunk loads and localizes the calendar when served
+  over the component asset route. - Size guard and wheel-contents checks updated for the new layout,
+  including a guard against stale per-component files leaking in from a cached setuptools build/lib
+  staging dir.
+
+
 ## v0.7.0 (2026-07-07)
 
 ### Chores
