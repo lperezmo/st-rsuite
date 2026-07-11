@@ -5,14 +5,9 @@ from __future__ import annotations
 from datetime import time
 from typing import Callable
 
-from st_rsuite._compat import component
+from st_rsuite._component import bind_kind
 
-_component = component(
-    "st-rsuite.time_range_picker",
-    js="index-*.js",
-
-    html='<div class="react-root"></div>',
-)
+_component = bind_kind("time_range_picker")
 
 
 def time_range_picker(

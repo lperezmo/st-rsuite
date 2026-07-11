@@ -2,13 +2,9 @@
 
 from __future__ import annotations
 
-from st_rsuite._compat import component
+from st_rsuite._component import bind_kind
 
-_component = component(
-    "st-rsuite.timeline",
-    js="index-*.js",
-    html='<div class="react-root"></div>',
-)
+_component = bind_kind("timeline")
 
 
 def timeline(
