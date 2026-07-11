@@ -1,6 +1,33 @@
 # CHANGELOG
 
 
+## v0.9.0 (2026-07-11)
+
+### Chores
+
+- Bump demo app requirement to v0.8.0
+  ([`9a220eb`](https://github.com/lperezmo/st-rsuite/commit/9a220ebe196cd4674daee02b035470f664f05456))
+
+### Features
+
+- Cascader and tree_picker
+  ([`9cd0054`](https://github.com/lperezmo/st-rsuite/commit/9cd0054437c07b979349ca7a5d540e895897c135))
+
+Completes the tree family with single-select counterparts: cascader (sibling of multi_cascade_tree)
+  and tree_picker (sibling of check_tree_picker). Both return str | None, carry label/help a11y via
+  FieldLabel, disabled_items=, locale=, and two-way value sync.
+
+- cascader: column-by-column navigation, parent_selectable= to allow non-leaf answers, searchable,
+  column_width/height. - tree_picker: searchable dropdown tree with virtualized=,
+  default_expand_all, show_indent_line, only_leaf_selectable, height. - Registry entries in the
+  shared bundle; shared chunk 637 -> 662 KB for both widgets together. - New e2e
+  (test_cascader_tree_e2e.py): cascade column navigation round-trips a leaf value, tree leaf click
+  round-trips, and a branch click under only_leaf_selectable does not change the selection. ccv2 e2e
+  and smoke suites extended to 17 widgets. - Showcase app: new Trees > Cascader and TreePicker page
+  with leaf-only vs parent-selectable cascaders, expanded and leaf-only trees, and usage code
+  snippets. - README: tree table rows + API sections for both widgets.
+
+
 ## v0.8.0 (2026-07-11)
 
 ### Chores
