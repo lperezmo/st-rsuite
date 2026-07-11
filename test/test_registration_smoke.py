@@ -6,7 +6,7 @@ This mirrors what the Streamlit runtime does at startup: it calls
 then resolves the component's ``asset_dir``. If discovery does not register it,
 a real app raises the reporter's
 ``Component 'st-rsuite.rsuite' must be declared in pyproject.toml with asset_dir``
-error for every widget (all 13 render through this single registration; the
+error for every widget (all 15 render through this single registration; the
 frontend routes on the ``kind`` discriminator). We assert it resolves, that every
 widget module binds a kind, and that the installed Streamlit lets the compat
 layer disable style isolation (at registration on Streamlit >= 1.53, or on the
@@ -36,6 +36,8 @@ WIDGETS = [
     "date_input",
     "date_range_input",
     "radio_tile",
+    "select_picker",
+    "tag_picker",
     "check_tree",
     "check_tree_picker",
     "multi_cascade_tree",
