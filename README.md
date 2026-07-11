@@ -47,6 +47,8 @@ Lightweight alternatives with no popup. Users navigate date segments with arrow 
 |-----------|-------------|----------------------|
 | `check_tree` | Standalone tree with checkboxes, searchable | -- |
 | `check_tree_picker` | Dropdown picker with checkbox tree inside | `st.multiselect` (flat) |
+| `tree_picker` | Dropdown picker with single-select tree inside | `st.selectbox` (flat) |
+| `cascader` | Single-select cascading column navigation | -- |
 | `multi_cascade_tree` | Multi-select cascading column navigation | -- |
 
 ### Display & Input
@@ -526,6 +528,67 @@ check_tree_picker(
     key=None,
 ) -> list[str]
 ```
+
+#### `tree_picker`
+
+```python
+tree_picker(
+    data=[...],           # [{value, label, children?: [...]}]
+    value=None,           # single selected value
+    label="",             # label above the control
+    searchable=True,
+    virtualized=False,    # virtualize very large trees
+    default_expand_all=False,
+    show_indent_line=False,
+    only_leaf_selectable=False,  # keep branch nodes unselectable
+    disabled_items=None,  # values rendered non-selectable
+    height=320,           # tree height in px inside the dropdown
+    appearance="default",
+    size="md",
+    placeholder="Select",
+    placement="bottomStart",
+    disabled=False,
+    cleanable=True,
+    block=False,
+    loading=False,
+    help=None,            # tooltip next to the label
+    locale=None,
+    on_change=None,
+    key=None,
+) -> str | None
+```
+
+Single-select counterpart of `check_tree_picker`.
+
+#### `cascader`
+
+```python
+cascader(
+    data=[...],           # [{value, label, children?: [...]}]
+    value=None,           # single selected value
+    label="",
+    parent_selectable=False,  # allow non-leaf nodes as the answer
+    searchable=True,
+    disabled_items=None,
+    column_width=156,     # width of each cascade column
+    column_height=320,    # height of each cascade column
+    appearance="default",
+    size="md",
+    placeholder="Select",
+    placement="bottomStart",
+    disabled=False,
+    cleanable=True,
+    block=False,
+    loading=False,
+    help=None,
+    locale=None,
+    on_change=None,
+    key=None,
+) -> str | None
+```
+
+Single-select counterpart of `multi_cascade_tree`. By default only leaf
+nodes are selectable; set `parent_selectable=True` to accept any level.
 
 #### `multi_cascade_tree`
 
