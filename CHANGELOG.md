@@ -1,6 +1,32 @@
 # CHANGELOG
 
 
+## v0.8.0 (2026-07-11)
+
+### Chores
+
+- Bump demo app requirement to v0.7.1
+  ([`71389fe`](https://github.com/lperezmo/st-rsuite/commit/71389fef7802d76c13e5112644023876e91f864c))
+
+### Features
+
+- Select_picker and tag_picker
+  ([`52a053e`](https://github.com/lperezmo/st-rsuite/commit/52a053ebd050f17db7af64ca9f3bedf4f19f87ae))
+
+Two new widgets wrapping RSuite SelectPicker and TagPicker: searchable single select and tag-style
+  multi select, both with automatic grouping (items carrying a group key), virtualized= for very
+  large lists, disabled_items=, label/help a11y via FieldLabel, and two-way value sync from day one.
+
+- tag_picker supports creatable=: values the user types that are not in items become options and
+  come back in the return list. - Registry entries in the shared bundle; shared chunk grew 611 ->
+  637 KB for both widgets together. - New e2e (test_select_tag_e2e.py): click-to-select roundtrip,
+  group headings render, disabled item is not selectable, created tag round-trips. ccv2 e2e and
+  smoke suites extended to 15 widgets. - Showcase app: new Select and Tag pickers page with
+  side-by-side comparisons against the st.selectbox / st.multiselect builtins, a virtualized
+  2,000-item list, and usage code snippets. - README: component table rows + API sections for both
+  widgets.
+
+
 ## v0.7.1 (2026-07-11)
 
 ### Chores

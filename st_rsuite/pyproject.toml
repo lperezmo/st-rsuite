@@ -1,6 +1,6 @@
 [project]
 name = "st-rsuite"
-version = "0.7.1"
+version = "0.8.0"
 
 # One component (one asset_dir, one bundle) serves every widget; the frontend
 # routes on the `kind` discriminator in `data`. See st_rsuite/_component.py.
