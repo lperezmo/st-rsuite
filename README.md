@@ -38,6 +38,8 @@ Lightweight alternatives with no popup. Users navigate date segments with arrow 
 | Component | Description | Streamlit equivalent |
 |-----------|-------------|----------------------|
 | `radio_tile` | Tile-based radio group with icons and descriptions | `st.radio` |
+| `select_picker` | Searchable single-select dropdown with grouping, virtualization, disabled options | `st.selectbox` |
+| `tag_picker` | Searchable multi-select as removable tags; can create new options | `st.multiselect` |
 
 ### Tree — hierarchical data selection
 
@@ -421,6 +423,62 @@ radio_tile(
     key=None,
 ) -> str | None
 ```
+
+#### `select_picker`
+
+```python
+select_picker(
+    items=[...],          # list of dicts: {value, label, group?}
+    value=None,           # default selected value
+    label="",             # label above the control
+    searchable=True,      # show search input in the dropdown
+    virtualized=False,    # virtualize very large lists
+    disabled_items=None,  # values rendered non-selectable
+    appearance="default", # 'default' | 'subtle'
+    size="md",            # 'lg' | 'md' | 'sm' | 'xs'
+    placeholder="Select",
+    placement="bottomStart",
+    disabled=False,
+    cleanable=True,
+    block=False,
+    loading=False,
+    help=None,            # tooltip next to the label
+    locale=None,
+    on_change=None,
+    key=None,
+) -> str | None
+```
+
+Options group automatically under headings when any item carries a `group` key.
+
+#### `tag_picker`
+
+```python
+tag_picker(
+    items=[...],          # list of dicts: {value, label, group?}
+    value=None,           # list of selected values
+    label="",
+    searchable=True,
+    virtualized=False,
+    creatable=False,      # let users create options not in items
+    disabled_items=None,
+    size="md",
+    placeholder="Select",
+    placement="bottomStart",
+    disabled=False,
+    cleanable=True,
+    block=False,
+    loading=False,
+    help=None,
+    locale=None,
+    on_change=None,
+    key=None,
+) -> list[str]
+```
+
+Multi-select rendered as removable tags. With `creatable=True`, values the
+user types that are not in `items` become selectable options and come back in
+the return list.
 
 ### Tree / Hierarchical
 

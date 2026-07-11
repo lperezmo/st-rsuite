@@ -1,6 +1,6 @@
 """Streamlit fixture app for the CCv2 e2e tests.
 
-Renders all 13 st-rsuite components with stable defaults and echoes each return
+Renders all 15 st-rsuite components with stable defaults and echoes each return
 value through a `data-testid` element so the tests can assert the Python <-> JS
 round-trip. Every component uses `key=<name>`, so tests target
 `.st-key-<name> .stBidiComponent`.
@@ -21,6 +21,8 @@ from st_rsuite import (
     multi_cascade_tree,
     pin_input,
     radio_tile,
+    select_picker,
+    tag_picker,
     time_picker,
     time_range_picker,
     timeline,
@@ -69,6 +71,19 @@ rt = radio_tile(
     key="radio_tile",
 )
 echo("echo-radio_tile", f"rt={rt}")
+
+FRAMEWORKS = [
+    {"value": "react", "label": "React", "group": "Frontend"},
+    {"value": "vue", "label": "Vue", "group": "Frontend"},
+    {"value": "django", "label": "Django", "group": "Backend"},
+    {"value": "fastapi", "label": "FastAPI", "group": "Backend"},
+]
+
+sp = select_picker(items=FRAMEWORKS, value="react", key="select_picker")
+echo("echo-select_picker", f"sp={sp}")
+
+tgp = tag_picker(items=FRAMEWORKS, value=["react", "vue"], key="tag_picker")
+echo("echo-tag_picker", f"tgp={'|'.join(tgp)}")
 
 # -- Trees -------------------------------------------------------------------
 TREE = [

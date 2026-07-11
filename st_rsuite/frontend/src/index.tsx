@@ -18,6 +18,8 @@ import DateRangePickerComponent from "./date_range_picker/DateRangePicker";
 import MultiCascadeTreeComponent from "./multi_cascade_tree/MultiCascadeTree";
 import PinInputComponent from "./pin_input/PinInput";
 import RadioTileComponent from "./radio_tile/RadioTile";
+import SelectPickerComponent from "./select_picker/SelectPicker";
+import TagPickerComponent from "./tag_picker/TagPicker";
 import TimePickerComponent from "./time_picker/TimePicker";
 import TimeRangePickerComponent from "./time_range_picker/TimeRangePicker";
 import TimelineComponent from "./timeline/Timeline";
@@ -38,6 +40,8 @@ const registry: Record<string, FC<any>> = {
   multi_cascade_tree: MultiCascadeTreeComponent,
   pin_input: PinInputComponent,
   radio_tile: RadioTileComponent,
+  select_picker: SelectPickerComponent,
+  tag_picker: TagPickerComponent,
   time_picker: TimePickerComponent,
   time_range_picker: TimeRangePickerComponent,
   timeline: TimelineComponent,
