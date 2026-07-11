@@ -1,6 +1,6 @@
 """Streamlit fixture app for the CCv2 e2e tests.
 
-Renders all 15 st-rsuite components with stable defaults and echoes each return
+Renders all 17 st-rsuite components with stable defaults and echoes each return
 value through a `data-testid` element so the tests can assert the Python <-> JS
 round-trip. Every component uses `key=<name>`, so tests target
 `.st-key-<name> .stBidiComponent`.
@@ -12,6 +12,7 @@ import streamlit as st
 
 from st_rsuite import (
     carousel,
+    cascader,
     check_tree,
     check_tree_picker,
     date_input,
@@ -26,6 +27,7 @@ from st_rsuite import (
     time_picker,
     time_range_picker,
     timeline,
+    tree_picker,
 )
 
 st.title("st-rsuite CCv2 e2e")
@@ -123,6 +125,12 @@ CASCADE = [
 ]
 mctv = multi_cascade_tree(data=CASCADE, value=["sf"], key="multi_cascade_tree")
 echo("echo-multi_cascade_tree", f"mct={sorted(mctv)}")
+
+tpv = tree_picker(data=TREE, value="react", key="tree_picker")
+echo("echo-tree_picker", f"tpv={tpv}")
+
+cas = cascader(data=CASCADE, value="sf", key="cascader")
+echo("echo-cascader", f"cas={cas}")
 
 # -- Display & input ---------------------------------------------------------
 car = carousel(

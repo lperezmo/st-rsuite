@@ -1,7 +1,7 @@
 """
 st-rsuite Showcase
 ==================
-Interactive demo of all 15 RSuite components for Streamlit,
+Interactive demo of all 17 RSuite components for Streamlit,
 with side-by-side comparisons against standard widgets.
 """
 
@@ -37,6 +37,7 @@ page = st.navigation(
         ],
         "Trees": [
             st.Page("app_pages/trees.py", title="Tree components", icon=":material/account_tree:"),
+            st.Page("app_pages/tree_pickers.py", title="Cascader & TreePicker", icon=":material/lan:"),
         ],
         "Display": [
             st.Page("app_pages/carousel.py", title="Carousel", icon=":material/view_carousel:"),

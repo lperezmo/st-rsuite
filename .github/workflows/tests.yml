@@ -124,7 +124,7 @@ jobs:
           fi
       - run: uv run --no-sync playwright install --with-deps chromium
       - run: uv run --no-sync python -c "import streamlit; print('streamlit', streamlit.__version__)"
-      - run: uv run --no-sync pytest test/test_ccv2_e2e.py test/test_single_bundle_e2e.py test/test_select_tag_e2e.py -v
+      - run: uv run --no-sync pytest test/test_ccv2_e2e.py test/test_single_bundle_e2e.py test/test_select_tag_e2e.py test/test_cascader_tree_e2e.py -v
       - uses: actions/upload-artifact@v7
         if: failure()
         with:

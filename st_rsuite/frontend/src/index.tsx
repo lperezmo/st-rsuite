@@ -9,6 +9,7 @@ import "rsuite/dist/rsuite-no-reset.min.css";
 import { FC } from "react";
 import { createRsuiteRenderer, RendererProps } from "./shared/renderer";
 import CarouselComponent from "./carousel/Carousel";
+import CascaderComponent from "./cascader/Cascader";
 import CheckTreeComponent from "./check_tree/CheckTree";
 import CheckTreePickerComponent from "./check_tree_picker/CheckTreePicker";
 import DateInputComponent from "./date_input/DateInput";
@@ -23,6 +24,7 @@ import TagPickerComponent from "./tag_picker/TagPicker";
 import TimePickerComponent from "./time_picker/TimePicker";
 import TimeRangePickerComponent from "./time_range_picker/TimeRangePicker";
 import TimelineComponent from "./timeline/Timeline";
+import TreePickerComponent from "./tree_picker/TreePicker";
 
 // Keys match the widget module names under st_rsuite/ (the Python side sends
 // data.kind = its module name). Each widget keeps its own precise State/Data
@@ -31,6 +33,7 @@ import TimelineComponent from "./timeline/Timeline";
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const registry: Record<string, FC<any>> = {
   carousel: CarouselComponent,
+  cascader: CascaderComponent,
   check_tree: CheckTreeComponent,
   check_tree_picker: CheckTreePickerComponent,
   date_input: DateInputComponent,
@@ -45,6 +48,7 @@ const registry: Record<string, FC<any>> = {
   time_picker: TimePickerComponent,
   time_range_picker: TimeRangePickerComponent,
   timeline: TimelineComponent,
+  tree_picker: TreePickerComponent,
 };
 
 const Dispatcher: FC<RendererProps> = ({ data, setStateValue }) => {
