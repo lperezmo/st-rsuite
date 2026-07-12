@@ -22,12 +22,12 @@
     "@types/node": "^22.14.1",
     "@types/react": "^18.3.20",
     "@types/react-dom": "^18.3.6",
-    "@vitejs/plugin-react": "^5.1.0",
+    "@vitejs/plugin-react": "^6.0.3",
     "cross-env": "^10.1.0",
     "prettier": "^3.6.2",
     "terser": "^5.48.0",
     "typescript": "^5.8.3",
-    "vite": "^7.1.12",
+    "vite": "^8.1.4",
     "vite-plugin-css-injected-by-js": "^4.0.1"
   }
 }
