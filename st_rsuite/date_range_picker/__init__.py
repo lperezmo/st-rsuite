@@ -2,10 +2,12 @@
 
 from __future__ import annotations
 
-from datetime import date, datetime
+from datetime import date
 from typing import Callable
 
+from st_rsuite._callbacks import single_fire
 from st_rsuite._component import bind_kind
+from st_rsuite._dates import serialize_date as _serialize
 
 _component = bind_kind("date_range_picker")
 
@@ -122,15 +124,6 @@ def date_range_picker(
     tuple of (date or None, date or None)
         The selected start and end dates.
     """
-    def _serialize(d):
-        if d is None:
-            return None
-        if isinstance(d, datetime):
-            return d.date().isoformat()
-        if isinstance(d, date):
-            return d.isoformat()
-        return str(d)
-
     start_val = None
     end_val = None
     if value is not None:
@@ -160,8 +153,10 @@ def date_range_picker(
             _serialize(default_calendar_value[1]),
         ]
 
-    def _noop():
-        pass
+    # Both ends share one callback: CCv2 dispatches per state key, so the end
+    # date changing on its own must still reach on_change. single_fire keeps a
+    # both-ends change from firing it twice.
+    _fire_change = single_fire(on_change)
 
     result = _component(
         key=key,
@@ -197,8 +192,8 @@ def date_range_picker(
             "defaultCalendarValue": default_cal,
             "locale": locale,
         },
-        on_start_date_change=on_change or _noop,
-        on_end_date_change=_noop,
+        on_start_date_change=_fire_change,
+        on_end_date_change=_fire_change,
     )
 
     def _parse(val):

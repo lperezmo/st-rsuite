@@ -63,6 +63,9 @@ const CheckTreeComponent: FC<Props> = ({ data, setStateValue }) => {
 
   // CheckTree has no `disabled` prop (only per-item disabling), so honor the
   // wrapper-level flag by blocking interaction and dimming the control.
+  // `inert` is what actually enforces it: pointerEvents blocks the mouse only,
+  // and RSuite's tree items stay in the tab order, so without inert a keyboard
+  // user could Tab in and toggle checkboxes straight back to Python.
   return (
     <div
       style={{
@@ -71,6 +74,7 @@ const CheckTreeComponent: FC<Props> = ({ data, setStateValue }) => {
         opacity: disabled ? 0.5 : 1,
         pointerEvents: disabled ? "none" : "auto",
       }}
+      inert={disabled ? "" : undefined}
       aria-disabled={disabled || undefined}
     >
       <RsuiteCheckTree

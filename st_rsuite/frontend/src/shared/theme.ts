@@ -5,10 +5,8 @@
  * We detect Streamlit's dark/light mode and pass the appropriate value.
  */
 
-function getCSSVar(name: string, fallback: string): string {
-  const val = getComputedStyle(document.documentElement)
-    .getPropertyValue(name)
-    .trim();
+function getCSSVar(element: Element, name: string, fallback: string): string {
+  const val = getComputedStyle(element).getPropertyValue(name).trim();
   return val || fallback;
 }
 
@@ -47,8 +45,12 @@ function isDarkBackground(bgColor: string): boolean {
   return lum < 0.5;
 }
 
-function detectDarkMode(): boolean {
-  const bgVar = getCSSVar("--st-background-color", "");
+function detectDarkMode(element: Element): boolean {
+  // Streamlit spreads its --st-* custom properties onto a per-component wrapper
+  // div, never onto document.documentElement, and CSS custom properties only
+  // inherit downward. The component's own element is therefore the only place
+  // the variable is readable; reading the document root always yields "".
+  const bgVar = getCSSVar(element, "--st-background-color", "");
   if (bgVar) return isDarkBackground(bgVar);
 
   const bgComputed = getComputedStyle(document.body).backgroundColor;
@@ -59,21 +61,17 @@ function detectDarkMode(): boolean {
   return window.matchMedia("(prefers-color-scheme: dark)").matches;
 }
 
-let cachedTheme: "light" | "dark" | null = null;
-let lastBg = "";
-
 /**
- * Returns RSuite theme mode based on Streamlit's current theme.
- * Caches the result and only recomputes when CSS vars change.
+ * RSuite theme mode for Streamlit's current appearance, read from the calling
+ * component's own element.
+ *
+ * Deliberately uncached. The previous module-level cache keyed on a variable
+ * read from document.documentElement, which is always empty, so the very first
+ * result was pinned for the life of the page and shared by every widget in the
+ * bundle: flipping Streamlit's appearance left calendars and popups on the old
+ * theme until a hard refresh. Recomputing costs a couple of style reads per
+ * render, which is far cheaper than being wrong.
  */
-export function getStreamlitRsuiteTheme(): "light" | "dark" {
-  const bgColor = getCSSVar("--st-background-color", "");
-
-  if (cachedTheme && bgColor === lastBg) {
-    return cachedTheme;
-  }
-
-  lastBg = bgColor;
-  cachedTheme = detectDarkMode() ? "dark" : "light";
-  return cachedTheme;
+export function getStreamlitRsuiteTheme(element: Element): "light" | "dark" {
+  return detectDarkMode(element) ? "dark" : "light";
 }

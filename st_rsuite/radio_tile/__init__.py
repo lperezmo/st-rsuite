@@ -60,5 +60,9 @@ def radio_tile(
         on_selected_value_change=on_change or _noop,
     )
 
-    selected = result.get("selected_value") if result else None
-    return selected if selected else None
+    # Only None means "nothing selected". "" is a legitimate option value
+    # (e.g. a "None of the above" tile), so it must be returned as-is rather
+    # than coerced to None by a falsiness check.
+    if not result:
+        return None
+    return result.get("selected_value")

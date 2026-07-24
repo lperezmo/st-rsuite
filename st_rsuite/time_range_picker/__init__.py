@@ -5,6 +5,7 @@ from __future__ import annotations
 from datetime import time
 from typing import Callable
 
+from st_rsuite._callbacks import single_fire
 from st_rsuite._component import bind_kind
 
 _component = bind_kind("time_range_picker")
@@ -106,8 +107,10 @@ def time_range_picker(
         start_val = _serialize(value[0])
         end_val = _serialize(value[1])
 
-    def _noop():
-        pass
+    # Both ends share one callback: CCv2 dispatches per state key, so the end
+    # time changing on its own must still reach on_change. single_fire keeps a
+    # both-ends change from firing it twice.
+    _fire_change = single_fire(on_change)
 
     result = _component(
         key=key,
@@ -136,8 +139,8 @@ def time_range_picker(
             "hiddenSeconds": hidden_seconds or [],
             "locale": locale,
         },
-        on_start_time_change=on_change or _noop,
-        on_end_time_change=_noop,
+        on_start_time_change=_fire_change,
+        on_end_time_change=_fire_change,
     )
 
     def _parse(val):
