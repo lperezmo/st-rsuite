@@ -32,8 +32,11 @@ async function main() {
       ),
     },
     build: {
-      // Lib-mode ES output skips esbuild whitespace minification (Vite keeps
-      // pure annotations intact), so production uses terser for a full minify.
+      // Vite 8 dropped esbuild for Rolldown/Oxc, so the old "esbuild skips
+      // whitespace minification in lib mode" rationale no longer applies.
+      // Production still opts into terser for the compress options below
+      // (drop_console / drop_debugger), which the default minifier does not
+      // expose. Keep this explicit: `false` would ship an unminified bundle.
       minify: isProd ? "terser" : false,
       ...(isProd && {
         terserOptions: {

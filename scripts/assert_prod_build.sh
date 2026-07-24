@@ -1,16 +1,21 @@
 #!/usr/bin/env bash
 # Guard against accidentally shipping development frontend builds.
 #
-# The production (terser-minified) single-bundle build is an index-*.js entry
-# (~0.45 MB), a shared chunk-index-*.js (~0.6 MB, includes the injected rsuite
-# stylesheet), and per-locale chunks under 15 KB. A dev build (NODE_ENV=
-# development) leaves the shared chunk unminified at ~1.9 MB and writes .js.map
-# files next to the bundles. The 1.2 MB per-file limit sits between the two so
-# a dev build can never ship. Run this after `npm run build` in any workflow
-# that packages or tests the built assets.
+# Since the vite 8 / Rolldown bump the production (terser-minified) build is a
+# single index-*.js entry (~1.11 MB, including the injected rsuite stylesheet;
+# there is no separate shared chunk-index-*.js any more) plus per-locale chunks
+# under 20 KB. A dev build (NODE_ENV=development) leaves that entry unminified
+# at ~2.56 MB and writes .js.map files next to the bundles.
+#
+# The 1.6 MB per-file limit sits between the two: ~44% of headroom above the
+# current production entry, so ordinary dependency growth does not trip it,
+# while still well under the dev-build size. The sourcemap check below catches
+# dev builds independently, so this is a size sanity check rather than the only
+# line of defense. Run this after `npm run build` in any workflow that packages
+# or tests the built assets.
 set -euo pipefail
 
-LIMIT_BYTES=1228800 # 1.2 MB
+LIMIT_BYTES=1677721 # 1.6 MB
 fail=0
 found_entry=0
 
