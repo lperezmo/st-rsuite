@@ -1,4 +1,4 @@
-"""Shared UI helpers — banners and header for the showcase app."""
+"""Shared UI helpers: banners and header for the showcase app."""
 
 import streamlit as st
 

@@ -6,7 +6,7 @@ from utils.ui import banner_rsuite, banner_st
 
 disabled = st.session_state.get("disabled", False)
 
-st.markdown("Simple keyboard-only date entry — no popup, meant for compact quick-entry scenarios.")
+st.markdown("Simple keyboard-only date entry with no popup, meant for compact quick-entry scenarios.")
 
 # -- DateInput ---------------------------------------------------------------
 st.subheader("DateInput")

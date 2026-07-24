@@ -13,9 +13,9 @@
 
 ## Components
 
-### Pickers — rich popups with full interaction
+### Pickers: rich popups with full interaction
 
-Calendar popups, scrolling time panels, range selection with hover highlighting — everything you'd expect from a production date/time picker.
+Calendar popups, scrolling time panels, range selection with hover highlighting. Everything you'd expect from a production date/time picker.
 
 | Component | Description | Streamlit equivalent |
 |-----------|-------------|----------------------|
@@ -24,7 +24,7 @@ Calendar popups, scrolling time panels, range selection with hover highlighting 
 | `time_picker` | Time picker with scrolling panel, AM/PM | `st.time_input` |
 | `time_range_picker` | Time range picker with dual panels | -- |
 
-### Inputs — simple keyboard-only entry
+### Inputs: simple keyboard-only entry
 
 Lightweight alternatives with no popup. Users navigate date segments with arrow keys and typing.
 
@@ -41,7 +41,7 @@ Lightweight alternatives with no popup. Users navigate date segments with arrow 
 | `select_picker` | Searchable single-select dropdown with grouping, virtualization, disabled options | `st.selectbox` |
 | `tag_picker` | Searchable multi-select as removable tags; can create new options | `st.multiselect` |
 
-### Tree — hierarchical data selection
+### Tree: hierarchical data selection
 
 | Component | Description | Streamlit equivalent |
 |-----------|-------------|----------------------|
@@ -126,8 +126,9 @@ start, end = date_range_input(
 
 selected = radio_tile(
     options=[
-        {"value": "a", "label": "Option A", "description": "First option", "icon": "☀️"},
-        {"value": "b", "label": "Option B", "description": "Second option", "icon": "🌙"},
+        # "icon" is rendered as text, so any short string works (emoji included)
+        {"value": "a", "label": "Option A", "description": "First option", "icon": "A"},
+        {"value": "b", "label": "Option B", "description": "Second option", "icon": "B"},
     ],
     value="a",
     inline=True,
@@ -221,6 +222,7 @@ date_picker(
     limit_start_year=None,   # lower year bound in the calendar
     limit_end_year=None,     # upper year bound in the calendar
     calendar_default_date=None,  # month the calendar opens on
+    help=None,            # tooltip next to the label
     locale=None,          # e.g. 'ja_JP', 'zh_CN', 'es_ES'
     on_change=None,
     key=None,
@@ -257,6 +259,7 @@ date_range_picker(
     limit_end_year=None,
     ranges=None,          # shortcut presets; [] removes RSuite defaults
     default_calendar_value=None,  # (start, end) month the panels open on
+    help=None,            # tooltip next to the label
     locale=None,
     on_change=None,
     key=None,
@@ -285,6 +288,7 @@ time_picker(
     hidden_hours=None,    # list of hours 0-23 to hide
     hidden_minutes=None,  # list of minutes 0-59 to hide
     hidden_seconds=None,  # list of seconds 0-59 to hide
+    help=None,            # tooltip next to the label
     locale=None,
     on_change=None,
     key=None,
@@ -314,6 +318,7 @@ time_range_picker(
     hidden_hours=None,
     hidden_minutes=None,
     hidden_seconds=None,
+    help=None,            # tooltip next to the label
     locale=None,
     on_change=None,
     key=None,
@@ -375,7 +380,7 @@ Each preset is `{"label": str, "value": (start, end)}`, with optional
 
 ### Inputs
 
-Simple keyboard-only components — no popups, designed for compact quick-entry scenarios.
+Simple keyboard-only components with no popups, designed for compact quick-entry scenarios.
 
 #### `date_input`
 
@@ -387,6 +392,7 @@ date_input(
     size="md",
     placeholder=None,
     disabled=False,
+    help=None,            # tooltip next to the label
     locale=None,
     on_change=None,
     key=None,
@@ -404,6 +410,7 @@ date_range_input(
     size="md",
     placeholder=None,
     disabled=False,
+    help=None,            # tooltip next to the label
     locale=None,
     on_change=None,
     key=None,
