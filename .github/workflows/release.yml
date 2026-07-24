@@ -1,11 +1,26 @@
 name: Release & Publish
 
+# Gated on Tests rather than on `push` directly. Both workflows used to trigger
+# on the same push and run independently, so a tag and a PyPI upload could race
+# a typecheck/e2e leg that was still running (or already red). workflow_run
+# fires only after the Tests run for this branch has finished, and the job-level
+# `if` below keeps anything but a green run from releasing.
 on:
-  push:
+  workflow_run:
+    workflows: ["Tests"]
+    types: [completed]
     branches: [main]
+
+# Serialize releases: two pushes landing close together must not have their
+# semantic-release runs interleave. Never cancel in progress, a half-finished
+# publish is worse than a queued one.
+concurrency:
+  group: release-main
+  cancel-in-progress: false
 
 jobs:
   release:
+    if: github.event.workflow_run.conclusion == 'success'
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -16,6 +31,9 @@ jobs:
     steps:
       - uses: actions/checkout@v6
         with:
+          # workflow_run checkouts default to the default branch; be explicit,
+          # and take full history so semantic-release can read the tag log.
+          ref: main
           fetch-depth: 0
 
       - uses: actions/setup-python@v6
