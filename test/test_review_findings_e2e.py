@@ -18,6 +18,8 @@ import re
 from pathlib import Path
 
 import pytest
+import streamlit as st
+from packaging.version import Version
 from playwright.sync_api import Page, expect
 
 from e2e_utils import StreamlitRunner
@@ -151,6 +153,27 @@ def test_distinct_word_splits_stay_distinct(page: Page):
 
 # -- theme re-detection ------------------------------------------------------
 
+# Streamlit itself has to repaint when the OS appearance flips, or the test has
+# no appearance change to observe and is measuring nothing. It does not do that
+# before 1.54: on the CI matrix this test failed on 1.51, 1.52 and 1.53 and
+# passed on 1.54 through latest, and the step that timed out was the wait for
+# Streamlit's own --st-background-color to move, before the component was
+# involved at all. The fix under test is version independent, so skipping the
+# older three costs no coverage; it is still exercised on six versions.
+#
+# Parsed with packaging (a Streamlit dependency, so always present) rather than
+# by splitting on dots: a prerelease like "1.54.0rc1" would crash an int() parse
+# at import time and take the whole module down with it.
+_LIVE_APPEARANCE_SWITCHING = Version("1.54")
+
+requires_live_appearance_switching = pytest.mark.skipif(
+    Version(st.__version__) < _LIVE_APPEARANCE_SWITCHING,
+    reason=(
+        f"Streamlit {st.__version__} does not repaint on a live "
+        "prefers-color-scheme change, so there is no flip to follow"
+    ),
+)
+
 
 _STREAMLIT_BACKGROUND = """() => {
     const root = document.querySelector('.st-key-themed_dp .react-root');
@@ -162,6 +185,7 @@ _STREAMLIT_BACKGROUND = """() => {
 }"""
 
 
+@requires_live_appearance_switching
 def test_rsuite_theme_follows_a_streamlit_appearance_change(page: Page):
     """The theme was read from documentElement, where Streamlit never puts its
     --st-* vars, and the empty result was cached for the life of the page: a
