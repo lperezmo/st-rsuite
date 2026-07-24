@@ -20,7 +20,13 @@ concurrency:
 
 jobs:
   release:
-    if: github.event.workflow_run.conclusion == 'success'
+    # The `branches: [main]` filter above matches the TRIGGERING run's head
+    # branch, and Tests also runs on pull_request, so a fork PR opened from the
+    # contributor's own `main` would satisfy it. Requiring the upstream event to
+    # be a push keeps pull requests from reaching the PyPI publish at all.
+    if: >-
+      github.event.workflow_run.event == 'push' &&
+      github.event.workflow_run.conclusion == 'success'
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -33,6 +39,10 @@ jobs:
         with:
           # workflow_run checkouts default to the default branch; be explicit,
           # and take full history so semantic-release can read the tag log.
+          # This is the tip of main, not workflow_run.head_sha, because
+          # semantic-release has to commit and push back to the branch. If a
+          # second push lands while this run is queued behind the concurrency
+          # group, the release covers that commit too.
           ref: main
           fetch-depth: 0
 
