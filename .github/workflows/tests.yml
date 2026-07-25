@@ -15,6 +15,22 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  # The Python counterpart to the frontend typecheck below, and the cheapest
+  # gate here, so it runs first. `check .` rather than a list of directories:
+  # a list silently stops covering anything added later, which is the same rot
+  # that left new test files unrun in the sibling st-aggrid repo.
+  # The rule set and the ruff version both come from pyproject.toml, which
+  # ruff-action reads: see the pin comment there for why the upper bound
+  # matters as much as the floor.
+  lint:
+    name: Lint (ruff)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: astral-sh/ruff-action@v3
+        with:
+          args: check .
+
   # TypeScript type check of the frontend. Runs independently of the build
   # (Vite/esbuild transpiles without type-checking), so this is the only gate
   # that catches type regressions such as passing a prop RSuite does not accept.
@@ -56,18 +72,29 @@ jobs:
           path: frontend-build.tgz
           retention-days: 1
 
-  # Fast, browser-less guard across every supported Streamlit minor: a real
+  # The whole browser-less suite across every supported Streamlit minor: a real
   # `streamlit run` would register the shared component every widget renders
   # through, and the compat layer can disable style isolation (at registration
   # on >=1.53, call site on 1.51/1.52).
-  smoke:
-    name: Smoke (Streamlit ${{ matrix.streamlit || 'latest' }})
+  #
+  # It ran only test_registration_smoke.py until the marker split, so date
+  # serialization, radio tile returns and range callbacks were exercised
+  # against a single Streamlit version inside the browser job. That is the
+  # coverage the sibling st-aggrid repo has had all along, and it is where its
+  # pandas 3 regression surfaced: on one leg of a matrix like this one.
+  #
+  # The empty entry is the floating leg: `pip install -U streamlit`, whatever
+  # is newest that day. It is not a substitute for pinning each minor, because
+  # it moves. When 1.61 ships it stops covering 1.60 and nothing else would,
+  # so every new minor gets a pin here as it lands.
+  python-suite:
+    name: Python (Streamlit ${{ matrix.streamlit || 'latest' }})
     needs: build-frontend
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
       matrix:
-        streamlit: ['1.51.*', '1.52.*', '1.53.*', '1.54.*', '1.55.*', '1.56.*', '1.57.*', '1.58.*', '']
+        streamlit: ['1.51.*', '1.52.*', '1.53.*', '1.54.*', '1.55.*', '1.56.*', '1.57.*', '1.58.*', '1.59.*', '1.60.*', '']
     steps:
       - uses: actions/checkout@v6
       - uses: actions/download-artifact@v7
@@ -89,7 +116,7 @@ jobs:
             uv pip install -U streamlit
           fi
       - run: uv run --no-sync python -c "import streamlit; print('streamlit', streamlit.__version__)"
-      - run: uv run --no-sync pytest test/test_registration_smoke.py -v
+      - run: uv run --no-sync pytest test/ -m "not browser" -v
 
   # Real-browser coverage: every component renders and round-trips on a real
   # Streamlit server. Authoritative guard for the asset_dir registration bug.
@@ -124,7 +151,17 @@ jobs:
           fi
       - run: uv run --no-sync playwright install --with-deps chromium
       - run: uv run --no-sync python -c "import streamlit; print('streamlit', streamlit.__version__)"
-      - run: uv run --no-sync pytest test/test_ccv2_e2e.py test/test_single_bundle_e2e.py test/test_select_tag_e2e.py test/test_cascader_tree_e2e.py -v
+      # Selected by marker, never by filename. Enumerating files here once
+      # silently dropped test_value_sync_e2e / test_a11y_e2e /
+      # test_date_constraints_e2e / test_range_shortcuts_e2e /
+      # test_time_constraints_e2e, half the e2e tests, including the entire
+      # useSyncedValue regression guard.
+      #
+      # `-m browser` rather than the whole directory: the browser-less tests
+      # used to ride along here, so they were reported by this job on the five
+      # Streamlit versions it covers instead of the nine the Python job covers,
+      # and a pure-logic failure read as a browser flake.
+      - run: uv run --no-sync pytest test/ -m browser -v
       - uses: actions/upload-artifact@v7
         if: failure()
         with:

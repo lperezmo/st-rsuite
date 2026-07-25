@@ -1,8 +1,9 @@
 import streamlit as st
 
 from st_rsuite import check_tree, check_tree_picker, multi_cascade_tree
+
+from utils.data import CASCADE_DATA, PICKER_DATA, TREE_DATA
 from utils.ui import banner_rsuite
-from utils.data import TREE_DATA, PICKER_DATA, CASCADE_DATA
 
 disabled = st.session_state.get("disabled", False)
 

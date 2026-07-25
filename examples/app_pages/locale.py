@@ -1,5 +1,6 @@
-import streamlit as st
 from datetime import date, timedelta
+
+import streamlit as st
 
 from st_rsuite import date_picker, date_range_picker
 

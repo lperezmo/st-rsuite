@@ -1,11 +1,32 @@
 name: Release & Publish
 
+# Gated on Tests rather than on `push` directly. Both workflows used to trigger
+# on the same push and run independently, so a tag and a PyPI upload could race
+# a typecheck/e2e leg that was still running (or already red). workflow_run
+# fires only after the Tests run for this branch has finished, and the job-level
+# `if` below keeps anything but a green run from releasing.
 on:
-  push:
+  workflow_run:
+    workflows: ["Tests"]
+    types: [completed]
     branches: [main]
+
+# Serialize releases: two pushes landing close together must not have their
+# semantic-release runs interleave. Never cancel in progress, a half-finished
+# publish is worse than a queued one.
+concurrency:
+  group: release-main
+  cancel-in-progress: false
 
 jobs:
   release:
+    # The `branches: [main]` filter above matches the TRIGGERING run's head
+    # branch, and Tests also runs on pull_request, so a fork PR opened from the
+    # contributor's own `main` would satisfy it. Requiring the upstream event to
+    # be a push keeps pull requests from reaching the PyPI publish at all.
+    if: >-
+      github.event.workflow_run.event == 'push' &&
+      github.event.workflow_run.conclusion == 'success'
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -16,13 +37,38 @@ jobs:
     steps:
       - uses: actions/checkout@v6
         with:
+          # workflow_run checkouts default to the default branch; be explicit,
+          # and take full history so semantic-release can read the tag log.
+          # This is the tip of main, not workflow_run.head_sha, because
+          # semantic-release has to commit and push back to the branch. The
+          # guard below then refuses to release when the tip has moved past the
+          # commit the green Tests run actually covered.
+          ref: main
           fetch-depth: 0
 
+      - name: Refuse to release an untested tip
+        id: guard
+        run: |
+          tested='${{ github.event.workflow_run.head_sha }}'
+          tip="$(git rev-parse HEAD)"
+          if [ "$tip" != "$tested" ]; then
+            echo "Tests passed on $tested but main is now at $tip." >> "$GITHUB_STEP_SUMMARY"
+            echo "Skipping: releasing would publish code this run never tested." >> "$GITHUB_STEP_SUMMARY"
+            echo 'stale=true' >> "$GITHUB_OUTPUT"
+          fi
+
+      # Skipped rather than failed: a second push landing during this run is
+      # ordinary, and its own Tests run brings its own Release run. Because
+      # semantic-release reads every commit since the last tag, the release
+      # skipped here is not lost, it is folded into that later run.
+
       - uses: actions/setup-python@v6
+        if: steps.guard.outputs.stale != 'true'
         with: { python-version: '3.13' }
 
       - name: Semantic Release
         id: release
+        if: steps.guard.outputs.stale != 'true'
         uses: python-semantic-release/python-semantic-release@v9
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}

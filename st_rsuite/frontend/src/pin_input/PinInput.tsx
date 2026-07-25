@@ -66,7 +66,7 @@ const PinInputComponent: FC<Props> = ({ data, setStateValue }) => {
   return (
     <div style={{ width: "100%", padding: "4px 0" }}>
       <RsuitePinInput
-        value={pinValue || undefined}
+        value={pinValue}
         onChange={(val) => handleChange(val || "")}
         length={length}
         mask={mask}

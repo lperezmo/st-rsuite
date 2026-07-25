@@ -2,10 +2,11 @@
 
 from __future__ import annotations
 
+from collections.abc import Callable
 from datetime import date
-from typing import Callable
 
 from st_rsuite._component import bind_kind
+from st_rsuite._dates import serialize_date as _serialize
 
 _component = bind_kind("date_input")
 
@@ -56,13 +57,6 @@ def date_input(
     date or None
         The selected date, or None if nothing selected.
     """
-    def _serialize(d):
-        if d is None:
-            return None
-        if isinstance(d, date):
-            return d.isoformat()
-        return str(d)
-
     def _noop():
         pass
 

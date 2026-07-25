@@ -2,8 +2,8 @@
 
 from __future__ import annotations
 
+from collections.abc import Callable
 from datetime import time
-from typing import Callable
 
 from st_rsuite._component import bind_kind
 

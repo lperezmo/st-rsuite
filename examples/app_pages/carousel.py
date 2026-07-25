@@ -1,7 +1,9 @@
-import streamlit as st
 from pathlib import Path
 
+import streamlit as st
+
 from st_rsuite import carousel
+
 from utils.ui import banner_rsuite
 
 st.markdown(
@@ -24,15 +26,15 @@ ci_local = carousel(
     items=[
         {
             "src": str(_ASSETS / "starry_night.jpg"),
-            "alt": "The Starry Night — Vincent van Gogh, 1889",
+            "alt": "The Starry Night by Vincent van Gogh, 1889",
         },
         {
             "src": str(_ASSETS / "great_wave.jpg"),
-            "alt": "The Great Wave off Kanagawa — Katsushika Hokusai, c. 1831",
+            "alt": "The Great Wave off Kanagawa by Katsushika Hokusai, c. 1831",
         },
         {
             "src": str(_ASSETS / "girl_pearl_earring.jpg"),
-            "alt": "Girl with a Pearl Earring — Johannes Vermeer, c. 1665",
+            "alt": "Girl with a Pearl Earring by Johannes Vermeer, c. 1665",
         },
     ],
     autoplay=True,
@@ -65,7 +67,7 @@ active = carousel(
 st.divider()
 st.subheader("URL images")
 st.caption(
-    "Pass any public image URL via the `src` key — no download needed. "
+    "Pass any public image URL via the `src` key, no download needed. "
     "Perfect for remote assets, CDNs, or user-provided links."
 )
 
@@ -74,15 +76,15 @@ ci_url = carousel(
     items=[
         {
             "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/e/ea/Van_Gogh_-_Starry_Night_-_Google_Art_Project.jpg/1280px-Van_Gogh_-_Starry_Night_-_Google_Art_Project.jpg",
-            "alt": "The Starry Night — Van Gogh (via Wikimedia)",
+            "alt": "The Starry Night by Van Gogh (via Wikimedia)",
         },
         {
             "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a5/Tsunami_by_hokusai_19th_century.jpg/1280px-Tsunami_by_hokusai_19th_century.jpg",
-            "alt": "The Great Wave — Hokusai (via Wikimedia)",
+            "alt": "The Great Wave by Hokusai (via Wikimedia)",
         },
         {
             "src": "https://upload.wikimedia.org/wikipedia/commons/d/d7/Meisje_met_de_parel.jpg",
-            "alt": "Girl with a Pearl Earring — Vermeer (via Wikimedia)",
+            "alt": "Girl with a Pearl Earring by Vermeer (via Wikimedia)",
         },
     ],
     autoplay=True,
@@ -118,7 +120,7 @@ active = carousel(
 # -- Example 3: Text slides --------------------------------------------------
 st.divider()
 st.subheader("Text slides")
-st.caption("Use `content` + `background` for simple text-based slides — no images needed.")
+st.caption("Use `content` + `background` for simple text-based slides, no images needed.")
 
 banner_rsuite()
 ci_text = carousel(

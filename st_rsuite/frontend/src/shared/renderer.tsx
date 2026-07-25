@@ -3,7 +3,7 @@
  *
  * With isolate_styles=False, the component renders directly in the DOM (no
  * Shadow DOM). RSuite styles inject into document.head and popups portal
- * to document.body — both work correctly in this mode.
+ * to document.body; both work correctly in this mode.
  *
  * Locales load lazily: each RSuite locale is its own chunk (see build.mjs),
  * so a page downloads only the locale it actually renders. The first paint of
@@ -123,7 +123,9 @@ export function createRsuiteRenderer<
       reactRoots.set(parentElement, reactRoot);
     }
 
-    const theme = getStreamlitRsuiteTheme();
+    // Resolve the theme from this component's own element: Streamlit's --st-*
+    // custom properties live on the per-component wrapper, not the document.
+    const theme = getStreamlitRsuiteTheme(rootElement);
     const explicit = (data as Record<string, unknown>).locale as
       | string
       | undefined;

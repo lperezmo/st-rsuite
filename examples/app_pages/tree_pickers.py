@@ -1,6 +1,7 @@
 import streamlit as st
 
 from st_rsuite import cascader, tree_picker
+
 from utils.data import CASCADE_DATA, TREE_DATA
 from utils.ui import banner_rsuite
 

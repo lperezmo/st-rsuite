@@ -369,7 +369,7 @@ The python-semantic-release action left .git files with different ownership, cau
 
 ### Features
 
-- Add 7 new components — RadioTile, CheckTree, CheckTreePicker, MultiCascadeTree, Carousel,
+- Add 7 new components: RadioTile, CheckTree, CheckTreePicker, MultiCascadeTree, Carousel,
   Timeline, PinInput
   ([`f611a35`](https://github.com/lperezmo/st-rsuite/commit/f611a3553a3cc654001f2ef842085580b2f27e6e))
 
