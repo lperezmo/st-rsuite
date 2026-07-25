@@ -74,6 +74,18 @@ version_toml = [
 tag_format = "v{version}"
 commit_message = "chore(release): v{version}"
 
+[tool.pytest.ini_options]
+# CI selects suites by marker, not by filename. The version matrix used to run
+# `pytest test/test_registration_smoke.py`, so three browser-less files
+# (date serialization, radio tile returns, range callbacks) were checked
+# against exactly one Streamlit version, inside the browser job. Naming files
+# in a workflow means a file added later is excluded by default and nobody
+# notices; with a marker the default is inclusion, and silence means "no
+# tests" rather than "not wired up".
+markers = [
+    "browser: needs a real browser and a running Streamlit server (Playwright)",
+]
+
 [tool.ruff]
 extend-exclude = ["references/"]
 

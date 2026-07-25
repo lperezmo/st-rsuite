@@ -72,12 +72,18 @@ jobs:
           path: frontend-build.tgz
           retention-days: 1
 
-  # Fast, browser-less guard across every supported Streamlit minor: a real
+  # The whole browser-less suite across every supported Streamlit minor: a real
   # `streamlit run` would register the shared component every widget renders
   # through, and the compat layer can disable style isolation (at registration
   # on >=1.53, call site on 1.51/1.52).
-  smoke:
-    name: Smoke (Streamlit ${{ matrix.streamlit || 'latest' }})
+  #
+  # It ran only test_registration_smoke.py until the marker split, so date
+  # serialization, radio tile returns and range callbacks were exercised
+  # against a single Streamlit version inside the browser job. That is the
+  # coverage the sibling st-aggrid repo has had all along, and it is where its
+  # pandas 3 regression surfaced: on one leg of a matrix like this one.
+  python-suite:
+    name: Python (Streamlit ${{ matrix.streamlit || 'latest' }})
     needs: build-frontend
     runs-on: ubuntu-latest
     strategy:
@@ -105,7 +111,7 @@ jobs:
             uv pip install -U streamlit
           fi
       - run: uv run --no-sync python -c "import streamlit; print('streamlit', streamlit.__version__)"
-      - run: uv run --no-sync pytest test/test_registration_smoke.py -v
+      - run: uv run --no-sync pytest test/ -m "not browser" -v
 
   # Real-browser coverage: every component renders and round-trips on a real
   # Streamlit server. Authoritative guard for the asset_dir registration bug.
@@ -140,14 +146,17 @@ jobs:
           fi
       - run: uv run --no-sync playwright install --with-deps chromium
       - run: uv run --no-sync python -c "import streamlit; print('streamlit', streamlit.__version__)"
-      # The whole suite, not a hand-maintained subset: enumerating files here
+      # Selected by marker, never by filename. Enumerating files here once
       # silently dropped test_value_sync_e2e / test_a11y_e2e /
       # test_date_constraints_e2e / test_range_shortcuts_e2e /
       # test_time_constraints_e2e, half the e2e tests, including the entire
-      # useSyncedValue regression guard. test_registration_smoke also runs in
-      # the smoke leg; re-running it here is cheap and keeps this a plain
-      # "run everything".
-      - run: uv run --no-sync pytest test/ -v
+      # useSyncedValue regression guard.
+      #
+      # `-m browser` rather than the whole directory: the browser-less tests
+      # used to ride along here, so they were reported by this job on the five
+      # Streamlit versions it covers instead of the nine the Python job covers,
+      # and a pure-logic failure read as a browser flake.
+      - run: uv run --no-sync pytest test/ -m browser -v
       - uses: actions/upload-artifact@v7
         if: failure()
         with:
