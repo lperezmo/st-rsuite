@@ -188,8 +188,15 @@ def test_distinct_word_splits_stay_distinct(page: Page):
 # before 1.54: on the CI matrix this test failed on 1.51, 1.52 and 1.53 and
 # passed on 1.54 through latest, and the step that timed out was the wait for
 # Streamlit's own --st-background-color to move, before the component was
-# involved at all. The fix under test is version independent, so skipping the
-# older three costs no coverage; it is still exercised on six versions.
+# involved at all.
+#
+# That leaves two of the five e2e legs running this test: 1.55 and latest. The
+# fix under test is version independent, so the older three cost no coverage of
+# the bridge itself, but do not read the skip as "covered elsewhere" either.
+# The in-app appearance control (as opposed to the OS-level scheme this test
+# emulates) does drive a repaint on 1.51, so a test that drove the menu instead
+# would run everywhere; it would also have to follow Streamlit's menu markup,
+# which moved the appearance switch between 1.51 and 1.55.
 #
 # Parsed with packaging (a Streamlit dependency, so always present) rather than
 # by splitting on dots: a prerelease like "1.54.0rc1" would crash an int() parse
@@ -219,7 +226,12 @@ _STREAMLIT_BACKGROUND = """() => {
 def test_rsuite_theme_follows_a_streamlit_appearance_change(page: Page):
     """The theme was read from documentElement, where Streamlit never puts its
     --st-* vars, and the empty result was cached for the life of the page: a
-    flip to dark left RSuite popups light-on-dark until a hard refresh."""
+    flip to dark left RSuite popups light-on-dark until a hard refresh.
+
+    Nothing is clicked here on purpose. The flip alone has to be enough: a user
+    who changes the appearance and touches nothing else is the case that broke,
+    and driving a rerun first would hide a re-introduced cache behind the fresh
+    render it would have got anyway."""
     body = page.locator("body")
     expect(body).to_have_class(re.compile(r"rs-theme-light"))
 
@@ -235,8 +247,9 @@ def test_rsuite_theme_follows_a_streamlit_appearance_change(page: Page):
         timeout=30000,
     )
 
-    # Re-render the picker so the bridge has to resolve the appearance again.
-    page.get_by_role("button", name="rerender").click()
-    expect(page.locator(".st-key-themed_dp label")).to_contain_text("render 1")
-
     expect(body).to_have_class(re.compile(r"rs-theme-dark"))
+
+    # And back, so the watcher is shown to keep following rather than to have
+    # fired once on the way to a value it would have reached regardless.
+    page.emulate_media(color_scheme="light")
+    expect(body).to_have_class(re.compile(r"rs-theme-light"))

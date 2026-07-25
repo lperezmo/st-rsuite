@@ -71,6 +71,14 @@ function detectDarkMode(element: Element): boolean {
  * bundle: flipping Streamlit's appearance left calendars and popups on the old
  * theme until a hard refresh. Recomputing costs a couple of style reads per
  * render, which is far cheaper than being wrong.
+ *
+ * Reading fresh is enough because Streamlit re-invokes a component's renderer
+ * when the appearance changes, so a render always follows the flip and there is
+ * nothing to subscribe to. Checked by hand on 1.51 (Settings dialog) and 1.55
+ * (menu icons): with no interaction beyond the appearance control itself,
+ * document.body went from rs-theme-light to rs-theme-dark. A watcher here would
+ * be dead weight. The e2e counterpart is
+ * test_rsuite_theme_follows_a_streamlit_appearance_change.
  */
 export function getStreamlitRsuiteTheme(element: Element): "light" | "dark" {
   return detectDarkMode(element) ? "dark" : "light";

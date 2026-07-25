@@ -9,8 +9,8 @@ Renders exactly the configurations the reviewed defects needed:
 - a ``tag_picker`` whose Python-driven value flips between ``["New York"]`` and
   ``["New", "York"]``, two lists that only stay distinct while the sync key
   joins on NUL,
-- a ``date_picker`` that can be forced to re-render so the theme bridge has to
-  re-detect Streamlit's appearance instead of serving a stale cache.
+- a ``date_picker`` that has to follow an appearance change on its own, rather
+  than serving a theme cached at first paint.
 """
 
 from datetime import date, datetime
@@ -102,15 +102,8 @@ tp = tag_picker(
 echo("echo-collide_tp", f"tp={'|'.join(tp)}")
 
 # -- theme re-detection ------------------------------------------------------
-# The button changes this picker's data, so Streamlit re-renders it and the
-# theme bridge has to resolve the appearance again.
-if st.button("rerender"):
-    st.session_state["renders"] = st.session_state.get("renders", 0) + 1
-
-date_picker(
-    label=f"render {st.session_state.get('renders', 0)}",
-    value=date(2026, 6, 22),
-    key="themed_dp",
-)
+# Nothing here forces a rerun: the test changes the appearance and expects the
+# picker to follow on its own, which is what a user does.
+date_picker(label="themed", value=date(2026, 6, 22), key="themed_dp")
 
 st.html("<pre data-testid='ready'>ready</pre>")
