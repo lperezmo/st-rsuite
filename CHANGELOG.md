@@ -1,6 +1,359 @@
 # CHANGELOG
 
 
+## v0.9.1 (2026-07-25)
+
+### Bug Fixes
+
+- Disable trees with a fieldset so they stay readable
+  ([`42b0862`](https://github.com/lperezmo/st-rsuite/commit/42b08623565083943072ec0f68ce14d0f844ade5))
+
+inert on the wrapper kept the keyboard out by removing the subtree from the accessibility tree as
+  well, so a screen reader announced nothing at all where sighted users saw a dimmed tree with
+  checked boxes, and the wrapper's own aria-disabled went unread with it.
+
+A disabled <fieldset> disables every form control inside it natively: the checkboxes and the search
+  box leave the tab order and are announced as unavailable, while the tree itself stays readable.
+
+Not RSuite's own disabledItemValues, the obvious alternative: it renders a disabled node as
+  unchecked whatever value says, so a disabled tree would show none of the selection it exists to
+  display. Measured in the browser, React went from aria-checked=true to false under it.
+
+The e2e guards are new: one that nothing is inert and every control is :disabled, one that the
+  checked node still reads as checked. Both fail against the inert build; the second also fails
+  against disabledItemValues.
+
+- Range on_change firing, theme re-detection, datetime defaults, disabled trees
+  ([`c5ce0a6`](https://github.com/lperezmo/st-rsuite/commit/c5ce0a692204b034895310448483353ed85f90d8))
+
+CCv2 dispatches change callbacks per state key, not per widget: Streamlit diffs the widget state
+  dict and runs metadata.callbacks[key] for each changed key. The range widgets registered the user
+  callback on the start key only and a no-op on the end key, so extending, shortening, or moving
+  only the end of a range silently skipped on_change. Both keys now share one callback wrapped in
+  _callbacks.single_fire, whose per-render closure flag keeps a both-ends change from firing it
+  twice.
+
+Theme detection cached forever and never re-detected. The cache key came from --st-background-color
+  read off document.documentElement, but Streamlit spreads those custom properties onto a
+  per-component wrapper div and custom properties only inherit downward, so the value was always
+  empty and the first result was pinned for the life of the page, shared by every widget in the
+  bundle. Flipping Streamlit appearance left calendars and popups on the stale theme. The theme is
+  now resolved per render from the component's own element.
+
+date_input and date_range_input serialized a datetime default as a full timestamp because they
+  tested isinstance(d, date) first and datetime is a subclass of date. The frontend then parsed an
+  Invalid Date and the Python side raised in date.fromisoformat and swallowed it, so the default
+  vanished on both sides. Hoisted the correct ordering into _dates.serialize_date and reused it
+  across all four date widgets.
+
+Other fixes:
+
+- check_tree / multi_cascade_tree disabled=True was mouse-only. pointerEvents blocks the pointer but
+  RSuite tree items stay in the tab order, so a keyboard user could Tab in and toggle checkboxes
+  back to Python. Added inert on the wrapper, with a React 18 JSX type declaration for the
+  attribute. - pin_input flipped controlled to uncontrolled once the user cleared every digit,
+  because the value prop fell back to undefined and handed control back to RSuite internal state. -
+  radio_tile coerced a selected empty-string option to None, so an option whose value is the empty
+  string was indistinguishable from no selection. - keyOfList joined on a literal NUL byte, which
+  made the whole file read as binary to git and to text tooling. Same separator, written as an
+  escape.
+
+### Chores
+
+- Add regression tests for the reviewed fixes
+  ([`ff258f2`](https://github.com/lperezmo/st-rsuite/commit/ff258f21e972905758b7b9f6def5193e4567fc4b))
+
+The 13 reviewed defects shipped with no test that would catch a regression: the suite sat at 55 on
+  both main and this branch. Add 48 tests covering the behavioral fixes, each verified to fail
+  against the unfixed code.
+
+Python units (no browser):
+
+- test_date_serialization.py pins serialize_date's datetime-before-date check. A datetime default
+  used to serialize to a full timestamp, which the frontend rendered as an Invalid Date and
+  date.fromisoformat rejected on the way back, so the default vanished on both sides. -
+  test_range_callbacks.py captures the callbacks each range widget registers and drives them through
+  Streamlit's own per-key dispatcher (SessionState._dispatch_json_change_callbacks), so the
+  production dispatch path is under test rather than a stand-in. Covers the reported bug (only the
+  end of a range changing skipped on_change entirely), the dedupe when both ends move, and the
+  no-change case. - test_radio_tile_return.py pins the empty string as a real option value, distinct
+  from no selection at all.
+
+Browser (test_review_findings_e2e.py + review_findings_e2e_app.py):
+
+- datetime defaults reach date_input and date_range_input as dates, - a disabled check_tree /
+  multi_cascade_tree refuses focus and stays out of the tab order, so a keyboard user can no longer
+  toggle a "disabled" tree, - ["New York"] and ["New", "York"] stay distinct value-sync keys,
+  locking in the NUL join in keyOfList, - the RSuite theme re-detects when Streamlit's appearance
+  flips, instead of serving a cache pinned at first render.
+
+No test for the PinInput controlled/uncontrolled fix: with RSuite's useControlled, value={pinValue
+  || undefined} and value={pinValue} are observationally identical from the browser, and the React
+  warning that would distinguish them is stripped from the production bundle. Tests written against
+  it passed on the unfixed code, so they were dropped rather than kept as false coverage.
+
+- Adopt ruff 0.16 and lint in CI, matching st-aggrid
+  ([`564d576`](https://github.com/lperezmo/st-rsuite/commit/564d576c3de2c844e967c5e0f814d466ebf11c0a))
+
+This repo carried a [tool.ruff] section with an extend-exclude and nothing that ever read it: no
+  ruff in the dev group, no lint job in tests.yml. So the Python side had no linting at all while
+  the frontend had a typecheck gate.
+
+Pinned to ruff>=0.16,<0.17 with the same reasoning as the sibling st-aggrid repo. The upper bound is
+  the load-bearing half: ruff-action installs the newest release satisfying the constraint, and
+  0.16.0 grew the default rule set from 59 rules to 413, which turned st-aggrid's CI red on 143
+  findings in untouched code. An unbounded floor would hand this repo the same surprise on the next
+  expansion.
+
+76 findings, 59 of them fixed automatically: deprecated typing imports rewritten to builtins and PEP
+  604 unions (the floor is 3.10, so both are available), plus import sorting. A further 20 came from
+  configuring known-local-folder and were also mechanical: examples import `utils` and tests import
+  `e2e_utils` by path rather than as installed packages, so without that setting they sorted above
+  st_rsuite itself and read as if the demos were importing the library from somewhere else.
+
+One real fix rather than a suppression: e2e_utils logged through logging.getLogger(__file__), so the
+  logger was named after an absolute path instead of the module.
+
+The rest are suppressed per file with the reason recorded, never project-wide. DTZ wants explicit
+  tzinfo everywhere, and every one of its 23 findings is in a date picker demo or a date test, none
+  in the shipped package. A naive date.today() is what a date picker demo should show, and
+  test_date_serialization holds naive and tz-aware values side by side with a test named
+  test_naive_datetime_drops_the_time, so requiring tzinfo would mean deleting the cases that cover
+  the behavior. SIM115 and PYI034 are scoped to test/e2e_utils.py: the temp file is deliberately
+  owned across start() and stop(), and typing.Self is 3.11+ while this package supports 3.10 without
+  typing_extensions.
+
+The lint job runs `check .` rather than a directory list. A list stops covering whatever is added
+  later, which is exactly how new test files went unrun in st-aggrid until markers replaced the
+  filenames in its workflow.
+
+45 non-browser tests pass, every changed file compiles, and every import in them resolves. The 20
+  example pages have no test coverage, so they were checked that way rather than assumed.
+
+- Bump demo app requirement to v0.9.0
+  ([`91a8ad2`](https://github.com/lperezmo/st-rsuite/commit/91a8ad2d631c211483ee69e45775a2295440bcb9))
+
+- Drop the stale July 7 review report
+  ([`ebf1bb9`](https://github.com/lperezmo/st-rsuite/commit/ebf1bb9887607ce8e6c99fd62e13cc0d4ed2cb3c))
+
+A 1200-line static report added by this branch, titled for v0.3.4 and listing three findings
+  (unminified dev wheels, Python-side value changes never reaching the widget, React and RSuite
+  bundled 13 times) that were all resolved across 0.4 to 0.7. The repo is at 0.9.0. Checked in under
+  docs/ with no index or date context, it reads as a list of currently open defects, and it has
+  nothing to do with the fixes on this branch. It stays in the history of the commit that added it.
+
+- Fix stale prod-build guard, bump postcss, correct build.mjs comment
+  ([`cbca040`](https://github.com/lperezmo/st-rsuite/commit/cbca0401c1c323de874b77f65ee0977c05b56398))
+
+assert_prod_build.sh still described the pre-vite-8 output shape: an index-*.js entry of about 0.45
+  MB plus a shared chunk-index-*.js of about 0.6 MB. Rolldown consolidated that shared chunk into
+  the entry, which is now 1,113,228 bytes, or 90.6 percent of the 1.2 MB per-file limit. The next
+  non-trivial dependency would have failed publish.yml and release.yml with a dev-build error on a
+  perfectly good production bundle. Raised the limit to 1.6 MB, measured against a real dev build at
+  2,558,072 bytes so the guard still separates the two, and rewrote the comment for the single-file
+  output. The sourcemap check continues to catch dev builds independently.
+
+npm audit reported 1 high (postcss GHSA-r28c-9q8g-f849, path traversal in previous-source-map
+  auto-loading), contradicting the 0-vulnerabilities claim in 0065587. npm audit fix bumps the
+  transitive postcss 8.5.17 to 8.5.23 and nanoid 3.3.15 to 3.3.16, both dev-only under vite. Build
+  and typecheck still pass.
+
+build.mjs justified terser in terms of esbuild skipping whitespace minification in lib mode, but
+  esbuild left the tree with vite 8. Terser is still the right choice for drop_console /
+  drop_debugger; the comment now says so.
+
+- Pin 1.59 and 1.60 legs on the version matrix
+  ([`f01b1a6`](https://github.com/lperezmo/st-rsuite/commit/f01b1a6d04d4a56a93ebe9b92e43b8cff477db42))
+
+The Python job claims to run across every supported Streamlit minor, but it pinned 1.51 through 1.58
+  and left the rest to the floating leg. That leg installs whatever is newest, so it covered 1.59
+  and 1.60 only until 1.61 ships, at which point both would silently fall out of the matrix with the
+  dependency still declared as streamlit>=1.51.
+
+Verified locally before pinning: the full suite, browser tests included, passes on 1.59.2 and
+  1.60.0.
+
+e2e stays a subset on purpose. Its legs track the compat-shim boundaries (1.51 and 1.52 take
+  isolate_styles at the call site, 1.53 at registration, 1.55 is the first that repaints on a live
+  appearance change) plus the floating leg, and a pinned 1.60 there would only duplicate what latest
+  already runs today.
+
+- Prove the theme bridge follows an appearance change unaided
+  ([`f7d03f6`](https://github.com/lperezmo/st-rsuite/commit/f7d03f67c815ef761863d0804af754f2b11fe73d))
+
+A reviewer read the renderer and concluded the uncached theme read only helps a render that happens
+  anyway, since Streamlit re-invokes a renderer for data and state changes: flip the appearance and
+  touch nothing else, and every widget would sit on the old theme.
+
+Measured instead of argued, with the theme read compiled out of the picture: on 1.51 (Settings
+  dialog) and 1.55 (menu icons), changing the appearance and touching nothing else moved
+  document.body from rs-theme-light to rs-theme-dark. Streamlit does re-invoke the renderer on an
+  appearance change, so there is nothing to subscribe to and a watcher here would be dead weight.
+  The docstring now records that.
+
+The e2e test drops its rerender click, and the fixture drops the button behind it: driving a rerun
+  first would hide a re-introduced cache behind the fresh render it would have got anyway. It also
+  flips back to light, so following once on the way to a value it would have reached regardless is
+  not enough to pass.
+
+The skip comment claimed six versions; the e2e matrix has five legs and only two clear the >= 1.54
+  floor. Corrected, with the note that the in-app appearance control does repaint on 1.51, so a
+  menu-driven test would run everywhere at the cost of following Streamlit's menu markup.
+
+- Refuse to release a tip the Tests run did not cover
+  ([`f1af172`](https://github.com/lperezmo/st-rsuite/commit/f1af1726400c29515897d75886c6e1ae514bc523))
+
+The release job is gated on a green Tests run but checked out ref: main, so it released whatever the
+  tip was rather than the commit that passed. Push A goes green, push B lands a second later, and
+  the workflow_run event for A checks out B, tags it and publishes it to PyPI while Tests-B is still
+  running or already red. That is the race the gating was added to close.
+
+The tip is still what gets checked out, because semantic-release has to commit and push back to the
+  branch; a guard step now compares it to workflow_run.head_sha and skips the release when they
+  differ. Skipped rather than failed: a second push is ordinary, it brings its own Tests and Release
+  runs, and semantic-release reads every commit since the last tag, so the skipped release is folded
+  into that later run rather than lost.
+
+- Require a push event to reach the release job
+  ([`acd9420`](https://github.com/lperezmo/st-rsuite/commit/acd9420f888d9d787c0d7578285551902ddfe54f))
+
+The branches filter on a workflow_run trigger matches the triggering run's head branch, and Tests
+  also runs on pull_request, so a fork PR opened from the contributor's own main branch satisfied it
+  and could reach the PyPI publish. The old push trigger was unreachable from forks, so gating on
+  Tests widened the surface. Requiring the upstream event to be a push closes it. Also documented
+  why the checkout takes the tip of main rather than workflow_run.head_sha.
+
+- Resolve all open Dependabot alerts via vite 8 and lockfile bumps
+  ([`0065587`](https://github.com/lperezmo/st-rsuite/commit/0065587b1e685e60616a87d8bee4fe2fe67a34aa))
+
+Frontend (st_rsuite/frontend): - vite 7.1.12 -> 8.1.4, @vitejs/plugin-react 5.1.0 -> 6.0.3. Vite 8
+  bundles with Rolldown, so esbuild and @babel/core leave the dependency tree entirely. The build
+  keeps minify: terser, which remains a supported opt-in path in vite 8; only the removed minify:
+  esbuild path is gone, and this repo never used it.
+
+- Transitive bumps in package-lock.json: lodash 4.18.1, postcss 8.5.17, picomatch 4.0.5. npm audit:
+  0 vulnerabilities.
+
+Python (uv.lock, all dev/example pins; runtime dep is streamlit only): - tornado 6.5.7, GitPython
+  3.1.50, pillow 12.3.0, urllib3 2.7.0, idna 3.18, requests 2.34.2.
+
+No source changes. Streamlit floor (>=1.51) and the _compat.py shim are untouched. Verified locally:
+  npm ci + npm run build (hashed index-*.js entry and chunk-* naming intact), tsc --noEmit,
+  scripts/assert_prod_build.sh, ruff check, 4 smoke + 51 Playwright e2e tests passing on Streamlit
+  1.55.
+
+- Restore the interpreter after stubbing the registration
+  ([`b38b7c4`](https://github.com/lperezmo/st-rsuite/commit/b38b7c419e93bd7d38c692e11ddbb67c839c8ce5))
+
+Both unit tests popped st_rsuite._component and the widget module out of sys.modules, re-imported
+  them under a patched _compat.component, and left it that way. Two things then outlived the test:
+  sys.modules kept the stub-bound module, so a later test asking for the real widget would get
+  canned answers, and importing the submodule rebound it as an attribute of the package, shadowing
+  the function st_rsuite.__getattr__ binds there. After that, from st_rsuite import radio_tile hands
+  out a module and calling it raises TypeError: 'module' object is not callable.
+
+That was survivable while each file was a CI job of its own. The matrix now runs pytest test/ in one
+  process, where the next test to touch a widget collects the wreckage.
+
+registration_stub owns the import and the cleanup, restoring both sys.modules and the package
+  attribute, with a test that says so.
+
+- Run the whole browser-less suite on the version matrix
+  ([`e00c37b`](https://github.com/lperezmo/st-rsuite/commit/e00c37ba148d08491ca064965f5bfe2758d5efdd))
+
+The matrix job was named "Smoke" and ran exactly one file, test/test_registration_smoke.py. That was
+  accurate as a name and wrong as coverage: three browser-less files (date serialization, radio tile
+  returns, range callbacks) never ran against any Streamlit version except the one the browser job
+  happened to be on, because that job ran the whole directory.
+
+So a pure-logic regression could only surface as a failure inside a Playwright leg, where it read as
+  a browser flake, and only on the five versions e2e covers rather than the nine here. The sibling
+  st-aggrid repo has had the wider coverage all along, and it is exactly where its pandas 3 NaT
+  regression appeared: on a single leg of a matrix like this one.
+
+Suites are now selected by the `browser` marker, matching st-aggrid. Enumerating filenames has
+  already failed twice in this repo: it dropped five e2e files including the whole useSyncedValue
+  regression guard, and it is what limited this job to one file. A marker makes inclusion the
+  default, so a new test file joins the right job without anyone remembering to edit the workflow.
+
+Python (Streamlit X) pytest test/ -m "not browser" 45 tests, 9 versions e2e (Streamlit X) pytest
+  test/ -m browser 58 tests, 5 versions
+
+45 + 58 = 103, the full collection, so nothing is unclassified and nothing runs twice.
+
+The job is renamed from smoke to python-suite. "Smoke" now understates what it runs, and matching
+  st-aggrid means the two repos read the same in a checks list. Neither main branch is protected, so
+  no required-check name depends on the old one.
+
+- Run the whole e2e suite in CI and gate PyPI publish on Tests
+  ([`e69eb7b`](https://github.com/lperezmo/st-rsuite/commit/e69eb7b5a882dee1ec88c9db4abc2f4492590c79))
+
+The e2e leg enumerated four test files by hand, so five never ran anywhere: test_value_sync_e2e (3
+  tests), test_a11y_e2e (2), test_date_constraints_e2e (4), test_range_shortcuts_e2e (2),
+  test_time_constraints_e2e (2). That is 13 of 26 e2e tests dead, including the entire
+  useSyncedValue regression guard. The leg now runs pytest test/ so a new test file is covered the
+  moment it lands.
+
+release.yml triggered on push to main and ran python-semantic-release plus the PyPI publish with no
+  dependency on tests.yml, which triggers independently on the same event. A merge whose typecheck
+  or e2e legs were still running or already red could be tagged and shipped. release.yml now
+  triggers on workflow_run of Tests and only proceeds when that run concluded successfully, with a
+  non-cancelling concurrency group so two closely spaced merges cannot interleave their releases.
+
+- Skip the appearance-flip test where Streamlit cannot flip
+  ([`1c5ab07`](https://github.com/lperezmo/st-rsuite/commit/1c5ab0728a04bbac336e6cae27a250505edf05df))
+
+The theme re-detection test failed on the 1.51, 1.52 and 1.53 legs of the e2e matrix and passed on
+  1.54 through latest. The step that timed out was the wait for Streamlit's own
+  --st-background-color to move after emulating prefers-color-scheme: dark, which runs before the
+  component is involved at
+
+all: those Streamlit versions do not repaint on a live appearance change, so there was no flip for
+  the bridge to follow and the test was asserting against a precondition it could not establish.
+
+Gate it on the capability instead. Reloading the page would make the test pass everywhere, but a
+  reload remounts the component and re-detects the theme correctly even with the bug, so it would no
+  longer catch the cache that pinned the appearance at first render. That is the whole point of the
+  test, so the flip has to stay in-page.
+
+The fix itself is version independent and is still exercised on six Streamlit versions. Parsed with
+  packaging rather than splitting on dots so a prerelease like 1.54.0rc1 cannot crash the module at
+  import.
+
+- Upgrade gitpython to clear the pip advisories
+  ([`3ee080d`](https://github.com/lperezmo/st-rsuite/commit/3ee080d214667f5363c8b7d303074046f458fec0))
+
+Clears all four open Dependabot alerts on this repo: GHSA-v396-v7q4-x2qj, GHSA-2f96-g7mh-g2hx and
+  GHSA-956x-8gvw-wg5v (patched in 3.1.51) plus GHSA-rwj8-pgh3-r573 (patched in 3.1.52). The resolver
+  went to 3.1.55.
+
+GitPython arrives only as a transitive dependency of streamlit, and uv.lock ships in neither the
+  wheel nor the sdist, so the exposure is CI and contributors rather than anyone installing the
+  package. Pillow was already at 12.3.0 here, which is why this repo has no Pillow alerts.
+
+103 tests still pass.
+
+### Documentation
+
+- Drop em dashes and emoji, document help= on six components
+  ([`1603a1e`](https://github.com/lperezmo/st-rsuite/commit/1603a1ec88b7eed8654caa9af7f5be7348c35656))
+
+Removed all 19 em dashes from tracked files (project style rule): README, CHANGELOG, pyproject
+  description (which ships as PyPI package metadata), .streamlit/config.toml, and the carousel /
+  inputs / ui example modules. Swept every tracked file rather than a fixed list; the count is now
+  zero. CHANGELOG is generated by semantic-release and will be rewritten on the next release, which
+  is fine.
+
+The quick-start block embedded two emoji as radio_tile icon values inside a python fence. That is
+  code, so no emoji: the example now uses plain letters and a comment noting the field renders any
+  short string.
+
+The README signature blocks for date_picker, date_range_picker, time_picker, time_range_picker,
+  date_input and date_range_input omitted help=, which all six accept and document in their
+  docstrings, while select_picker, tag_picker, tree_picker and cascader listed it. Added it to the
+  six for consistency.
+
+
 ## v0.9.0 (2026-07-11)
 
 ### Chores
@@ -369,7 +722,7 @@ The python-semantic-release action left .git files with different ownership, cau
 
 ### Features
 
-- Add 7 new components: RadioTile, CheckTree, CheckTreePicker, MultiCascadeTree, Carousel,
+- Add 7 new components — RadioTile, CheckTree, CheckTreePicker, MultiCascadeTree, Carousel,
   Timeline, PinInput
   ([`f611a35`](https://github.com/lperezmo/st-rsuite/commit/f611a3553a3cc654001f2ef842085580b2f27e6e))
 
