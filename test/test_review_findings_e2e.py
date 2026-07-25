@@ -4,7 +4,8 @@ Each test pins one fix that only shows up against a real Streamlit server and a
 real RSuite render:
 
 - ``datetime`` defaults reach the date fields as dates, not timestamps,
-- a disabled tree is disabled for the keyboard too, not just the mouse,
+- a disabled tree is disabled for the keyboard too, not just the mouse, while
+  staying readable to assistive tech and still showing what is selected,
 - distinct word splits keep distinct value-sync keys,
 - the RSuite theme re-detects when Streamlit's appearance changes.
 
@@ -111,6 +112,33 @@ def test_disabled_tree_refuses_focus_and_keeps_its_value(
 
     page.keyboard.press("Space")
     expect(echo).to_have_text(expected)
+
+
+@pytest.mark.parametrize("key", ["disabled_ct", "disabled_mct"])
+def test_disabled_tree_is_still_readable(page: Page, key: str):
+    """`inert` kept the keyboard out by removing the subtree from the
+    accessibility tree along with the tab order, so a screen-reader user heard
+    nothing at all where sighted users saw a dimmed tree. Disabled controls are
+    announced; hidden ones are not, so every control has to be `:disabled` and
+    nothing may be inert."""
+    comp = _comp(page, key)
+
+    assert comp.evaluate(
+        "el => !el.closest('[inert]') && el.querySelectorAll('[inert]').length === 0"
+    ), f"{key} is inert, so assistive tech cannot read it"
+
+    fields = _fields(page, key)
+    expect(fields.first).to_be_attached()
+    assert comp.locator("input:not([type='hidden']):disabled").count() == fields.count()
+    expect(comp.locator('[role="treeitem"]').first).to_be_visible()
+
+
+def test_disabled_check_tree_still_shows_its_selection(page: Page):
+    """RSuite's own per-item disabling (disabledItemValues) renders a disabled
+    node as unchecked whatever `value` says, which would hide the selection the
+    tree is there to display, on screen and in the accessibility tree alike."""
+    item = _comp(page, "disabled_ct").locator('[role="treeitem"]', has_text="React")
+    expect(item).to_have_attribute("aria-checked", "true")
 
 
 def test_tab_order_skips_the_disabled_trees(page: Page):
