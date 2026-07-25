@@ -1,6 +1,7 @@
 import streamlit as st
 
 from st_rsuite import timeline
+
 from utils.ui import banner_rsuite
 
 st.markdown(

@@ -18,7 +18,7 @@ test_registration_smoke).
 
 import importlib
 import sys
-from typing import Callable
+from collections.abc import Callable
 from unittest.mock import patch
 
 import pytest

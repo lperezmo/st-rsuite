@@ -15,6 +15,22 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  # The Python counterpart to the frontend typecheck below, and the cheapest
+  # gate here, so it runs first. `check .` rather than a list of directories:
+  # a list silently stops covering anything added later, which is the same rot
+  # that left new test files unrun in the sibling st-aggrid repo.
+  # The rule set and the ruff version both come from pyproject.toml, which
+  # ruff-action reads: see the pin comment there for why the upper bound
+  # matters as much as the floor.
+  lint:
+    name: Lint (ruff)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: astral-sh/ruff-action@v3
+        with:
+          args: check .
+
   # TypeScript type check of the frontend. Runs independently of the build
   # (Vite/esbuild transpiles without type-checking), so this is the only gate
   # that catches type regressions such as passing a prop RSuite does not accept.

@@ -1,0 +1,1200 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>st-rsuite v0.3.4 code review</title>
+    <style>
+      :root {
+        /* palette */
+        --ivory: #faf9f5;
+        --slate: #141413;
+        --clay: #d97757; /* primary accent */
+        --olive: #788c5d; /* success / done */
+        --rust: #bc4b39; /* danger / high */
+        --oat: #e3dacc;
+        --gray-100: #f5f4ee;
+        --gray-150: #f0eee6;
+        --gray-300: #d1cfc5;
+        --gray-500: #87867f;
+        --gray-700: #3d3d3a;
+        --white: #ffffff;
+        --accent: var(--clay);
+
+        /* type */
+        --serif: ui-serif, Georgia, 'Times New Roman', serif;
+        --sans: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+        --mono: ui-monospace, 'SF Mono', Menlo, Monaco, monospace;
+
+        /* shape */
+        --border: 1.5px solid var(--gray-300);
+        --radius-panel: 12px;
+        --radius-row: 8px;
+
+        color-scheme: light;
+      }
+
+      :root[data-theme='dark'] {
+        --ivory: #211f1d;
+        --slate: #f3f1ea;
+        --white: #2b2926;
+        --gray-100: #302e2a;
+        --gray-150: #35322d;
+        --gray-300: #46433d;
+        --gray-500: #a3a196;
+        --gray-700: #e2dfd5;
+        --oat: #3a362f;
+        --olive: #9cb67a;
+        --rust: #e56b54;
+
+        color-scheme: dark;
+      }
+      @media (prefers-color-scheme: dark) {
+        :root:not([data-theme]) {
+          --ivory: #211f1d;
+          --slate: #f3f1ea;
+          --white: #2b2926;
+          --gray-100: #302e2a;
+          --gray-150: #35322d;
+          --gray-300: #46433d;
+          --gray-500: #a3a196;
+          --gray-700: #e2dfd5;
+          --oat: #3a362f;
+          --olive: #9cb67a;
+          --rust: #e56b54;
+
+          color-scheme: dark;
+        }
+      }
+      :root[data-theme='dark'] .sev.med {
+        background: #48332a;
+        color: #f0a684;
+      }
+      :root[data-theme='dark'] .sev.high {
+        background: #4d2a24;
+        color: #f0907a;
+      }
+      :root[data-theme='dark'] .code {
+        background: #16150f;
+      }
+
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: var(--sans);
+        background: var(--ivory);
+        color: var(--gray-700);
+        line-height: 1.55;
+        padding: 56px 32px 120px;
+        -webkit-font-smoothing: antialiased;
+      }
+
+      .page {
+        max-width: 1120px;
+        margin: 0 auto;
+      }
+
+      a {
+        color: var(--accent);
+      }
+
+      .doc-head {
+        margin-bottom: 48px;
+        max-width: 820px;
+      }
+      .doc-head .eyebrow {
+        font-family: var(--mono);
+        font-size: 12px;
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+        color: var(--gray-500);
+        margin-bottom: 12px;
+      }
+      .doc-head h1 {
+        font-family: var(--serif);
+        font-weight: 500;
+        font-size: 38px;
+        letter-spacing: -0.01em;
+        color: var(--slate);
+        margin-bottom: 14px;
+      }
+      .doc-head .lede {
+        font-size: 16px;
+        color: var(--gray-700);
+        max-width: 720px;
+      }
+      .doc-head .meta {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px 18px;
+        align-items: center;
+        margin-top: 16px;
+        font-size: 13.5px;
+        color: var(--gray-500);
+      }
+      .doc-head .meta .mono {
+        font-family: var(--mono);
+        font-size: 13px;
+        color: var(--gray-700);
+      }
+
+      .pill {
+        font-family: var(--mono);
+        font-size: 11px;
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+        color: var(--gray-500);
+        background: var(--gray-100);
+        border: var(--border);
+        border-radius: 999px;
+        padding: 5px 11px;
+        white-space: nowrap;
+      }
+      .pill.accent {
+        color: var(--white);
+        background: var(--accent);
+        border-color: transparent;
+      }
+      .pill.done {
+        color: var(--white);
+        background: var(--olive);
+        border-color: transparent;
+      }
+
+      section {
+        margin-bottom: 56px;
+      }
+      .sec-head {
+        display: flex;
+        align-items: baseline;
+        gap: 12px;
+        margin-bottom: 6px;
+      }
+      .sec-head h2 {
+        font-family: var(--serif);
+        font-weight: 500;
+        font-size: 26px;
+        letter-spacing: -0.01em;
+        color: var(--slate);
+      }
+      .sec-intro {
+        font-size: 14.5px;
+        color: var(--gray-500);
+        max-width: 720px;
+        margin-bottom: 28px;
+      }
+
+      .toc {
+        margin-bottom: 48px;
+        max-width: 480px;
+      }
+      .toc-title {
+        font-family: var(--mono);
+        font-size: 11px;
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+        color: var(--gray-500);
+        margin-bottom: 10px;
+      }
+      .toc-list {
+        list-style: none;
+        counter-reset: toc;
+      }
+      .toc-list li {
+        counter-increment: toc;
+      }
+      .toc-list li a {
+        display: flex;
+        align-items: baseline;
+        gap: 10px;
+        padding: 6px 0;
+        font-size: 14.5px;
+        color: var(--gray-700);
+        text-decoration: none;
+        border-bottom: 1px solid var(--gray-150);
+        transition: color 0.15s;
+      }
+      .toc-list li a:hover {
+        color: var(--accent);
+      }
+      .toc-list li a::before {
+        content: counter(toc, decimal-leading-zero);
+        font-family: var(--mono);
+        font-size: 12px;
+        color: var(--gray-500);
+        flex-shrink: 0;
+      }
+
+      .prose p {
+        font-size: 14.5px;
+        color: var(--gray-700);
+        max-width: 720px;
+        margin-bottom: 14px;
+        line-height: 1.65;
+      }
+      .prose ul,
+      .prose ol {
+        font-size: 14.5px;
+        color: var(--gray-700);
+        max-width: 720px;
+        margin-bottom: 14px;
+        padding-left: 24px;
+        line-height: 1.65;
+      }
+      .prose li + li {
+        margin-top: 4px;
+      }
+      .prose code {
+        font-family: var(--mono);
+        font-size: 13px;
+        background: var(--gray-150);
+        border: 1px solid var(--gray-300);
+        border-radius: 4px;
+        padding: 1px 5px;
+      }
+      .prose strong {
+        color: var(--slate);
+      }
+
+      .summary {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 16px;
+      }
+      @media (max-width: 900px) {
+        .summary {
+          grid-template-columns: repeat(2, 1fr);
+        }
+      }
+      .summary .cell {
+        background: var(--white);
+        border: var(--border);
+        border-radius: var(--radius-panel);
+        padding: 18px 20px;
+      }
+      .summary .k {
+        font-family: var(--mono);
+        font-size: 11px;
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+        color: var(--gray-500);
+        margin-bottom: 6px;
+      }
+      .summary .v {
+        font-size: 17px;
+        color: var(--slate);
+        font-weight: 600;
+      }
+      .summary .v.accent {
+        color: var(--accent);
+      }
+
+      .callout {
+        border: var(--border);
+        border-left: 4px solid var(--gray-500);
+        border-radius: var(--radius-row);
+        background: var(--white);
+        padding: 14px 18px;
+        margin: 18px 0;
+        font-size: 14px;
+      }
+      .callout .tag {
+        font-family: var(--mono);
+        font-size: 11px;
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+        display: block;
+        margin-bottom: 4px;
+        color: var(--gray-500);
+      }
+      .callout.note {
+        border-left-color: var(--accent);
+      }
+      .callout.warn {
+        border-left-color: var(--rust);
+      }
+      .callout.success {
+        border-left-color: var(--olive);
+      }
+      .callout.decision {
+        border-left-color: var(--slate);
+      }
+
+      .milestones {
+        display: flex;
+        flex-direction: column;
+      }
+      .milestone {
+        display: grid;
+        grid-template-columns: 130px 28px 1fr;
+        gap: 0 18px;
+      }
+      .milestone .when {
+        text-align: right;
+        font-family: var(--mono);
+        font-size: 12px;
+        color: var(--gray-500);
+        padding-top: 4px;
+      }
+      .milestone .dot-col {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+      }
+      .milestone .dot {
+        width: 14px;
+        height: 14px;
+        border-radius: 50%;
+        background: var(--white);
+        border: 3px solid var(--accent);
+        margin-top: 4px;
+        flex-shrink: 0;
+      }
+      .milestone .dot.done {
+        background: var(--olive);
+        border-color: var(--olive);
+      }
+      .milestone .line {
+        width: 2px;
+        flex: 1;
+        background: var(--gray-300);
+        margin: 4px 0;
+      }
+      .milestone:last-child .line {
+        display: none;
+      }
+      .milestone .body {
+        padding-bottom: 36px;
+      }
+      .milestone .body h3 {
+        font-family: var(--serif);
+        font-weight: 500;
+        font-size: 19px;
+        color: var(--slate);
+        margin-bottom: 4px;
+      }
+      .milestone .body p {
+        font-size: 14px;
+        color: var(--gray-500);
+        margin-bottom: 10px;
+        max-width: 620px;
+      }
+      .milestone .tags {
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+      }
+      .milestone .tag {
+        font-family: var(--mono);
+        font-size: 11.5px;
+        background: var(--gray-150);
+        border: 1px solid var(--gray-300);
+        border-radius: 6px;
+        padding: 3px 8px;
+        color: var(--gray-700);
+      }
+
+      .code-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 28px;
+      }
+      @media (max-width: 980px) {
+        .code-grid {
+          grid-template-columns: 1fr;
+        }
+      }
+      .code-block {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+      }
+      .code-block .file-label {
+        font-family: var(--mono);
+        font-size: 12px;
+        color: var(--gray-500);
+      }
+      .code {
+        background: var(--slate);
+        border-radius: var(--radius-panel);
+        padding: 18px 20px;
+        overflow-x: auto;
+        flex: 1;
+      }
+      .code pre {
+        font-family: var(--mono);
+        font-size: 12.5px;
+        line-height: 1.65;
+        color: #e8e6de;
+        white-space: pre;
+      }
+      .code .kw {
+        color: var(--clay);
+      }
+      .code .str {
+        color: var(--olive);
+      }
+      .code .cm {
+        color: var(--gray-500);
+      }
+      .code .fn {
+        color: #c9b98a;
+      }
+
+      .grid {
+        border: var(--border);
+        border-radius: var(--radius-panel);
+        overflow: hidden;
+        background: var(--white);
+      }
+      .grid .row {
+        display: grid;
+        grid-template-columns: 1.6fr 90px 1.6fr;
+      }
+      @media (max-width: 780px) {
+        .grid .row {
+          grid-template-columns: 1fr;
+        }
+      }
+      .grid .row + .row {
+        border-top: var(--border);
+      }
+      .grid .cell {
+        padding: 14px 18px;
+        font-size: 13.5px;
+      }
+      .grid .cell + .cell {
+        border-left: var(--border);
+      }
+      @media (max-width: 780px) {
+        .grid .cell + .cell {
+          border-left: none;
+          border-top: 1px dashed var(--gray-300);
+        }
+      }
+      .grid .head {
+        background: var(--gray-150);
+        font-weight: 600;
+        color: var(--slate);
+        font-size: 12px;
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+      }
+      .sev {
+        display: inline-block;
+        font-family: var(--mono);
+        font-size: 11px;
+        padding: 2px 8px;
+        border-radius: 6px;
+        font-weight: 600;
+      }
+      .sev.low {
+        background: var(--gray-150);
+        color: var(--olive);
+      }
+      .sev.med {
+        background: #f6e7de;
+        color: var(--clay);
+      }
+      .sev.high {
+        background: #f3dad3;
+        color: var(--rust);
+      }
+
+      details {
+        border: var(--border);
+        border-radius: var(--radius-row);
+        background: var(--white);
+        margin-bottom: 10px;
+      }
+      summary {
+        list-style: none;
+        cursor: pointer;
+        padding: 14px 16px;
+        font-weight: 600;
+        color: var(--slate);
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+      summary::-webkit-details-marker {
+        display: none;
+      }
+      summary::before {
+        content: '›';
+        font-family: var(--mono);
+        color: var(--accent);
+        transition: transform 0.15s;
+        display: inline-block;
+      }
+      details[open] summary::before {
+        transform: rotate(90deg);
+      }
+      summary .where {
+        font-family: var(--mono);
+        font-weight: 400;
+        font-size: 12px;
+        color: var(--gray-500);
+        margin-left: auto;
+      }
+      details .body {
+        padding: 0 16px 16px;
+      }
+      details .body p {
+        font-size: 14px;
+        max-width: 760px;
+        margin-bottom: 8px;
+      }
+      details .body code {
+        font-family: var(--mono);
+        font-size: 12.5px;
+        background: var(--gray-150);
+        border: 1px solid var(--gray-300);
+        border-radius: 4px;
+        padding: 1px 5px;
+      }
+
+      .sources {
+        font-family: var(--mono);
+        font-size: 12px;
+        color: var(--gray-500);
+        border-top: 1px solid var(--gray-300);
+        padding-top: 16px;
+        margin-top: 8px;
+      }
+
+      body,
+      .summary .cell,
+      .callout,
+      .grid,
+      details,
+      .pill,
+      .milestone .tag,
+      .milestone .dot,
+      .code,
+      .theme-toggle,
+      .theme-toggle button,
+      h1,
+      h2,
+      h3,
+      .prose p,
+      .lede,
+      .sec-intro,
+      .toc-list li a {
+        transition: background-color 0.28s ease, border-color 0.28s ease,
+          color 0.22s ease, fill 0.28s ease, stroke 0.28s ease;
+      }
+      @media (prefers-reduced-motion: reduce) {
+        * {
+          transition: none !important;
+        }
+      }
+
+      .theme-toggle {
+        position: fixed;
+        top: 18px;
+        right: 20px;
+        z-index: 50;
+        display: inline-flex;
+        gap: 2px;
+        padding: 3px;
+        background: var(--white);
+        border: var(--border);
+        border-radius: 999px;
+        box-shadow: 0 2px 8px rgba(20, 20, 19, 0.09);
+      }
+      .theme-toggle button {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 30px;
+        height: 30px;
+        padding: 0;
+        border: none;
+        background: transparent;
+        border-radius: 999px;
+        color: var(--gray-500);
+        cursor: pointer;
+      }
+      .theme-toggle button:hover {
+        color: var(--slate);
+        background: var(--gray-100);
+      }
+      .theme-toggle button[aria-pressed='true'],
+      .theme-toggle button[aria-pressed='true']:hover {
+        background: var(--accent);
+        color: var(--white);
+      }
+      .theme-toggle button:focus-visible {
+        outline: 2px solid var(--accent);
+        outline-offset: 2px;
+      }
+      .theme-toggle svg {
+        width: 16px;
+        height: 16px;
+        display: block;
+      }
+      @media (max-width: 640px) {
+        .theme-toggle {
+          top: 12px;
+          right: 12px;
+        }
+      }
+
+      @media print {
+        .theme-toggle {
+          display: none;
+        }
+        body {
+          background: var(--white);
+          padding: 0;
+        }
+        section {
+          break-inside: avoid;
+        }
+        details {
+          break-inside: avoid;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <script>
+      (function () {
+        var root = document.documentElement;
+        var KEY = 'thariq-doc-theme';
+        var mq = window.matchMedia('(prefers-color-scheme: dark)');
+
+        function getPref() {
+          try {
+            return localStorage.getItem(KEY) || 'system';
+          } catch (e) {
+            return 'system';
+          }
+        }
+        function resolve(pref) {
+          if (pref === 'system') return mq.matches ? 'dark' : 'light';
+          return pref;
+        }
+        function apply() {
+          var pref = getPref();
+          root.setAttribute('data-theme', resolve(pref));
+          var btns = document.querySelectorAll('.theme-toggle button');
+          for (var i = 0; i < btns.length; i++) {
+            var on = btns[i].getAttribute('data-set-theme') === pref;
+            btns[i].setAttribute('aria-pressed', on ? 'true' : 'false');
+          }
+        }
+
+        root.setAttribute('data-theme', resolve(getPref()));
+
+        function wire() {
+          var btns = document.querySelectorAll('.theme-toggle button');
+          for (var i = 0; i < btns.length; i++) {
+            btns[i].addEventListener('click', function () {
+              try {
+                localStorage.setItem(KEY, this.getAttribute('data-set-theme'));
+              } catch (e) {}
+              apply();
+            });
+          }
+          apply();
+        }
+        if (document.readyState === 'loading') {
+          document.addEventListener('DOMContentLoaded', wire);
+        } else {
+          wire();
+        }
+        mq.addEventListener('change', function () {
+          if (getPref() === 'system') apply();
+        });
+      })();
+    </script>
+
+    <div class="theme-toggle" role="group" aria-label="Color theme">
+      <button type="button" data-set-theme="light" title="Light" aria-label="Light theme">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <circle cx="12" cy="12" r="4" />
+          <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41" />
+        </svg>
+      </button>
+      <button type="button" data-set-theme="dark" title="Dark" aria-label="Dark theme">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />
+        </svg>
+      </button>
+      <button type="button" data-set-theme="system" title="System" aria-label="Match system theme">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <rect x="2" y="3" width="20" height="14" rx="2" />
+          <path d="M8 21h8M12 17v4" />
+        </svg>
+      </button>
+    </div>
+
+    <main class="page">
+      <header class="doc-head">
+        <div class="eyebrow">Code review · st-rsuite</div>
+        <h1>st-rsuite v0.3.4: high-level review and roadmap ideas</h1>
+        <p class="lede">
+          A pass over the whole library (Python wrappers, React frontend, build pipeline, CI, published wheel)
+          plus a sweep of the RSuite v6 docs for API and component gaps. Three substantive findings,
+          a set of missing-feature ideas, and a suggested order of attack.
+        </p>
+        <div class="meta">
+          <span class="pill accent">review</span>
+          <span class="mono">lperezmo/st-rsuite</span>
+          <span class="mono">v0.3.4</span>
+          <span>2026-07-07</span>
+          <span>Claire</span>
+        </div>
+      </header>
+
+      <nav class="toc">
+        <div class="toc-title">Contents</div>
+        <ol class="toc-list">
+          <li><a href="#at-a-glance">At a glance</a></li>
+          <li><a href="#what-holds-up">What holds up well</a></li>
+          <li><a href="#shipping-dev-builds">Finding 1: PyPI wheel ships unminified dev builds</a></li>
+          <li><a href="#value-sync">Finding 2: Python-side value changes never reach the widget</a></li>
+          <li><a href="#bundle-duplication">Finding 3: React and RSuite are bundled 13 times</a></li>
+          <li><a href="#api-gaps">API gaps vs RSuite v6</a></li>
+          <li><a href="#missing-components">Missing components worth adding</a></li>
+          <li><a href="#smaller-items">Smaller items</a></li>
+          <li><a href="#suggested-roadmap">Suggested roadmap</a></li>
+        </ol>
+      </nav>
+
+      <section id="at-a-glance">
+        <div class="summary">
+          <div class="cell">
+            <div class="k">Components</div>
+            <div class="v">13 wrapped</div>
+          </div>
+          <div class="cell">
+            <div class="k">Wheel on PyPI</div>
+            <div class="v accent">9.2 MB (should be ~2)</div>
+          </div>
+          <div class="cell">
+            <div class="k">High findings</div>
+            <div class="v">2</div>
+          </div>
+          <div class="cell">
+            <div class="k">Biggest idea</div>
+            <div class="v">Date constraints API</div>
+          </div>
+        </div>
+      </section>
+
+      <section id="what-holds-up">
+        <div class="sec-head"><h2>What holds up well</h2></div>
+        <div class="prose">
+          <p>
+            The overall architecture is clean and the recent 0.3.x work shows. Things I would not change:
+          </p>
+          <ul>
+            <li><strong>The compat shim</strong> (<code>st_rsuite/_compat.py</code>) is small, well documented, and resolves the
+              <code>isolate_styles</code> registration-vs-call-site split once at import time. This is the right shape.</li>
+            <li><strong>Lazy top-level imports</strong> in <code>st_rsuite/__init__.py</code> via module <code>__getattr__</code>,
+              with rebinding so the hook fires once per name.</li>
+            <li><strong>CI test matrix</strong> covers every supported Streamlit minor (1.51 through latest) with a browser-less
+              smoke leg plus real Playwright e2e round-trips. This is the regression guard that caught the 0.3.3 floor bug, and it is solid.</li>
+            <li><strong>Repo hygiene</strong>: built JS is gitignored and built fresh in CI, <code>references/</code> and
+              <code>.claude/</code> stay untracked, and semantic-release keeps both pyproject versions in sync.</li>
+            <li><strong>Locale handling</strong>: 29 locales mapped, with browser-language auto-detection and a sane
+              language-only fallback chain.</li>
+          </ul>
+        </div>
+      </section>
+
+      <section id="shipping-dev-builds">
+        <div class="sec-head"><h2>Finding 1: PyPI wheel ships unminified dev builds</h2></div>
+        <p class="sec-intro">
+          Severity: high. Verified against the actual v0.3.4 wheel downloaded from PyPI, not just inferred from the config.
+        </p>
+        <div class="prose">
+          <p>
+            <code>build.mjs</code> keys minification and sourcemaps off <code>NODE_ENV === "production"</code>, but neither
+            <code>release.yml</code> nor <code>publish.yml</code> ever sets it. npm does not set <code>NODE_ENV</code> for you.
+            So every published release is a development build.
+          </p>
+          <p>What is actually inside the v0.3.4 wheel:</p>
+          <ul>
+            <li>13 JS bundles, <strong>19.5 MB total, unminified</strong> (largest: <code>time_range_picker</code> at 1.66 MB)</li>
+            <li>13 sourcemaps, <strong>30.3 MB total</strong>, shipped because <code>sourcemap: !isProd</code> is true in dev mode</li>
+            <li>~50 MB unpacked into every user's site-packages; each widget serves ~1.6 MB of JS to the browser</li>
+          </ul>
+        </div>
+        <div class="callout warn">
+          <span class="tag">Impact</span>
+          Every st-rsuite user downloads and serves roughly 5x more JavaScript than they need to. A page with five
+          widgets ships ~8 MB of component JS before RSuite even renders. This is the single highest-leverage fix available.
+        </div>
+        <div class="code-grid">
+          <div class="code-block">
+            <div class="file-label">Today: .github/workflows/release.yml (and publish.yml)</div>
+            <div class="code">
+              <pre><span class="cm"># NODE_ENV is unset, so build.mjs</span>
+<span class="cm"># takes the dev path: no minify,</span>
+<span class="cm"># sourcemaps on.</span>
+- run: npm ci &amp;&amp; npm run build
+  working-directory: st_rsuite/frontend</pre>
+            </div>
+            <p class="sec-intro">Result: 9.2 MB wheel, 49.8 MB unpacked.</p>
+          </div>
+          <div class="code-block">
+            <div class="file-label">Fix: make production the default, dev opt-in</div>
+            <div class="code">
+              <pre><span class="cm">// build.mjs: flip the default so a bare</span>
+<span class="cm">// build is always production</span>
+<span class="kw">const</span> isProd = process.env.NODE_ENV !== <span class="str">"development"</span>;
+
+<span class="cm">// package.json already has build:dev and</span>
+<span class="cm">// dev scripts for the development path</span></pre>
+            </div>
+            <p class="sec-intro">Also add <code>recursive-exclude st_rsuite *.js.map</code> to MANIFEST.in as a belt-and-suspenders guard.</p>
+          </div>
+        </div>
+        <div class="prose">
+          <p>
+            Flipping the default in <code>build.mjs</code> is safer than adding <code>env:</code> blocks to the workflows,
+            because it also protects any future workflow or a maintainer building a wheel locally. Worth adding a CI assertion
+            too: fail the release if any <code>build/*.js</code> exceeds, say, 900 KB, so a regression can never ship silently again.
+          </p>
+        </div>
+      </section>
+
+      <section id="value-sync">
+        <div class="sec-head"><h2>Finding 2: Python-side value changes never reach the widget</h2></div>
+        <p class="sec-intro">
+          Severity: high (correctness). All 13 components use the exact "initial-only hydration" pattern that the repo's own
+          CCv2 reference (<code>references/state-sync.md</code>) documents as a pitfall.
+        </p>
+        <div class="prose">
+          <p>
+            Every component seeds local React state from <code>data.value</code> with <code>useState(initialValue)</code> and
+            never reconciles afterwards. The shared renderer reuses the same React root across reruns (WeakMap on
+            <code>parentElement</code>), so re-renders keep the stale local state. Once a widget has mounted, changing
+            <code>value=</code> from Python is silently ignored.
+          </p>
+          <p>Concretely, none of these work today:</p>
+          <ul>
+            <li>A "reset filters" button that re-runs the script with a different <code>value=</code></li>
+            <li>Dependent widgets (picking a preset that should move a date picker)</li>
+            <li>Driving the widget from <code>st.session_state</code> per the canonical CCv2 controlled pattern</li>
+          </ul>
+        </div>
+        <div class="code-grid">
+          <div class="code-block">
+            <div class="file-label">Today: all 13 *.tsx (DatePicker.tsx:64 shown)</div>
+            <div class="code">
+              <pre><span class="kw">const</span> initialValue = <span class="fn">useMemo</span>(
+  () =&gt; (value ? <span class="kw">new</span> <span class="fn">Date</span>(value + <span class="str">"T00:00:00"</span>) : <span class="kw">null</span>),
+  [value]
+);
+<span class="cm">// state never re-syncs after mount</span>
+<span class="kw">const</span> [selected, setSelected] =
+  <span class="fn">useState</span>&lt;Date | <span class="kw">null</span>&gt;(initialValue);</pre>
+            </div>
+            <p class="sec-intro">Python re-runs with a new value; the widget keeps showing the old one.</p>
+          </div>
+          <div class="code-block">
+            <div class="file-label">Fix: reconcile from data, guard the echo</div>
+            <div class="code">
+              <pre><span class="kw">const</span> lastEmitted = <span class="fn">useRef</span>&lt;string | <span class="kw">null</span>&gt;(<span class="kw">null</span>);
+
+<span class="fn">useEffect</span>(() =&gt; {
+  <span class="cm">// only accept Python values we did not</span>
+  <span class="cm">// just emit ourselves</span>
+  <span class="kw">if</span> (value !== lastEmitted.current) {
+    <span class="fn">setSelected</span>(<span class="fn">parse</span>(value));
+    lastEmitted.current = value;
+  }
+}, [value]);
+
+<span class="cm">// in handleChange:</span>
+lastEmitted.current = <span class="fn">toISODate</span>(next);</pre>
+            </div>
+            <p class="sec-intro">One shared hook (e.g. <code>useSyncedValue</code>) in <code>shared/</code> covers all 13 components.</p>
+          </div>
+        </div>
+        <div class="callout note">
+          <span class="tag">Note</span>
+          The <code>lastEmitted</code> guard matters: without it, the Python echo of the user's own selection can fight
+          in-progress edits (the "fighting the user's cursor" problem the state-sync doc warns about). Add an e2e case:
+          mount, click a Streamlit button that changes value=, assert the widget updated.
+        </div>
+      </section>
+
+      <section id="bundle-duplication">
+        <div class="sec-head"><h2>Finding 3: React and RSuite are bundled 13 times</h2></div>
+        <p class="sec-intro">Severity: medium. Real cost, but the fix is architectural, so it deserves its own release.</p>
+        <div class="prose">
+          <p>
+            Each component is a separate Vite library build, and each bundle embeds its own full copy of React, ReactDOM,
+            the RSuite runtime, all 29 locale files, and the react-icons subset. Even after Finding 1 is fixed
+            (roughly 500 to 600 KB minified per bundle), an app using five st-rsuite widgets still downloads five copies
+            of the same framework code, and the browser boots five independent React runtimes.
+          </p>
+          <p>Two directions, not mutually exclusive:</p>
+          <ul>
+            <li>
+              <strong>Single registered component (recommended).</strong> Register one CCv2 component
+              (one <code>asset_dir</code>, one bundle) and pass a <code>kind</code> discriminator in <code>data</code>;
+              a top-level switch in the frontend routes to the right React component. One ~1 MB bundle, fetched once and
+              cached for every widget on the page. Wheel drops to roughly 1 MB. The Python API does not change at all.
+            </li>
+            <li>
+              <strong>Cheaper trims if staying multi-bundle:</strong> lazy-load locales with dynamic
+              <code>import()</code> instead of statically bundling all 29 into every component, and import react-icons
+              per-icon (only Timeline needs them today).
+            </li>
+          </ul>
+        </div>
+        <div class="callout decision">
+          <span class="tag">Trade-off</span>
+          The single-component design gives up per-component cache invalidation (any change re-downloads the one bundle)
+          and makes the one bundle bigger than any single current bundle. For a library where users typically mix several
+          widgets per page, one shared cached bundle wins clearly.
+        </div>
+      </section>
+
+      <section id="api-gaps">
+        <div class="sec-head"><h2>API gaps vs RSuite v6</h2></div>
+        <p class="sec-intro">
+          From the RSuite v6 docs sweep. The pattern: the wrappers expose appearance props well, but almost none of the
+          constraint props. For a date/time library, constraints are core functionality, not polish.
+        </p>
+        <div class="grid">
+          <div class="row">
+            <div class="cell head">Gap</div>
+            <div class="cell head">Priority</div>
+            <div class="cell head">Detail</div>
+          </div>
+          <div class="row">
+            <div class="cell"><strong>No date constraints at all.</strong> <code>shouldDisableDate</code>, <code>limitStartYear</code>, <code>limitEndYear</code></div>
+            <div class="cell"><span class="sev high">High</span></div>
+            <div class="cell">Even <code>st.date_input</code> has <code>min_value</code>/<code>max_value</code>. Callables do not cross the Python/JS boundary, so expose declarative params: <code>min_date=</code>, <code>max_date=</code>, <code>disabled_dates=[...]</code>, <code>disabled_weekdays=[...]</code>, and build the <code>shouldDisableDate</code> closure in JS.</div>
+          </div>
+          <div class="row">
+            <div class="cell"><strong>No time constraints.</strong> <code>shouldDisableHour/Minute/Second</code>, <code>hideHours/Minutes/Seconds</code></div>
+            <div class="cell"><span class="sev high">High</span></div>
+            <div class="cell">Business-hours pickers (a very common ask) are impossible today. Same declarative approach: <code>min_time=</code>, <code>max_time=</code>, <code>hidden_hours=[...]</code>.</div>
+          </div>
+          <div class="row">
+            <div class="cell"><strong>No shortcut ranges.</strong> DateRangePicker <code>ranges</code></div>
+            <div class="cell"><span class="sev med">Med</span></div>
+            <div class="cell">RSuite ships Today / Yesterday / Last 7 days by default and supports custom presets. A <code>ranges=[{"label": "Last 30 days", "value": (start, end)}]</code> param is a big dashboard win.</div>
+          </div>
+          <div class="row">
+            <div class="cell"><strong>No <code>editable</code> / <code>loading</code>.</strong></div>
+            <div class="cell"><span class="sev med">Med</span></div>
+            <div class="cell"><code>editable=False</code> makes pickers toggle-only (kills keyboard-entry parse edge cases on touch devices); <code>loading=True</code> shows a spinner while the app computes.</div>
+          </div>
+          <div class="row">
+            <div class="cell"><strong>No <code>defaultCalendarValue</code> / <code>calendarDefaultDate</code>.</strong></div>
+            <div class="cell"><span class="sev low">Low</span></div>
+            <div class="cell">Controls which month the empty picker opens on. Cheap to add alongside the constraint work.</div>
+          </div>
+          <div class="row">
+            <div class="cell"><strong>CheckTreePicker power props.</strong> <code>virtualized</code>, <code>disabledItemValues</code>, controlled <code>expandItemValues</code></div>
+            <div class="cell"><span class="sev low">Low</span></div>
+            <div class="cell"><code>virtualized=True</code> matters for large trees; <code>disabledItemValues</code> complements the already-exposed <code>uncheckable_values</code>. (Async <code>getChildren</code> does not map to CCv2 cleanly; skip it.)</div>
+          </div>
+          <div class="row">
+            <div class="cell"><strong>No datetime picker.</strong></div>
+            <div class="cell"><span class="sev med">Med</span></div>
+            <div class="cell">RSuite DatePicker handles combined date+time via <code>format="yyyy-MM-dd HH:mm"</code>, but the wrapper truncates everything to a date. A <code>datetime_picker</code> (or <code>show_time=True</code>) fills a real Streamlit hole: there is no native datetime input.</div>
+          </div>
+        </div>
+      </section>
+
+      <section id="missing-components">
+        <div class="sec-head"><h2>Missing components worth adding</h2></div>
+        <p class="sec-intro">
+          Ranked by how weak or absent the Streamlit native equivalent is. The frontend plumbing (shared renderer,
+          theme bridge, locale map) makes each addition mostly boilerplate.
+        </p>
+        <div class="grid">
+          <div class="row" style="grid-template-columns: 1.1fr 90px 2fr;">
+            <div class="cell head">Component</div>
+            <div class="cell head">Value</div>
+            <div class="cell head">Why</div>
+          </div>
+          <div class="row" style="grid-template-columns: 1.1fr 90px 2fr;">
+            <div class="cell"><code>select_picker</code> / <code>tag_picker</code></div>
+            <div class="cell"><span class="sev high">High</span></div>
+            <div class="cell">Searchable single/multi select with grouping and rich item rendering. <code>st.selectbox</code> / <code>st.multiselect</code> are plain by comparison; this pair would likely become the most-used part of the library.</div>
+          </div>
+          <div class="row" style="grid-template-columns: 1.1fr 90px 2fr;">
+            <div class="cell"><code>cascader</code> / <code>tree_picker</code></div>
+            <div class="cell"><span class="sev high">High</span></div>
+            <div class="cell">Single-select hierarchical dropdowns. No Streamlit equivalent at all, and they complete the tree family you already ship (check_tree, check_tree_picker, multi_cascade_tree are all multi-select; there is no single-select counterpart).</div>
+          </div>
+          <div class="row" style="grid-template-columns: 1.1fr 90px 2fr;">
+            <div class="cell"><code>tag_input</code></div>
+            <div class="cell"><span class="sev med">Med</span></div>
+            <div class="cell">Free-form chip/token entry (tags, emails, keywords). No Streamlit builtin; people abuse <code>st.multiselect</code> with a pre-seeded list.</div>
+          </div>
+          <div class="row" style="grid-template-columns: 1.1fr 90px 2fr;">
+            <div class="cell"><code>steps</code></div>
+            <div class="cell"><span class="sev med">Med</span></div>
+            <div class="cell">Wizard/progress indicator for multi-step form flows. No builtin; pairs naturally with the inputs you already have.</div>
+          </div>
+          <div class="row" style="grid-template-columns: 1.1fr 90px 2fr;">
+            <div class="cell"><code>rate</code></div>
+            <div class="cell"><span class="sev med">Med</span></div>
+            <div class="cell">Star rating input with half-star support. <code>st.feedback</code> is the closest builtin and it is much more limited.</div>
+          </div>
+          <div class="row" style="grid-template-columns: 1.1fr 90px 2fr;">
+            <div class="cell"><code>auto_complete</code></div>
+            <div class="cell"><span class="sev low">Low</span></div>
+            <div class="cell">Text input with suggestions. Nice, but the CCv2 round-trip makes per-keystroke async suggestion fetching awkward; static suggestion lists only.</div>
+          </div>
+        </div>
+        <div class="callout note">
+          <span class="tag">Skip</span>
+          Uploader (fights <code>st.file_uploader</code> and CCv2 has no good file channel), Slider/RangeSlider
+          (<code>st.slider</code> is close enough), and Nav/Tabs (page chrome, not a widget). Also noted in the v6 docs
+          sweep as future candidates: CheckPicker, InputPicker, SegmentedControl, and Placeholder skeletons.
+        </div>
+      </section>
+
+      <section id="smaller-items">
+        <div class="sec-head"><h2>Smaller items</h2></div>
+        <p class="sec-intro">Scan the headings; expand what you care about.</p>
+
+        <details open>
+          <summary>Theme bridge misses high-contrast and RTL <span class="where">frontend/src/shared/theme.ts, renderer.tsx</span></summary>
+          <div class="body">
+            <p>
+              RSuite's CustomProvider supports a third theme, <code>high-contrast</code>, which the bridge never emits, and an
+              <code>rtl</code> prop that matters for the <code>ar_EG</code> and <code>fa_IR</code> locales you already ship.
+              Both are one-line passes through CustomProvider. Also worth knowing: RSuite's provider default locale is en-GB,
+              not en-US; your browser-detection fallback already handles this, so no change needed there.
+            </p>
+          </div>
+        </details>
+
+        <details>
+          <summary>Theme cache can go stale on live theme toggle <span class="where">frontend/src/shared/theme.ts:69</span></summary>
+          <div class="body">
+            <p>
+              <code>getStreamlitRsuiteTheme()</code> only recomputes when <code>--st-background-color</code> changes and is only
+              called when a rerun re-renders the component. If Streamlit ever repaints the theme without rerunning the script,
+              mounted widgets keep the old mode. A <code>MutationObserver</code> on the root element's style attribute (or a
+              matchMedia listener as backstop) would make it live. Low priority; verify whether a theme toggle triggers a rerun first.
+            </p>
+          </div>
+        </details>
+
+        <details>
+          <summary>carousel _resolve_src reads any file path it is handed <span class="where">st_rsuite/carousel/__init__.py:19</span></summary>
+          <div class="body">
+            <p>
+              Any string that is not http/https/data is treated as a local path, expanded with <code>~</code>, read, and inlined
+              as a base64 data URI into the page. Fine when the app author controls <code>src</code>, but if an app ever passes
+              user input through, it becomes an arbitrary-file-read-to-browser primitive. At minimum document that
+              <code>src</code> must be trusted; optionally gate on an allowlist of image extensions.
+            </p>
+          </div>
+        </details>
+
+        <details>
+          <summary>Labels are not associated with their inputs <span class="where">all frontend/src/*/*.tsx</span></summary>
+          <div class="body">
+            <p>
+              Each component renders <code>&lt;label&gt;</code> with no <code>htmlFor</code>, so screen readers do not connect the
+              label to the control and clicking the label does nothing. Generate an id (React <code>useId()</code>) and pass it to
+              the RSuite component's <code>id</code> prop.
+            </p>
+          </div>
+        </details>
+
+        <details>
+          <summary>Dead branch in date_picker._serialize <span class="where">st_rsuite/date_picker/__init__.py:78</span></summary>
+          <div class="body">
+            <p>
+              The inner <code>isinstance(d, datetime)</code> check returns <code>d.isoformat()</code> on both paths; the branch is
+              a no-op. Either delete it or make it meaningful by truncating datetimes to dates (<code>d.date().isoformat()</code>),
+              which would also stop a passed datetime from leaking a time suffix into the frontend.
+            </p>
+          </div>
+        </details>
+
+        <details>
+          <summary>Missing Streamlit-parity conveniences: help=, width= <span class="where">all Python wrappers</span></summary>
+          <div class="body">
+            <p>
+              Streamlit builtins take <code>help=</code> (tooltip) and are moving toward explicit <code>width=</code> params.
+              A <code>help=</code> that renders an info tooltip next to the label would make the components feel native.
+              You already have <code>block=</code> for full width; consider aliasing or documenting it against Streamlit's
+              <code>use_container_width</code> vocabulary people search for.
+            </p>
+          </div>
+        </details>
+      </section>
+
+      <section id="suggested-roadmap">
+        <div class="sec-head"><h2>Suggested roadmap</h2></div>
+        <p class="sec-intro">Sequenced so each release is independently shippable and the highest-leverage fixes land first.</p>
+        <div class="milestones">
+          <div class="milestone">
+            <div class="when">v0.3.5 (fix)</div>
+            <div class="dot-col"><span class="dot"></span><span class="line"></span></div>
+            <div class="body">
+              <h3>Production builds on PyPI</h3>
+              <p>Flip build.mjs default to production, exclude sourcemaps in MANIFEST.in, add a CI bundle-size assertion. One small PR, roughly 80% wheel-size reduction.</p>
+              <div class="tags"><span class="tag">build.mjs</span><span class="tag">MANIFEST.in</span><span class="tag">workflows</span></div>
+            </div>
+          </div>
+          <div class="milestone">
+            <div class="when">v0.4.0 (fix)</div>
+            <div class="dot-col"><span class="dot"></span><span class="line"></span></div>
+            <div class="body">
+              <h3>Two-way value sync</h3>
+              <p>Shared useSyncedValue hook across all 13 components, plus an e2e test that drives a Python-side value change. Behavior change for anyone relying on the widget ignoring value updates, hence minor bump.</p>
+              <div class="tags"><span class="tag">shared/</span><span class="tag">all *.tsx</span><span class="tag">test/</span></div>
+            </div>
+          </div>
+          <div class="milestone">
+            <div class="when">v0.5.0 (feat)</div>
+            <div class="dot-col"><span class="dot"></span><span class="line"></span></div>
+            <div class="body">
+              <h3>Constraints and ranges API</h3>
+              <p>min_date/max_date/disabled_dates/disabled_weekdays, time constraints, DateRangePicker ranges presets, editable and loading, datetime support. This is the release that makes the pickers production-complete.</p>
+              <div class="tags"><span class="tag">date/time wrappers</span><span class="tag">frontend</span></div>
+            </div>
+          </div>
+          <div class="milestone">
+            <div class="when">v0.6.0</div>
+            <div class="dot-col"><span class="dot"></span><span class="line"></span></div>
+            <div class="body">
+              <h3>Single-bundle architecture</h3>
+              <p>One registered CCv2 component with a kind discriminator; Python API unchanged. Wheel to roughly 1 MB, one cached bundle per app instead of one per widget.</p>
+              <div class="tags"><span class="tag">architecture</span><span class="tag">pyproject</span></div>
+            </div>
+          </div>
+          <div class="milestone">
+            <div class="when">v0.7.0+</div>
+            <div class="dot-col"><span class="dot"></span><span class="line"></span></div>
+            <div class="body">
+              <h3>New components</h3>
+              <p>select_picker and tag_picker first, then cascader/tree_picker to complete the tree family, then tag_input, steps, rate as demand shows.</p>
+              <div class="tags"><span class="tag">new widgets</span></div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <footer class="sources">
+        Sources: local repo D:\Python\st-rsuite @ e9f748b (v0.3.4) &middot; st-rsuite 0.3.4 wheel downloaded from PyPI &middot;
+        RSuite v6 docs sweep (rsuitejs.com, Opus subagent, 2026-07-07), cross-checked against the local dump
+        references/rsuite_reference_all.md &middot; repo CCv2 state-sync reference &middot; generated 2026-07-07
+      </footer>
+    </main>
+  </body>
+</html>

@@ -42,6 +42,16 @@ dev = [
     "pytest-playwright>=0.6",
     "requests>=2.32",
     "build>=1.2",
+    # Pinned to the 0.16 line because the lint config relies on that
+    # generation's default rule set (413 rules, up from 59). An older ruff
+    # reports a small subset and disagrees with CI. The upper bound matters
+    # just as much: `astral-sh/ruff-action` reads this constraint and installs
+    # the newest release satisfying it, so an unbounded floor lets the next
+    # default expansion turn CI red on unchanged code. That is not
+    # hypothetical: it is exactly what 0.16.0 did to the sibling st-aggrid
+    # repo, 143 findings on untouched code. Raising this is a deliberate
+    # change with its own triage pass.
+    "ruff>=0.16,<0.17",
 ]
 
 [tool.setuptools.packages.find]
@@ -66,3 +76,43 @@ commit_message = "chore(release): v{version}"
 
 [tool.ruff]
 extend-exclude = ["references/"]
+
+[tool.ruff.lint]
+# No explicit `select`: the rule set is ruff's own default, which 0.16.0 grew
+# from 59 rules to 413. The dev dependency floor is `ruff>=0.16` so that a
+# local run and the CI run agree on what "default" means; an older ruff would
+# silently check a much smaller set and let new findings through. This mirrors
+# the sibling st-aggrid configuration so the two repos lint identically.
+
+[tool.ruff.lint.isort]
+# `e2e_utils` (tests) and `utils` (examples) are sibling modules imported by
+# path rather than installed packages. Without this they sort into the
+# third-party block, above st_rsuite itself, which reads as if the example apps
+# were importing the library from somewhere else.
+known-local-folder = ["e2e_utils", "utils"]
+
+[tool.ruff.lint.per-file-ignores]
+# DTZ wants an explicit tzinfo on every date and datetime construction. This
+# package is a wrapper around date and time pickers, where a naive local date
+# is a first-class supported input rather than an oversight, and the shipped
+# package has zero DTZ findings: every one is in a demo page or a date test.
+# `date.today()` is what a date picker demo should show.
+"examples/app_pages/date_pickers.py" = ["DTZ011"]
+"examples/app_pages/inputs.py" = ["DTZ011"]
+"examples/app_pages/locale.py" = ["DTZ011"]
+# Naive datetimes are the subject under test here, not an accident: the fixture
+# list holds naive and tz-aware values side by side and one test is named
+# test_naive_datetime_drops_the_time. Requiring tzinfo would mean deleting the
+# cases that cover the behavior.
+"test/test_date_serialization.py" = ["DTZ001"]
+"test/review_findings_e2e_app.py" = ["DTZ001"]
+"test/e2e_utils.py" = [
+    # The temp file is owned by AsyncSubprocess across start() and stop() and is
+    # closed there, so it deliberately outlives the statement that opens it. A
+    # context manager cannot express that lifetime.
+    "SIM115",
+    # PYI034 wants `__enter__` annotated with `typing.Self`, which is 3.11+.
+    # The package supports 3.10 and does not depend on typing_extensions, so the
+    # class name is the only annotation available.
+    "PYI034",
+]

@@ -1,7 +1,9 @@
-import streamlit as st
 from pathlib import Path
 
+import streamlit as st
+
 from st_rsuite import carousel
+
 from utils.ui import banner_rsuite
 
 st.markdown(

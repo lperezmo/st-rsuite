@@ -5,7 +5,7 @@ from __future__ import annotations
 import base64
 import mimetypes
 import os
-from typing import Callable
+from collections.abc import Callable
 
 from st_rsuite._component import bind_kind
 

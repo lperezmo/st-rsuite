@@ -14,8 +14,7 @@ import typing
 from contextlib import closing
 from tempfile import TemporaryFile
 
-
-LOGGER = logging.getLogger(__file__)
+LOGGER = logging.getLogger(__name__)
 
 
 def _find_free_port() -> int:
@@ -30,10 +29,10 @@ class AsyncSubprocess:
     """Wraps subprocess.Popen, capturing output to a temp file to avoid
     deadlocks on large output."""
 
-    def __init__(self, args: typing.List[str]):
+    def __init__(self, args: list[str]):
         self.args = args
-        self._proc: typing.Optional[subprocess.Popen] = None
-        self._stdout_file: typing.Optional[typing.IO[str]] = None
+        self._proc: subprocess.Popen | None = None
+        self._stdout_file: typing.IO[str] | None = None
 
     def start(self) -> None:
         self._stdout_file = TemporaryFile("w+")
@@ -45,7 +44,7 @@ class AsyncSubprocess:
             text=True,
         )
 
-    def stop(self) -> typing.Optional[str]:
+    def stop(self) -> str | None:
         stdout = None
         if self._stdout_file is not None:
             with contextlib.suppress(Exception):
@@ -64,10 +63,10 @@ class AsyncSubprocess:
 class StreamlitRunner:
     """Context manager that runs a Streamlit script and exposes its URL."""
 
-    def __init__(self, script_path: os.PathLike, server_port: typing.Optional[int] = None):
+    def __init__(self, script_path: os.PathLike, server_port: int | None = None):
         self.script_path = script_path
         self.server_port = server_port
-        self._process: typing.Optional[AsyncSubprocess] = None
+        self._process: AsyncSubprocess | None = None
 
     def __enter__(self) -> "StreamlitRunner":
         self.server_port = self.server_port or _find_free_port()

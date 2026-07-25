@@ -14,7 +14,8 @@ The fix is to register the same callback on both keys and dedupe, which is what
 
 from __future__ import annotations
 
-from typing import Any, Callable
+from collections.abc import Callable
+from typing import Any
 
 
 def single_fire(on_change: Callable[[], Any] | None) -> Callable[[], None]:
