@@ -82,6 +82,11 @@ jobs:
   # against a single Streamlit version inside the browser job. That is the
   # coverage the sibling st-aggrid repo has had all along, and it is where its
   # pandas 3 regression surfaced: on one leg of a matrix like this one.
+  #
+  # The empty entry is the floating leg: `pip install -U streamlit`, whatever
+  # is newest that day. It is not a substitute for pinning each minor, because
+  # it moves. When 1.61 ships it stops covering 1.60 and nothing else would,
+  # so every new minor gets a pin here as it lands.
   python-suite:
     name: Python (Streamlit ${{ matrix.streamlit || 'latest' }})
     needs: build-frontend
@@ -89,7 +94,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        streamlit: ['1.51.*', '1.52.*', '1.53.*', '1.54.*', '1.55.*', '1.56.*', '1.57.*', '1.58.*', '']
+        streamlit: ['1.51.*', '1.52.*', '1.53.*', '1.54.*', '1.55.*', '1.56.*', '1.57.*', '1.58.*', '1.59.*', '1.60.*', '']
     steps:
       - uses: actions/checkout@v6
       - uses: actions/download-artifact@v7
