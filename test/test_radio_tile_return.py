@@ -7,17 +7,19 @@ string is a real option value and has to survive the round trip.
 
 The widget module is imported against a stubbed CCv2 registration because
 file-backed registration only resolves inside a real ``streamlit run`` (see
-test_registration_smoke).
+test_registration_smoke); ``registration_stub`` owns the import and the cleanup.
 """
 
-import importlib
 import sys
 from collections.abc import Callable
-from unittest.mock import patch
+from types import ModuleType
 
 import pytest
+from registration_stub import stubbed_registration
 
-from st_rsuite import _compat
+import st_rsuite
+
+_MISSING = object()
 
 OPTIONS = [
     {"value": "a", "label": "Option A"},
@@ -34,11 +36,7 @@ def _radio_tile_returning(state: dict | None) -> Callable:
 
         return render
 
-    for mod in ("st_rsuite._component", "st_rsuite.radio_tile"):
-        sys.modules.pop(mod, None)
-
-    with patch.object(_compat, "component", fake_registration):
-        module = importlib.import_module("st_rsuite.radio_tile")
+    with stubbed_registration("radio_tile", fake_registration) as module:
         return module.radio_tile
 
 
@@ -64,3 +62,24 @@ def test_missing_state_is_none(state):
 def test_an_ordinary_selection_still_round_trips():
     radio_tile = _radio_tile_returning({"selected_value": "a"})
     assert radio_tile(options=OPTIONS, key="rt") == "a"
+
+
+def test_the_stub_does_not_outlive_the_test():
+    """The stub has to be invisible to whatever runs next in this process.
+
+    Two things used to survive it. ``sys.modules["st_rsuite.radio_tile"]`` kept
+    the stub-bound module, so a later test asking for the real widget silently
+    got canned answers; and importing the submodule rebound it as an attribute
+    of the package, shadowing the function ``st_rsuite.__getattr__`` binds
+    there, so ``from st_rsuite import radio_tile`` handed out a module and
+    calling it raised ``TypeError: 'module' object is not callable``.
+    """
+    watched = ("st_rsuite._component", "st_rsuite.radio_tile")
+    before = {name: sys.modules.get(name) for name in watched}
+    before_attr = st_rsuite.__dict__.get("radio_tile", _MISSING)
+
+    _radio_tile_returning({"selected_value": "a"})
+
+    assert {name: sys.modules.get(name) for name in watched} == before
+    assert st_rsuite.__dict__.get("radio_tile", _MISSING) is before_attr
+    assert not isinstance(st_rsuite.__dict__.get("radio_tile"), ModuleType)

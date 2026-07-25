@@ -13,19 +13,16 @@ so the production dispatch path is what is under test, not a stand-in for it.
 
 The widget modules are imported against a stubbed CCv2 registration because
 file-backed registration only resolves inside a real ``streamlit run`` (see
-test_registration_smoke).
+test_registration_smoke); ``registration_stub`` owns the import and the cleanup.
 """
 
-import importlib
-import sys
 from collections.abc import Callable
-from unittest.mock import patch
 
 import pytest
+from registration_stub import stubbed_registration
 from streamlit.runtime.state.common import WidgetMetadata
 from streamlit.runtime.state.session_state import SessionState
 
-from st_rsuite import _compat
 from st_rsuite._callbacks import single_fire
 
 # widget module/function name -> (start state key, end state key, three values)
@@ -55,11 +52,7 @@ def _register(widget: str, on_change: Callable | None) -> dict[str, Callable]:
 
         return render
 
-    for mod in ("st_rsuite._component", f"st_rsuite.{widget}"):
-        sys.modules.pop(mod, None)
-
-    with patch.object(_compat, "component", fake_registration):
-        module = importlib.import_module(f"st_rsuite.{widget}")
+    with stubbed_registration(widget, fake_registration) as module:
         getattr(module, widget)(on_change=on_change, key="k")
 
     # Streamlit derives the state key from the kwarg name: on_<key>_change
