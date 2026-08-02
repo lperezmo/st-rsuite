@@ -17,7 +17,10 @@ import {
 import { ComponentProps, StrictMode, FC } from "react";
 import { createRoot, Root } from "react-dom/client";
 import { CustomProvider } from "rsuite";
-import { getStreamlitRsuiteTheme } from "./theme";
+import {
+  applyStreamlitPrimaryPalette,
+  getStreamlitRsuiteTheme,
+} from "./theme";
 
 type RsuiteLocale = ComponentProps<typeof CustomProvider>["locale"];
 
@@ -125,7 +128,11 @@ export function createRsuiteRenderer<
 
     // Resolve the theme from this component's own element: Streamlit's --st-*
     // custom properties live on the per-component wrapper, not the document.
+    // Both reads happen every render for the same reason the theme mode is
+    // uncached: an appearance change rewrites these properties and re-invokes
+    // the renderer, and that render is the only signal there is.
     const theme = getStreamlitRsuiteTheme(rootElement);
+    applyStreamlitPrimaryPalette(rootElement);
     const explicit = (data as Record<string, unknown>).locale as
       | string
       | undefined;
