@@ -1,6 +1,45 @@
 # CHANGELOG
 
 
+## v0.10.0 (2026-08-02)
+
+### Chores
+
+- Bump demo app requirement to v0.9.1
+  ([`4cffeb5`](https://github.com/lperezmo/st-rsuite/commit/4cffeb510c47979eaf07790ca4724906a215f2ae))
+
+### Features
+
+- Draw RSuite accents in the app's primary color
+  ([`e5ebd7d`](https://github.com/lperezmo/st-rsuite/commit/e5ebd7dc223cc89b6d0d114347a0c5fbc5036273))
+
+RSuite ships a fixed blue primary ramp and nothing pointed it at --st-primary-color, so every accent
+  it drew (a selected day, a checked box, a highlighted option, a focused border) was RSuite's blue
+  no matter what the app configured. A themed app rendered its own widgets in one color and its
+  st-rsuite widgets in another. This repo's own fixture theme is violet and carries a comment
+  calling itself distinct from st-mui's blue palette, while the widgets underneath it rendered in
+  very nearly that blue.
+
+RSuite derives its accents from a ten stop ramp rather than a single value, so the bridge generates
+  the ramp. Each stop is a fraction of the distance from the configured color's lightness toward
+  white or black, with the fractions taken from RSuite's own light ramp solved against its 500 stop.
+  Feeding the generator RSuite's blue therefore reproduces RSuite's ramp, and the 500 stop is left
+  as exactly the configured color rather than snapped onto RSuite's lightness. Fractions rather than
+  fixed offsets because the base color belongs to the app: a light primary such as the violet this
+  repo uses in dark mode has too little headroom for RSuite's own step sizes, which would clamp its
+  top three stops to plain white and flatten the hover states that use them.
+
+The ramp is written to documentElement and to body, and it needs both. RSuite does not read the ramp
+  where it paints; it derives semantic properties from it, such as --rs-bg-active:
+  var(--rs-primary-500), and a var() in a declaration resolves against the element that declaration
+  sits on. The light theme declares those on :root and the dark theme redeclares them on body under
+  .rs-theme-dark, which also redeclares the ramp. Writing body alone leaves light mode entirely
+  unchanged; writing documentElement alone is overridden in dark mode.
+
+Checked by eye in both appearances before and after. The color parsing that dark mode detection
+  already did is now shared with the ramp generator instead of duplicated.
+
+
 ## v0.9.1 (2026-07-25)
 
 ### Bug Fixes
