@@ -1,4 +1,6 @@
 <div align="center">
+  <img src="https://raw.githubusercontent.com/lperezmo/st-rsuite/main/assets/logo.svg" alt="st-rsuite logo" width="380">
+
   <h1>st-rsuite</h1>
   <p>Built using <a href="https://rsuitejs.com/">RSuite</a> · Streamlit <a href="https://docs.streamlit.io/develop/api-reference/custom-components/st.components.v2.component">Components v2</a></p>
 
