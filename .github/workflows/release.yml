@@ -73,14 +73,12 @@ jobs:
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
 
-  publish:
+  build-dist:
     needs: [release]
     if: needs.release.outputs.released == 'true'
     runs-on: ubuntu-latest
-    environment: pypi
     permissions:
-      contents: write
-      id-token: write
+      contents: read
     steps:
       - uses: actions/checkout@v6
         with:
@@ -102,13 +100,42 @@ jobs:
           python -m pip install --upgrade build
           python -m build
 
-      # Upload dists to the GitHub Release that semantic-release already created
+      - uses: actions/upload-artifact@v7
+        with:
+          name: release-dist
+          path: dist/
+
+  upload-release-assets:
+    needs: [release, build-dist]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/download-artifact@v7
+        with:
+          name: release-dist
+          path: dist/
+
+      # Upload dists to the GitHub Release that semantic-release already created.
       - name: Upload assets to GitHub Release
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: gh release upload "${{ needs.release.outputs.tag }}" dist/* --clobber
 
-      # Publish to PyPI
+  publish:
+    needs: [release, build-dist]
+    runs-on: ubuntu-latest
+    environment: pypi
+    permissions:
+      id-token: write
+    steps:
+      - uses: actions/download-artifact@v7
+        with:
+          name: release-dist
+          path: dist/
+
+      # This job handles the completed artifact only; no build dependencies run
+      # with the PyPI OIDC capability.
       - name: Publish to PyPI
         uses: pypa/gh-action-pypi-publish@release/v1
         with:

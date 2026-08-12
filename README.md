@@ -57,7 +57,7 @@ Lightweight alternatives with no popup. Users navigate date segments with arrow 
 
 | Component | Description | Streamlit equivalent |
 |-----------|-------------|----------------------|
-| `carousel` | Content/image carousel with autoplay, local files & URLs | -- |
+| `carousel` | Content/image carousel with autoplay, explicit local paths & URLs | -- |
 | `timeline` | Timeline with custom react-icons | -- |
 | `pin_input` | PIN/verification code input with masking | `st.text_input` |
 
@@ -623,7 +623,7 @@ multi_cascade_tree(
 
 ```python
 carousel(
-    items=[...],          # [{content?, src?, alt?, background?, color?}]  # src: URL or local file path
+    items=[...],          # src: URL/data string or explicit pathlib.Path
     autoplay=True,
     autoplay_interval=4000,  # ms between slides
     placement="bottom",   # indicator: 'top' | 'bottom' | 'left' | 'right'
@@ -635,9 +635,11 @@ carousel(
 ) -> int                  # active slide index
 ```
 
-> A non-URL `src` is read from the local filesystem and inlined as a base64
-> data URI, so it must be a trusted path chosen by the app, not unsanitized
-> user input.
+> A string `src` is always a browser reference and is never probed on the
+> server filesystem. To inline an app-owned local image, pass a `pathlib.Path`
+> (or another `os.PathLike`) chosen by the app. Local assets are limited to
+> 10 MiB each and 20 MiB per carousel render; never construct the path object
+> from unsanitized user input.
 
 #### `timeline`
 

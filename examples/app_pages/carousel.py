@@ -25,15 +25,15 @@ banner_rsuite()
 ci_local = carousel(
     items=[
         {
-            "src": str(_ASSETS / "starry_night.jpg"),
+            "src": _ASSETS / "starry_night.jpg",
             "alt": "The Starry Night by Vincent van Gogh, 1889",
         },
         {
-            "src": str(_ASSETS / "great_wave.jpg"),
+            "src": _ASSETS / "great_wave.jpg",
             "alt": "The Great Wave off Kanagawa by Katsushika Hokusai, c. 1831",
         },
         {
-            "src": str(_ASSETS / "girl_pearl_earring.jpg"),
+            "src": _ASSETS / "girl_pearl_earring.jpg",
             "alt": "Girl with a Pearl Earring by Johannes Vermeer, c. 1665",
         },
     ],
@@ -52,9 +52,9 @@ ASSETS = Path(__file__).parent / "assets"
 
 active = carousel(
     items=[
-        {"src": str(ASSETS / "starry_night.jpg"), "alt": "Starry Night"},
-        {"src": str(ASSETS / "great_wave.jpg"),   "alt": "Great Wave"},
-        {"src": str(ASSETS / "pearl_earring.jpg"), "alt": "Pearl Earring"},
+        {"src": ASSETS / "starry_night.jpg", "alt": "Starry Night"},
+        {"src": ASSETS / "great_wave.jpg",   "alt": "Great Wave"},
+        {"src": ASSETS / "pearl_earring.jpg", "alt": "Pearl Earring"},
     ],
     autoplay=True,
     autoplay_interval=4000,
