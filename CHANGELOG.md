@@ -1,6 +1,34 @@
 # CHANGELOG
 
 
+## v0.10.1 (2026-08-12)
+
+### Bug Fixes
+
+- Address Codex Security findings
+  ([`af37223`](https://github.com/lperezmo/st-rsuite/commit/af3722334cfd58bc2abf0deb9f5fbe4040e0d7fb))
+
+### Chores
+
+- Bump demo app requirement to v0.10.0
+  ([`ec493d1`](https://github.com/lperezmo/st-rsuite/commit/ec493d1a1a74a4051eadfc71e4f101be2c24785d))
+
+### Documentation
+
+- Add project logo to README
+  ([`10149d9`](https://github.com/lperezmo/st-rsuite/commit/10149d9922f84f43b39ba0d3b9367da7cf45d445))
+
+Adds assets/logo.svg and shows it centered at the top of the README, above the project title and
+  badges.
+
+The source SVG carried width and height but no viewBox, which makes browsers clip it when it is
+  scaled down inside an img tag. A viewBox of 0 0 1280 640 was added so it scales cleanly. The
+  artwork itself is unchanged.
+
+The mark has a transparent background and no white plate, so it reads on both the light and dark
+  GitHub themes.
+
+
 ## v0.10.0 (2026-08-02)
 
 ### Chores
