@@ -10,6 +10,10 @@ st.markdown(
     "A PIN / verification code input with configurable length, "
     "masking, and input type filtering."
 )
+st.caption(
+    "Demo only: masked PIN and OTP values are not echoed in plaintext. "
+    "Do not enter real credentials."
+)
 
 st.markdown("#### Basic (6-digit)")
 
@@ -32,7 +36,7 @@ pi2 = pin_input(
     disabled=disabled,
     key="pi_masked",
 )
-st.code(f"PIN: '{pi2}'")
+st.code(f"PIN entered: {len(pi2 or '')}/4 digits")
 
 st.divider()
 
@@ -61,7 +65,7 @@ pi4 = pin_input(
     disabled=disabled,
     key="pi_otp",
 )
-st.code(f"OTP: '{pi4}'")
+st.code(f"OTP entered: {len(pi4 or '')}/6 digits")
 
 with st.expander("Usage code", icon=":material/code:"):
     st.code(
