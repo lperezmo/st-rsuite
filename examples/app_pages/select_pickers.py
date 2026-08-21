@@ -1,14 +1,15 @@
 import streamlit as st
 
-from st_rsuite import select_picker, tag_picker
+from st_rsuite import check_picker, select_picker, tag_picker
 
 from utils.ui import banner_rsuite, banner_st
 
 disabled = st.session_state.get("disabled", False)
 
 st.markdown(
-    "Searchable dropdown pickers: single select with grouping, and a "
-    "multi-select rendered as removable tags that can create new options."
+    "Searchable dropdown pickers: single select with grouping, a "
+    "multi-select rendered as removable tags that can create new options, "
+    "and a checkbox multi-select with a selection count."
 )
 
 FRAMEWORKS = [
@@ -163,6 +164,78 @@ selected = tag_picker(
     label="Stack",
     creatable=True,        # let users add values not in items
     key="my_tags",
+)""",
+        language="python",
+    )
+
+# -- CheckPicker ----------------------------------------------------------------
+st.divider()
+st.subheader("CheckPicker")
+st.markdown(
+    "A searchable multi-select with a checkbox per option. The closed control "
+    "shows a selection count instead of one tag per value, so it stays tidy "
+    "when many options are checked."
+)
+
+st.markdown("#### Side by side")
+
+col_rs3, col_st3 = st.columns(2)
+with col_rs3:
+    banner_rsuite()
+    ckp = check_picker(
+        items=FRAMEWORKS,
+        value=["react", "postgres"],
+        label="Stack",
+        help="Check as many options as you need",
+        disabled_items=["rails"],
+        block=True,
+        disabled=disabled,
+        key="ckp_basic",
+    )
+    st.code(f"Selected: {ckp}")
+with col_st3:
+    banner_st()
+    ms2 = st.multiselect(
+        "Stack",
+        options=[f["label"] for f in FRAMEWORKS],
+        default=["React", "PostgreSQL"],
+        disabled=disabled,
+        key="ms_basic_2",
+    )
+    st.code(f"Selected: {ms2}")
+
+st.divider()
+
+st.markdown("#### Grouped, with disabled options")
+
+banner_rsuite()
+ckp2 = check_picker(
+    items=FRAMEWORKS,
+    value=["fastapi"],
+    disabled_items=["angular"],
+    placeholder="Pick your stack",
+    block=True,
+    disabled=disabled,
+    key="ckp_grouped",
+)
+st.code(f"Selected: {ckp2}")
+
+with st.expander("Usage code", icon=":material/code:"):
+    st.code(
+        """from st_rsuite import check_picker
+
+items = [
+    {"value": "react", "label": "React", "group": "Frontend"},
+    {"value": "django", "label": "Django", "group": "Backend"},
+]
+
+selected = check_picker(
+    items=items,
+    value=["react"],
+    label="Stack",
+    countable=True,          # show "N selected" in the closed control
+    disabled_items=["django"],
+    key="my_checks",
 )""",
         language="python",
     )

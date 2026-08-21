@@ -10,6 +10,7 @@ import { FC } from "react";
 import { createRsuiteRenderer, RendererProps } from "./shared/renderer";
 import CarouselComponent from "./carousel/Carousel";
 import CascaderComponent from "./cascader/Cascader";
+import CheckPickerComponent from "./check_picker/CheckPicker";
 import CheckTreeComponent from "./check_tree/CheckTree";
 import CheckTreePickerComponent from "./check_tree_picker/CheckTreePicker";
 import DateInputComponent from "./date_input/DateInput";
@@ -34,6 +35,7 @@ import TreePickerComponent from "./tree_picker/TreePicker";
 const registry: Record<string, FC<any>> = {
   carousel: CarouselComponent,
   cascader: CascaderComponent,
+  check_picker: CheckPickerComponent,
   check_tree: CheckTreeComponent,
   check_tree_picker: CheckTreePickerComponent,
   date_input: DateInputComponent,
@@ -55,7 +57,9 @@ const Dispatcher: FC<RendererProps> = ({ data, setStateValue }) => {
   const kind = typeof data.kind === "string" ? data.kind : "";
   const Widget = registry[kind];
   if (!Widget) {
-    return <div>Unknown st-rsuite widget kind: {kind || String(data.kind)}</div>;
+    return (
+      <div>Unknown st-rsuite widget kind: {kind || String(data.kind)}</div>
+    );
   }
   return <Widget data={data} setStateValue={setStateValue} />;
 };

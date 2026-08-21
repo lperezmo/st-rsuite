@@ -1,4 +1,4 @@
-"""RSuite TagPicker component for Streamlit."""
+"""RSuite CheckPicker component for Streamlit."""
 
 from __future__ import annotations
 
@@ -6,16 +6,16 @@ from collections.abc import Callable
 
 from st_rsuite._component import bind_kind
 
-_component = bind_kind("tag_picker")
+_component = bind_kind("check_picker")
 
 
-def tag_picker(
+def check_picker(
     items: list[dict],
     value: list[str] | None = None,
     label: str = "",
     searchable: bool = True,
     virtualized: bool = False,
-    creatable: bool = False,
+    countable: bool = True,
     disabled_items: list[str] | None = None,
     appearance: str = "default",
     size: str = "md",
@@ -30,7 +30,11 @@ def tag_picker(
     on_change: Callable | None = None,
     key: str | None = None,
 ) -> list[str]:
-    """A searchable multi-select rendered as removable tags, powered by RSuite.
+    """A searchable multi-select dropdown with checkboxes, powered by RSuite.
+
+    Unlike ``tag_picker``, the selection is shown as a count (or placeholder)
+    in the closed control instead of one tag per selected value, which keeps
+    compact layouts tidy when many options are checked.
 
     Parameters
     ----------
@@ -47,9 +51,8 @@ def tag_picker(
     virtualized : bool
         Render the option list virtualized; keeps large lists (thousands of
         items) fast.
-    creatable : bool
-        Let the user create new options by typing a value not in ``items``.
-        Created values come back in the return list like any other selection.
+    countable : bool
+        Show the number of checked options in the closed control.
     disabled_items : list of str or None
         Option values rendered as non-selectable.
     appearance : str
@@ -81,7 +84,7 @@ def tag_picker(
     Returns
     -------
     list of str
-        Selected values (including any user-created ones when ``creatable``).
+        Selected values, in the order they were checked.
     """
 
     def _noop():
@@ -97,7 +100,6 @@ def tag_picker(
             "groupBy": "group" if any("group" in item for item in items) else None,
             "searchable": searchable,
             "virtualized": virtualized,
-            "creatable": creatable,
             "disabledItems": disabled_items or [],
             "appearance": appearance,
             "size": size,
@@ -107,6 +109,7 @@ def tag_picker(
             "cleanable": cleanable,
             "block": block,
             "loading": loading,
+            "countable": countable,
             "help": help,
             "locale": locale,
         },

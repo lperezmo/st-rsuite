@@ -42,6 +42,7 @@ Lightweight alternatives with no popup. Users navigate date segments with arrow 
 | `radio_tile` | Tile-based radio group with icons and descriptions | `st.radio` |
 | `select_picker` | Searchable single-select dropdown with grouping, virtualization, disabled options | `st.selectbox` |
 | `tag_picker` | Searchable multi-select as removable tags; can create new options | `st.multiselect` |
+| `check_picker` | Searchable multi-select dropdown with checkboxes and a selection count | `st.multiselect` |
 
 ### Tree: hierarchical data selection
 
@@ -473,6 +474,7 @@ tag_picker(
     virtualized=False,
     creatable=False,      # let users create options not in items
     disabled_items=None,
+    appearance="default", # 'default' | 'subtle'
     size="md",
     placeholder="Select",
     placement="bottomStart",
@@ -490,6 +492,36 @@ tag_picker(
 Multi-select rendered as removable tags. With `creatable=True`, values the
 user types that are not in `items` become selectable options and come back in
 the return list.
+
+#### `check_picker`
+
+```python
+check_picker(
+    items=[...],          # list of dicts: {value, label, group?}
+    value=None,           # list of selected values
+    label="",
+    searchable=True,
+    virtualized=False,
+    countable=True,       # show the selected count in the closed control
+    disabled_items=None,
+    appearance="default", # 'default' | 'subtle'
+    size="md",
+    placeholder="Select",
+    placement="bottomStart",
+    disabled=False,
+    cleanable=True,
+    block=False,
+    loading=False,
+    help=None,
+    locale=None,
+    on_change=None,
+    key=None,
+) -> list[str]
+```
+
+Multi-select with a checkbox per option. Unlike `tag_picker`, the closed
+control shows a selection count instead of one tag per value, which keeps
+compact layouts tidy when many options are checked.
 
 ### Tree / Hierarchical
 
