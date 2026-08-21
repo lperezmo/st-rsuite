@@ -1,6 +1,41 @@
 # CHANGELOG
 
 
+## v0.11.0 (2026-08-21)
+
+### Bug Fixes
+
+- Initialize Streamlit thread state in range callback tests
+  ([`4e60981`](https://github.com/lperezmo/st-rsuite/commit/4e60981457ca8cb430253b1e3649902c4e3ceb75))
+
+Streamlit latest (1.62) gates widget callback dispatch on a per-thread FragmentThreadState, so
+  SessionState._dispatch_json_change_callbacks raised on the bare test thread. Initialize
+  ThreadState before dispatch, guarded by import for older Streamlit versions.
+
+### Chores
+
+- Bump demo app requirement to v0.10.1
+  ([`bbdc919`](https://github.com/lperezmo/st-rsuite/commit/bbdc9190b4ac5bc120968fd674d755daa976aa03))
+
+- Bump GitPython to 3.1.59 to clear Dependabot alerts
+  ([`915c91e`](https://github.com/lperezmo/st-rsuite/commit/915c91e2016cd2200e6e1f808e4c53d18438bf2f))
+
+All 9 open alerts (6 high, 3 medium) are GitPython in uv.lock; 3.1.59 is past the 3.1.58 fix for all
+  of them.
+
+### Features
+
+- Add check_picker and give tag_picker an appearance param
+  ([`a02834b`](https://github.com/lperezmo/st-rsuite/commit/a02834b75f61db69a32e029580f943c5b3fc6ac3))
+
+check_picker wraps RSuite CheckPicker as the checkbox multi-select: searchable, groupable,
+  virtualized, with a countable closed control that shows N selected instead of one tag per value.
+  tag_picker gains the appearance param every other popup widget already had.
+
+The new widget routes through the existing single-bundle registry (bind_kind + index.tsx), so it
+  ships in the same bundle with no extra network cost.
+
+
 ## v0.10.1 (2026-08-12)
 
 ### Bug Fixes
