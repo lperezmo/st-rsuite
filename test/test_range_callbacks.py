@@ -23,6 +23,11 @@ from registration_stub import stubbed_registration
 from streamlit.runtime.state.common import WidgetMetadata
 from streamlit.runtime.state.session_state import SessionState
 
+try:
+    from streamlit.runtime.scriptrunner_utils.script_run_context import ThreadState
+except ImportError:  # Streamlit < 1.62 has no per-thread state to initialize
+    ThreadState = None
+
 from st_rsuite._callbacks import single_fire
 
 # widget module/function name -> (start state key, end state key, three values)
@@ -66,6 +71,10 @@ def _register(widget: str, on_change: Callable | None) -> dict[str, Callable]:
 
 def _dispatch(callbacks: dict[str, Callable], old_map: dict, new_map: dict) -> None:
     """Run Streamlit's real per-key change dispatch over one widget's state."""
+    # Callback execution runs inside Streamlit's per-thread script context;
+    # newer Streamlit refuses to dispatch without one on the calling thread.
+    if ThreadState is not None:
+        ThreadState.initialize()
     state = SessionState()
     wid = "$$WIDGET_ID-st_rsuite_range"
     metadata = WidgetMetadata(

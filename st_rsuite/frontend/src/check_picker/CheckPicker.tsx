@@ -1,10 +1,10 @@
 import { FC, useCallback, useId } from "react";
 import { FrontendRendererArgs } from "@streamlit/component-v2-lib";
-import { TagPicker as RsuiteTagPicker } from "rsuite";
+import { CheckPicker as RsuiteCheckPicker } from "rsuite";
 import { useSyncedValue, keyOfList } from "../shared/useSyncedValue";
 import { FieldLabel } from "../shared/FieldLabel";
 
-export type TagPickerState = {
+export type CheckPickerState = {
   selected_values: string[];
 };
 
@@ -14,14 +14,13 @@ type Item = {
   group?: string;
 };
 
-export type TagPickerData = {
+export type CheckPickerData = {
   label: string;
   items: Item[];
   value: string[];
   groupBy: string | null;
   searchable: boolean;
   virtualized: boolean;
-  creatable: boolean;
   disabledItems: string[];
   appearance: "default" | "subtle";
   size: "lg" | "md" | "sm" | "xs";
@@ -31,19 +30,20 @@ export type TagPickerData = {
   cleanable: boolean;
   block: boolean;
   loading: boolean;
+  countable: boolean;
   help?: string | null;
   locale?: string | null;
 };
 
 type Props = {
-  data: TagPickerData;
+  data: CheckPickerData;
   setStateValue: FrontendRendererArgs<
-    TagPickerState,
-    TagPickerData
+    CheckPickerState,
+    CheckPickerData
   >["setStateValue"];
 };
 
-const TagPickerComponent: FC<Props> = ({ data, setStateValue }) => {
+const CheckPickerComponent: FC<Props> = ({ data, setStateValue }) => {
   const {
     label,
     items,
@@ -51,7 +51,6 @@ const TagPickerComponent: FC<Props> = ({ data, setStateValue }) => {
     groupBy,
     searchable,
     virtualized,
-    creatable,
     disabledItems,
     appearance,
     size,
@@ -61,6 +60,7 @@ const TagPickerComponent: FC<Props> = ({ data, setStateValue }) => {
     cleanable,
     block,
     loading,
+    countable,
     help,
   } = data;
 
@@ -83,7 +83,7 @@ const TagPickerComponent: FC<Props> = ({ data, setStateValue }) => {
   return (
     <div style={{ width: "100%", padding: "4px 0" }}>
       <FieldLabel htmlFor={fieldId} label={label} help={help} />
-      <RsuiteTagPicker
+      <RsuiteCheckPicker
         id={fieldId}
         data={items}
         value={selected}
@@ -91,7 +91,6 @@ const TagPickerComponent: FC<Props> = ({ data, setStateValue }) => {
         groupBy={groupBy ?? undefined}
         searchable={searchable}
         virtualized={virtualized}
-        creatable={creatable}
         disabledItemValues={disabledItems || []}
         appearance={appearance}
         size={size}
@@ -101,10 +100,11 @@ const TagPickerComponent: FC<Props> = ({ data, setStateValue }) => {
         cleanable={cleanable}
         block={block}
         loading={loading}
+        countable={countable}
         style={{ width: "100%" }}
       />
     </div>
   );
 };
 
-export default TagPickerComponent;
+export default CheckPickerComponent;

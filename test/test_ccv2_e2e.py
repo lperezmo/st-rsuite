@@ -33,6 +33,7 @@ ALL_KEYS = [
     "radio_tile",
     "select_picker",
     "tag_picker",
+    "check_picker",
     "check_tree",
     "check_tree_picker",
     "tree_picker",
@@ -54,6 +55,7 @@ ROUNDTRIPS = {
     "radio_tile": "rt=a",
     "select_picker": "sp=react",
     "tag_picker": "react|vue",
+    "check_picker": "react|vue",
     "check_tree": "react",
     "check_tree_picker": "react",
     "tree_picker": "tpv=react",
@@ -74,7 +76,7 @@ def streamlit_app():
 def go_to_app(page: Page, streamlit_app: StreamlitRunner):
     page.goto(streamlit_app.server_url)
     # Wait for the whole first script run to finish: the LAST component renders
-    # and echoes its value. All 17 widgets share one bundle, but the first
+    # and echoes its value. All 18 widgets share one bundle, but the first
     # render still takes a while; asserting earlier races the render.
     expect(page.get_by_test_id("echo-pin_input")).to_contain_text("123456", timeout=60000)
     expect(page.locator(".st-key-pin_input .stBidiComponent")).to_be_attached()
