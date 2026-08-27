@@ -3,7 +3,8 @@
 Covers the behavior beyond mount/roundtrip (which test_ccv2_e2e already
 guards): checking an option delivers the new value to Python, grouping
 renders group headings, a disabled item cannot be checked, the closed
-control shows the selected count, and appearance="subtle" reaches the DOM
+control shows selected labels and a count badge, and appearance="subtle"
+reaches the DOM
 for both pickers.
 """
 
@@ -62,9 +63,10 @@ def test_check_picker_disabled_item_not_selectable(page: Page):
     expect(page.get_by_test_id("echo-ckp")).to_contain_text("ckp=react")
 
 
-def test_check_picker_shows_count(page: Page):
+def test_check_picker_shows_labels_and_count_badge(page: Page):
     toggle = page.locator(".st-key-ckp .rs-picker-toggle")
-    expect(toggle).to_contain_text("1")
+    expect(toggle.locator(".rs-picker-value-list")).to_contain_text("React")
+    expect(toggle.locator(".rs-picker-value-count")).to_have_text("1")
 
 
 def test_appearance_subtle_reaches_dom(page: Page):

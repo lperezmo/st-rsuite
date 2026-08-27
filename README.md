@@ -42,7 +42,7 @@ Lightweight alternatives with no popup. Users navigate date segments with arrow 
 | `radio_tile` | Tile-based radio group with icons and descriptions | `st.radio` |
 | `select_picker` | Searchable single-select dropdown with grouping, virtualization, disabled options | `st.selectbox` |
 | `tag_picker` | Searchable multi-select as removable tags; can create new options | `st.multiselect` |
-| `check_picker` | Searchable multi-select dropdown with checkboxes and a selection count | `st.multiselect` |
+| `check_picker` | Searchable multi-select dropdown with checkboxes, selected labels, and a count badge | `st.multiselect` |
 
 ### Tree: hierarchical data selection
 
@@ -474,7 +474,6 @@ tag_picker(
     virtualized=False,
     creatable=False,      # let users create options not in items
     disabled_items=None,
-    appearance="default", # 'default' | 'subtle'
     size="md",
     placeholder="Select",
     placement="bottomStart",
@@ -486,6 +485,7 @@ tag_picker(
     locale=None,
     on_change=None,
     key=None,
+    appearance="default", # 'default' | 'subtle'
 ) -> list[str]
 ```
 
@@ -502,7 +502,7 @@ check_picker(
     label="",
     searchable=True,
     virtualized=False,
-    countable=True,       # show the selected count in the closed control
+    countable=True,       # append a selection-count badge
     disabled_items=None,
     appearance="default", # 'default' | 'subtle'
     size="md",
@@ -520,8 +520,8 @@ check_picker(
 ```
 
 Multi-select with a checkbox per option. Unlike `tag_picker`, the closed
-control shows a selection count instead of one tag per value, which keeps
-compact layouts tidy when many options are checked.
+control shows selected labels plus a count badge instead of removable tags.
+The labels truncate as needed while the badge remains visible.
 
 ### Tree / Hierarchical
 
