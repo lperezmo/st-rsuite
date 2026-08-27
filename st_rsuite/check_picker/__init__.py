@@ -32,9 +32,9 @@ def check_picker(
 ) -> list[str]:
     """A searchable multi-select dropdown with checkboxes, powered by RSuite.
 
-    Unlike ``tag_picker``, the selection is shown as a count (or placeholder)
-    in the closed control instead of one tag per selected value, which keeps
-    compact layouts tidy when many options are checked.
+    Unlike ``tag_picker``, the closed control shows selected labels plus a
+    count badge instead of removable tags. Labels truncate as needed while the
+    badge remains visible.
 
     Parameters
     ----------
@@ -52,7 +52,7 @@ def check_picker(
         Render the option list virtualized; keeps large lists (thousands of
         items) fast.
     countable : bool
-        Show the number of checked options in the closed control.
+        Append a badge with the number of checked options to the selected labels.
     disabled_items : list of str or None
         Option values rendered as non-selectable.
     appearance : str

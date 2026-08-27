@@ -9,7 +9,7 @@ disabled = st.session_state.get("disabled", False)
 st.markdown(
     "Searchable dropdown pickers: single select with grouping, a "
     "multi-select rendered as removable tags that can create new options, "
-    "and a checkbox multi-select with a selection count."
+    "and a checkbox multi-select with selected labels and a count badge."
 )
 
 FRAMEWORKS = [
@@ -173,8 +173,8 @@ st.divider()
 st.subheader("CheckPicker")
 st.markdown(
     "A searchable multi-select with a checkbox per option. The closed control "
-    "shows a selection count instead of one tag per value, so it stays tidy "
-    "when many options are checked."
+    "shows selected labels plus a count badge instead of removable tags; labels "
+    "truncate as needed while the badge remains visible."
 )
 
 st.markdown("#### Side by side")
@@ -233,7 +233,7 @@ selected = check_picker(
     items=items,
     value=["react"],
     label="Stack",
-    countable=True,          # show "N selected" in the closed control
+    countable=True,          # append a selection-count badge
     disabled_items=["django"],
     key="my_checks",
 )""",

@@ -17,7 +17,6 @@ def tag_picker(
     virtualized: bool = False,
     creatable: bool = False,
     disabled_items: list[str] | None = None,
-    appearance: str = "default",
     size: str = "md",
     placeholder: str = "Select",
     placement: str = "bottomStart",
@@ -29,6 +28,7 @@ def tag_picker(
     locale: str | None = None,
     on_change: Callable | None = None,
     key: str | None = None,
+    appearance: str = "default",
 ) -> list[str]:
     """A searchable multi-select rendered as removable tags, powered by RSuite.
 
@@ -52,8 +52,6 @@ def tag_picker(
         Created values come back in the return list like any other selection.
     disabled_items : list of str or None
         Option values rendered as non-selectable.
-    appearance : str
-        Visual style: 'default' or 'subtle'.
     size : str
         Component size: 'lg', 'md', 'sm', or 'xs'.
     placeholder : str
@@ -77,6 +75,8 @@ def tag_picker(
         Callback when the selection changes.
     key : str or None
         Unique widget key.
+    appearance : str
+        Visual style: 'default' or 'subtle'.
 
     Returns
     -------
