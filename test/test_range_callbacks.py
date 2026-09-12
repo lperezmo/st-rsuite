@@ -8,7 +8,7 @@ the end key, so extending, shortening, or moving only the end of a range never
 reached the callback.
 
 These tests capture the callbacks the widgets actually register and feed them to
-Streamlit's own dispatcher (``SessionState._dispatch_json_change_callbacks``),
+Streamlit's own dispatcher (``SessionState._call_callbacks``),
 so the production dispatch path is what is under test, not a stand-in for it.
 
 The widget modules are imported against a stubbed CCv2 registration because
@@ -87,7 +87,9 @@ def _dispatch(callbacks: dict[str, Callable], old_map: dict, new_map: dict) -> N
     state._new_widget_state.set_widget_metadata(metadata)
     state._new_widget_state.set_from_value(wid, new_map)
     state._old_state[wid] = old_map
-    state._dispatch_json_change_callbacks(wid, metadata, (), {})
+    # Use the dispatcher entry point so Streamlit owns any per-dispatch context
+    # (including the rerun-vote accumulator introduced in 1.63).
+    state._call_callbacks()
 
 
 def _fire_count(widget: str, old_map: dict, new_map: dict) -> int:
