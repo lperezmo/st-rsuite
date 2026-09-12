@@ -3,6 +3,7 @@ import { FrontendRendererArgs } from "@streamlit/component-v2-lib";
 import { CheckPicker as RsuiteCheckPicker } from "rsuite";
 import { useSyncedValue, keyOfList } from "../shared/useSyncedValue";
 import { FieldLabel } from "../shared/FieldLabel";
+import { useAnchoredPopup } from "../shared/useAnchoredPopup";
 
 export type CheckPickerState = {
   selected_values: string[];
@@ -65,6 +66,7 @@ const CheckPickerComponent: FC<Props> = ({ data, setStateValue }) => {
   } = data;
 
   const fieldId = useId();
+  const popup = useAnchoredPopup(placement);
 
   const [selected, emitSelected] = useSyncedValue<string[]>(
     keyOfList(value),
@@ -95,6 +97,9 @@ const CheckPickerComponent: FC<Props> = ({ data, setStateValue }) => {
         appearance={appearance}
         size={size}
         placeholder={placeholder || undefined}
+        ref={popup.ref}
+        onOpen={popup.onOpen}
+        onClose={popup.onClose}
         placement={placement as any}
         disabled={disabled}
         cleanable={cleanable}
