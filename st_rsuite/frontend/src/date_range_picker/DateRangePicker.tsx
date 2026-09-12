@@ -6,6 +6,8 @@ import { useSyncedValue, keyOfPair } from "../shared/useSyncedValue";
 import { buildShouldDisableDate } from "../shared/dateConstraints";
 import { buildRanges, SerializedRange } from "../shared/rangePresets";
 import { FieldLabel } from "../shared/FieldLabel";
+import { useAnchoredPopup } from "../shared/useAnchoredPopup";
+import { toISOValue, parseISOValue } from "../shared/dateValue";
 
 export type DateRangePickerState = {
   start_date: string | null;
@@ -17,6 +19,11 @@ export type DateRangePickerData = {
   startValue: string | null;
   endValue: string | null;
   format: string;
+  // True when `format` carries a time field, so the widget selects and emits
+  // "YYYY-MM-DDTHH:mm:ss" datetimes instead of "YYYY-MM-DD" dates. Derived
+  // Python-side from the format string so both sides share one rule.
+  withTime: boolean;
+  showMeridiem?: boolean;
   character: string;
   appearance: "default" | "subtle";
   size: "lg" | "md" | "sm" | "xs";
@@ -52,26 +59,14 @@ type Props = {
   >["setStateValue"];
 };
 
-function toISODate(d: Date | null): string | null {
-  if (!d || isNaN(d.getTime())) return null;
-  const y = d.getFullYear();
-  const m = String(d.getMonth() + 1).padStart(2, "0");
-  const day = String(d.getDate()).padStart(2, "0");
-  return `${y}-${m}-${day}`;
-}
-
-function parseDate(val: string | null): Date | null {
-  if (!val) return null;
-  const d = new Date(val + "T00:00:00");
-  return isNaN(d.getTime()) ? null : d;
-}
-
 const DateRangePickerComponent: FC<Props> = ({ data, setStateValue }) => {
   const {
     label,
     startValue,
     endValue,
     format,
+    withTime,
+    showMeridiem,
     character,
     appearance,
     size,
@@ -99,12 +94,13 @@ const DateRangePickerComponent: FC<Props> = ({ data, setStateValue }) => {
   } = data;
 
   const fieldId = useId();
+  const popup = useAnchoredPopup(placement);
 
   const [selected, emitSelected] = useSyncedValue<DateRange | null>(
     keyOfPair(startValue, endValue),
     () => {
-      const s = parseDate(startValue);
-      const e = parseDate(endValue);
+      const s = parseISOValue(startValue);
+      const e = parseISOValue(endValue);
       return s && e ? [s, e] : null;
     }
   );
@@ -123,20 +119,20 @@ const DateRangePickerComponent: FC<Props> = ({ data, setStateValue }) => {
   const rangePresets = useMemo(() => buildRanges(ranges), [ranges]);
   const defaultCalValue = useMemo<DateRange | undefined>(() => {
     if (!defaultCalendarValue) return undefined;
-    const s = parseDate(defaultCalendarValue[0]);
-    const e = parseDate(defaultCalendarValue[1]);
+    const s = parseISOValue(defaultCalendarValue[0]);
+    const e = parseISOValue(defaultCalendarValue[1]);
     return s && e ? [s, e] : undefined;
   }, [defaultCalendarValue]);
 
   const handleChange = useCallback(
     (newValue: DateRange | null) => {
-      const s = newValue ? toISODate(newValue[0]) : null;
-      const e = newValue ? toISODate(newValue[1]) : null;
+      const s = newValue ? toISOValue(newValue[0], withTime) : null;
+      const e = newValue ? toISOValue(newValue[1], withTime) : null;
       emitSelected(newValue);
       setStateValue("start_date", s);
       setStateValue("end_date", e);
     },
-    [emitSelected, setStateValue]
+    [emitSelected, setStateValue, withTime]
   );
 
   return (
@@ -151,6 +147,9 @@ const DateRangePickerComponent: FC<Props> = ({ data, setStateValue }) => {
         appearance={appearance}
         size={size}
         placeholder={placeholder || undefined}
+        ref={popup.ref}
+        onOpen={popup.onOpen}
+        onClose={popup.onClose}
         placement={placement as any}
         disabled={disabled}
         cleanable={cleanable}
@@ -159,6 +158,7 @@ const DateRangePickerComponent: FC<Props> = ({ data, setStateValue }) => {
         showWeekNumbers={showWeekNumbers}
         showOneCalendar={showOneCalendar}
         oneTap={oneTap}
+        showMeridiem={showMeridiem}
         hoverRange={hoverRange || undefined}
         editable={editable}
         loading={loading}

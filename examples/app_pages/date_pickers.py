@@ -1,4 +1,4 @@
-from datetime import date, timedelta
+from datetime import date, datetime, time, timedelta
 
 import streamlit as st
 
@@ -12,6 +12,41 @@ st.markdown(
     "Date pickers with calendar popups, one-tap mode, "
     "ISO week support, and customizable format."
 )
+
+# -- Date-time range ---------------------------------------------------------
+st.subheader("Date-time range")
+st.markdown(
+    "Give `date_range_picker` a format with a time field and it becomes a "
+    "date-time range picker: RSuite adds time panels and the widget returns "
+    "two `datetime` objects instead of two `date` objects. The format is any "
+    "date-fns pattern: this one is `EEE MMM do, yyyy - h:mm aaa` with "
+    "`show_meridiem=True` for a 12-hour AM/PM clock (`yyyy-MM-dd HH:mm` gives "
+    "a plain 24-hour one). RSuite and st-rsuite are both MIT "
+    "licensed, so this is included here; MUI X ships its "
+    "`DateTimeRangePicker` only under a commercial (Pro) license."
+)
+
+_hero_day = date.today()
+with st.container(horizontal=True):
+    banner_rsuite()
+    drp_dt = date_range_picker(
+        label="Shift window",
+        value=(
+            datetime.combine(_hero_day, time(8, 0)),
+            datetime.combine(_hero_day, time(17, 0)),
+        ),
+        format="EEE MMM do, yyyy - h:mm aaa",
+        character="  /  ",
+        show_meridiem=True,
+        # Ordinal day tokens (12th) have no typed-entry mask; pick, do not type.
+        editable=False,
+        help="Pick the days, then the times, in one control.",
+        disabled=disabled,
+        key="drp_datetime_hero",
+    )
+    st.code(f"Start: {drp_dt[0]}\nEnd:   {drp_dt[1]}")
+
+st.divider()
 
 # -- DatePicker --------------------------------------------------------------
 st.subheader("DatePicker")
@@ -90,7 +125,7 @@ with st.container(horizontal=True):
 
 with st.expander("Usage code", icon=":material/code:"):
     st.code(
-        '''from st_rsuite import date_picker
+        """from st_rsuite import date_picker
 from datetime import date
 
 selected = date_picker(
@@ -99,7 +134,7 @@ selected = date_picker(
     format="yyyy-MM-dd",
     one_tap=True,
     key="my_date",
-)''',
+)""",
         language="python",
     )
 
@@ -186,7 +221,7 @@ with st.container(horizontal=True):
 
 with st.expander("Usage code", icon=":material/code:"):
     st.code(
-        '''from st_rsuite import date_range_picker
+        """from st_rsuite import date_range_picker
 from datetime import date, timedelta
 
 today = date.today()
@@ -198,6 +233,6 @@ start, end = date_range_picker(
         {"label": "This month", "value": (today.replace(day=1), today)},
     ],
     key="my_range",
-)''',
+)""",
         language="python",
     )

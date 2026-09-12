@@ -17,12 +17,12 @@
 
 ### Pickers: rich popups with full interaction
 
-Calendar popups, scrolling time panels, range selection with hover highlighting. Everything you'd expect from a production date/time picker.
+Calendar popups, scrolling time panels, range selection with hover highlighting. Everything you'd expect from a production date/time picker. Popups stay anchored to their field while the Streamlit page scrolls, flip above the field when there is no room below but there is above, and hide once the field scrolls out of view.
 
 | Component | Description | Streamlit equivalent |
 |-----------|-------------|----------------------|
-| `date_picker` | Calendar popup with format control, one-tap, ISO week | `st.date_input` |
-| `date_range_picker` | Dual-calendar popup for date ranges, hover range | `st.date_input` (range mode) |
+| `date_picker` | Calendar popup with format control, one-tap, ISO week, datetime mode | `st.date_input` |
+| `date_range_picker` | Dual-calendar popup for date ranges, hover range, datetime mode | `st.date_input` (range mode) |
 | `time_picker` | Time picker with scrolling panel, AM/PM | `st.time_input` |
 | `time_range_picker` | Time range picker with dual panels | -- |
 
@@ -229,7 +229,27 @@ date_picker(
     locale=None,          # e.g. 'ja_JP', 'zh_CN', 'es_ES'
     on_change=None,
     key=None,
-) -> date | None
+    show_meridiem=False,  # 12-hour clock with AM/PM in the time panel
+) -> date | datetime | None
+```
+
+Datetime mode: when `format` carries a time field, RSuite adds a time panel and
+the picker returns a `datetime` instead of a `date`. A format counts as a time
+format when it contains any of `H h m s` anywhere, quoted literals included
+(RSuite's own rule; `M` is month and `d` is day, so those do not count).
+`value` accepts a
+`datetime`, a `date` (time defaults to 00:00:00), or an ISO string of either
+shape.
+
+```python
+from datetime import datetime
+
+when = date_picker(
+    label="Starts at",
+    value=datetime(2026, 6, 1, 9, 30),
+    format="yyyy-MM-dd HH:mm",
+    key="dp_datetime",
+)  # -> datetime.datetime(2026, 6, 1, 9, 30)
 ```
 
 #### `date_range_picker`
@@ -266,7 +286,24 @@ date_range_picker(
     locale=None,
     on_change=None,
     key=None,
-) -> tuple[date | None, date | None]
+    show_meridiem=False,  # 12-hour clock with AM/PM in the time panel
+) -> tuple[date | None, date | None] | tuple[datetime | None, datetime | None]
+```
+
+Datetime mode: the same rule applies here, and a time format turns this into a
+full date-time range picker returning two `datetime` values. Pair a 12-hour
+format such as `"yyyy-MM-dd hh:mm aa"` with `show_meridiem=True` for an AM/PM
+clock.
+
+```python
+from datetime import datetime
+
+start, end = date_range_picker(
+    label="Shift window",
+    value=(datetime(2026, 6, 1, 8, 0), datetime(2026, 6, 1, 17, 0)),
+    format="yyyy-MM-dd HH:mm",
+    key="drp_datetime",
+)  # -> (datetime(2026, 6, 1, 8, 0), datetime(2026, 6, 1, 17, 0))
 ```
 
 #### `time_picker`
