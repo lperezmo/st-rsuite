@@ -1,6 +1,39 @@
 # CHANGELOG
 
 
+## v0.11.1 (2026-09-12)
+
+### Bug Fixes
+
+- Preserve tag_picker positional API
+  ([`b7038af`](https://github.com/lperezmo/st-rsuite/commit/b7038af75f810c1bf66bf93c7c8237ff1ca2d9e1))
+
+Move the newly added appearance option behind the existing parameters so pre-0.11 positional calls
+  keep their meaning. Add a regression test for the legacy tail of the signature.
+
+Also align CheckPicker docs and its browser assertion with RSuite's actual closed state: selected
+  labels plus a numeric count badge.
+
+- **deps**: Resolve dependency security alerts
+  ([`7173780`](https://github.com/lperezmo/st-rsuite/commit/717378013b7c6e911d9085658971bf2cf40714c9))
+
+### Chores
+
+- Bump demo app requirement to v0.11.0
+  ([`d9a0f85`](https://github.com/lperezmo/st-rsuite/commit/d9a0f852ec9b5650049443b4d0e9ac78e96d6d4c))
+
+### Testing
+
+- Inspect tag_picker signature without importing
+  ([`722b5d8`](https://github.com/lperezmo/st-rsuite/commit/722b5d8783de2c6e64f4d859777658fb08f41485))
+
+Older Streamlit versions cannot register the component during bare test collection. Parse the module
+  signature directly so the API regression test stays independent of Streamlit's component runtime.
+
+- Support Streamlit 1.63 callback dispatch
+  ([`31858e2`](https://github.com/lperezmo/st-rsuite/commit/31858e2f73cd4e6eafb5d6894a7bce2d93ba7b09))
+
+
 ## v0.11.0 (2026-08-21)
 
 ### Bug Fixes
