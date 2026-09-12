@@ -1,6 +1,50 @@
 # CHANGELOG
 
 
+## v0.12.0 (2026-09-12)
+
+### Bug Fixes
+
+- Keep picker popups anchored to their field while the page scrolls
+  ([`2c328ee`](https://github.com/lperezmo/st-rsuite/commit/2c328ee1b0728ae5f0acc2f84d4b30848fe49b1e))
+
+RSuite portals every picker popup to document.body, positions it once on open, and only re-anchors
+  on window resize or when the popup resizes. Streamlit never scrolls the window; it scrolls the
+  main section (and dialogs, expanders, other nested scrollers), so the popup stayed at its stale
+  coordinates while the field moved away.
+
+Add a shared useAnchoredPopup hook and wire it into every popup picker. While open it tracks the
+  field on each scroll frame through a capturing document listener, flips a vertical placement when
+  the configured side no longer fits but the other does, and hides plus parks the popup inside the
+  viewport when the field leaves its visible area. The position is written the same way RSuite's
+  forced update does (--rs-position-x/y and data-placement), because RSuite's state-driven position
+  never reaches the DOM for these pickers. Observers re-apply it synchronously after RSuite's own
+  writes; a per-render re-check covers Streamlit reruns; the hook stands down below RSuite's xs
+  breakpoint where the picker is a drawer.
+
+Playwright e2e covers tracking, hide and return, flip and flip back.
+
+### Chores
+
+- Bump demo app requirement to v0.11.1
+  ([`b47b14e`](https://github.com/lperezmo/st-rsuite/commit/b47b14ec006b1212c258d3e7e2c892c712f7664c))
+
+### Features
+
+- Datetime mode and 12-hour clock for date_picker and date_range_picker
+  ([`13b7c28`](https://github.com/lperezmo/st-rsuite/commit/13b7c28226b21a65862af6baf44e191d31b952c2))
+
+A format containing any of H h m s (RSuite's own shouldRenderTime rule, applied to the raw string)
+  makes RSuite render time panels; the widgets now round-trip the time and return datetime values
+  instead of dates. Date-only formats are unchanged. Add a trailing show_meridiem parameter for a
+  12-hour AM/PM clock. value, calendar defaults and range presets accept datetime; min/max/disabled
+  dates stay day-granular because the constraint check compares calendar days.
+
+Showcase gets a "Date-time range" hero at the top of the Date pickers page (EEE MMM do, yyyy - h:mm
+  aaa with an AM/PM clock), noting that RSuite and st-rsuite are MIT licensed while MUI X ships its
+  DateTimeRangePicker only under a commercial license. README documents both.
+
+
 ## v0.11.1 (2026-09-12)
 
 ### Bug Fixes
