@@ -117,6 +117,9 @@ known-local-folder = ["e2e_utils", "utils"]
 # test_naive_datetime_drops_the_time. Requiring tzinfo would mean deleting the
 # cases that cover the behavior.
 "test/test_date_serialization.py" = ["DTZ001"]
+# Same reason: datetime mode is exactly what this file tests, and naive local
+# wall time is the shape the pickers serialize.
+"test/test_datetime_serialization.py" = ["DTZ001"]
 "test/review_findings_e2e_app.py" = ["DTZ001"]
 "test/e2e_utils.py" = [
     # The temp file is owned by AsyncSubprocess across start() and stop() and is

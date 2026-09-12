@@ -8,6 +8,7 @@ import {
   buildHideSeconds,
 } from "../shared/timeConstraints";
 import { FieldLabel } from "../shared/FieldLabel";
+import { useAnchoredPopup } from "../shared/useAnchoredPopup";
 
 export type TimePickerState = {
   selected_time: string | null;
@@ -82,6 +83,7 @@ const TimePickerComponent: FC<Props> = ({ data, setStateValue }) => {
   } = data;
 
   const fieldId = useId();
+  const popup = useAnchoredPopup(placement);
 
   const [selected, emitSelected] = useSyncedValue<Date | null>(
     keyOfScalar(value),
@@ -119,6 +121,9 @@ const TimePickerComponent: FC<Props> = ({ data, setStateValue }) => {
         appearance={appearance}
         size={size}
         placeholder={placeholder || undefined}
+        ref={popup.ref}
+        onOpen={popup.onOpen}
+        onClose={popup.onClose}
         placement={placement as any}
         disabled={disabled}
         cleanable={cleanable}

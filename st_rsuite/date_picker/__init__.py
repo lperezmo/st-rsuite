@@ -3,9 +3,15 @@
 from __future__ import annotations
 
 from collections.abc import Callable
-from datetime import date
+from datetime import date, datetime
 
 from st_rsuite._component import bind_kind
+from st_rsuite._dates import (
+    format_has_time,
+    parse_date_return,
+    parse_datetime_return,
+    serialize_datetime,
+)
 from st_rsuite._dates import serialize_date as _serialize
 
 _component = bind_kind("date_picker")
@@ -13,7 +19,7 @@ _component = bind_kind("date_picker")
 
 def date_picker(
     label: str = "",
-    value: date | str | None = None,
+    value: date | datetime | str | None = None,
     format: str = "yyyy-MM-dd",
     appearance: str = "default",
     size: str = "md",
@@ -34,21 +40,43 @@ def date_picker(
     disabled_weekdays: list[int] | None = None,
     limit_start_year: int | None = None,
     limit_end_year: int | None = None,
-    calendar_default_date: date | str | None = None,
+    calendar_default_date: date | datetime | str | None = None,
     locale: str | None = None,
     on_change: Callable | None = None,
     key: str | None = None,
-) -> date | None:
+    show_meridiem: bool = False,
+) -> date | datetime | None:
     """A date picker with calendar popup powered by RSuite.
+
+    Datetime mode
+    -------------
+    When ``format`` contains a time field, RSuite renders a time panel and the
+    widget becomes a datetime picker: it returns a ``datetime`` instead of a
+    ``date``, and ``value`` round-trips the time. The rule is RSuite's own: a
+    format counts as a time format when it contains any of ``H h m s``
+    anywhere, quoted literals included (``M`` is month and ``d`` is day, so
+    those do not count).
+
+    >>> when = date_picker(
+    ...     label="Starts at",
+    ...     value=datetime(2026, 6, 1, 9, 30),
+    ...     format="yyyy-MM-dd HH:mm",
+    ...     key="dp_datetime",
+    ... )  # doctest: +SKIP
+    >>> when  # doctest: +SKIP
+    datetime.datetime(2026, 6, 1, 9, 30)
 
     Parameters
     ----------
     label : str
         Label displayed at the start of the toggle.
-    value : date or str or None
-        Default date value. Accepts date object or ISO string (YYYY-MM-DD).
+    value : date or datetime or str or None
+        Default value. Accepts a ``date``, a ``datetime``, or an ISO string
+        (``YYYY-MM-DD`` or ``YYYY-MM-DDTHH:MM:SS``). In datetime mode a plain
+        date defaults the time to 00:00:00.
     format : str
-        Date format string (Unicode Technical Standard #35 tokens).
+        Date format string (Unicode Technical Standard #35 tokens). Including a
+        time field (any of ``H h m s``) switches the widget to datetime mode.
     appearance : str
         Visual style: 'default' or 'subtle'.
     size : str
@@ -91,7 +119,7 @@ def date_picker(
     limit_end_year : int or None
         Upper bound on the year navigable in the calendar, relative to the
         current selection.
-    calendar_default_date : date or str or None
+    calendar_default_date : date or datetime or str or None
         Which month the calendar opens on when there is no selection. Does not
         select a value.
     locale : str or None
@@ -100,22 +128,35 @@ def date_picker(
         Callback when the selected date changes.
     key : str or None
         Unique widget key.
+    show_meridiem : bool
+        Show a 12-hour clock with an AM/PM column in the time panel. Pair it
+        with a 12-hour ``format`` such as ``"yyyy-MM-dd hh:mm aa"``. Default
+        False (24-hour clock).
 
     Returns
     -------
-    date or None
-        The selected date, or None if nothing selected.
+    date or datetime or None
+        The selected value (a ``datetime`` in datetime mode), or None if
+        nothing selected.
     """
+
     def _noop():
         pass
 
+    with_time = format_has_time(format)
+    # min/max/disabled dates stay day-granular: the frontend compares them on
+    # the calendar day only, so a time component there would be meaningless.
+    _serialize_value = serialize_datetime if with_time else _serialize
+
     result = _component(
         key=key,
-        default={"selected_date": _serialize(value)},
+        default={"selected_date": _serialize_value(value)},
         data={
             "label": label,
-            "value": _serialize(value),
+            "value": _serialize_value(value),
             "format": format,
+            "withTime": with_time,
+            "showMeridiem": show_meridiem,
             "appearance": appearance,
             "size": size,
             "placeholder": placeholder,
@@ -135,16 +176,13 @@ def date_picker(
             "disabledWeekdays": disabled_weekdays or [],
             "limitStartYear": limit_start_year,
             "limitEndYear": limit_end_year,
-            "calendarDefaultDate": _serialize(calendar_default_date),
+            "calendarDefaultDate": _serialize_value(calendar_default_date),
             "locale": locale,
         },
         on_selected_date_change=on_change or _noop,
     )
 
     selected = result.get("selected_date") if result else None
-    if selected:
-        try:
-            return date.fromisoformat(selected)
-        except (ValueError, TypeError):
-            return None
-    return None
+    if with_time:
+        return parse_datetime_return(selected)
+    return parse_date_return(selected)

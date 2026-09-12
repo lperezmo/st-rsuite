@@ -3,6 +3,7 @@ import { FrontendRendererArgs } from "@streamlit/component-v2-lib";
 import { SelectPicker as RsuiteSelectPicker } from "rsuite";
 import { useSyncedValue, keyOfScalar } from "../shared/useSyncedValue";
 import { FieldLabel } from "../shared/FieldLabel";
+import { useAnchoredPopup } from "../shared/useAnchoredPopup";
 
 export type SelectPickerState = {
   selected_value: string | null;
@@ -63,6 +64,7 @@ const SelectPickerComponent: FC<Props> = ({ data, setStateValue }) => {
   } = data;
 
   const fieldId = useId();
+  const popup = useAnchoredPopup(placement);
 
   const [selected, emitSelected] = useSyncedValue<string | null>(
     keyOfScalar(value),
@@ -92,6 +94,9 @@ const SelectPickerComponent: FC<Props> = ({ data, setStateValue }) => {
         appearance={appearance}
         size={size}
         placeholder={placeholder || undefined}
+        ref={popup.ref}
+        onOpen={popup.onOpen}
+        onClose={popup.onClose}
         placement={placement as any}
         disabled={disabled}
         cleanable={cleanable}

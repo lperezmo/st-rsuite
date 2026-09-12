@@ -9,6 +9,7 @@ import {
   buildHideSeconds,
 } from "../shared/timeConstraints";
 import { FieldLabel } from "../shared/FieldLabel";
+import { useAnchoredPopup } from "../shared/useAnchoredPopup";
 
 export type TimeRangePickerState = {
   start_time: string | null;
@@ -88,6 +89,7 @@ const TimeRangePickerComponent: FC<Props> = ({ data, setStateValue }) => {
   } = data;
 
   const fieldId = useId();
+  const popup = useAnchoredPopup(placement);
 
   const [selected, emitSelected] = useSyncedValue<DateRange | null>(
     keyOfPair(startValue, endValue),
@@ -131,6 +133,9 @@ const TimeRangePickerComponent: FC<Props> = ({ data, setStateValue }) => {
         appearance={appearance}
         size={size}
         placeholder={placeholder || undefined}
+        ref={popup.ref}
+        onOpen={popup.onOpen}
+        onClose={popup.onClose}
         placement={placement as any}
         disabled={disabled}
         cleanable={cleanable}

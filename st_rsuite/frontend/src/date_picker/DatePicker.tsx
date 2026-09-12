@@ -4,6 +4,8 @@ import { DatePicker as RsuiteDatePicker } from "rsuite";
 import { useSyncedValue, keyOfScalar } from "../shared/useSyncedValue";
 import { buildShouldDisableDate } from "../shared/dateConstraints";
 import { FieldLabel } from "../shared/FieldLabel";
+import { useAnchoredPopup } from "../shared/useAnchoredPopup";
+import { toISOValue, parseISOValue } from "../shared/dateValue";
 
 export type DatePickerState = {
   selected_date: string | null;
@@ -13,6 +15,11 @@ export type DatePickerData = {
   label: string;
   value: string | null;
   format: string;
+  // True when `format` carries a time field, so the widget selects and emits a
+  // "YYYY-MM-DDTHH:mm:ss" datetime instead of a "YYYY-MM-DD" date. Derived
+  // Python-side from the format string so both sides share one rule.
+  withTime: boolean;
+  showMeridiem?: boolean;
   appearance: "default" | "subtle";
   size: "lg" | "md" | "sm" | "xs";
   placeholder: string;
@@ -44,25 +51,13 @@ type Props = {
   >["setStateValue"];
 };
 
-function toISODate(d: Date | null): string | null {
-  if (!d || isNaN(d.getTime())) return null;
-  const y = d.getFullYear();
-  const m = String(d.getMonth() + 1).padStart(2, "0");
-  const day = String(d.getDate()).padStart(2, "0");
-  return `${y}-${m}-${day}`;
-}
-
-function parseDate(val: string | null): Date | null {
-  if (!val) return null;
-  const d = new Date(val + "T00:00:00");
-  return isNaN(d.getTime()) ? null : d;
-}
-
 const DatePickerComponent: FC<Props> = ({ data, setStateValue }) => {
   const {
     label,
     value,
     format,
+    withTime,
+    showMeridiem,
     appearance,
     size,
     placeholder,
@@ -86,10 +81,11 @@ const DatePickerComponent: FC<Props> = ({ data, setStateValue }) => {
   } = data;
 
   const fieldId = useId();
+  const popup = useAnchoredPopup(placement);
 
   const [selected, emitSelected] = useSyncedValue<Date | null>(
     keyOfScalar(value),
-    () => parseDate(value)
+    () => parseISOValue(value)
   );
 
   const shouldDisableDate = useMemo(
@@ -104,17 +100,17 @@ const DatePickerComponent: FC<Props> = ({ data, setStateValue }) => {
   );
 
   const calDefaultDate = useMemo(
-    () => (calendarDefaultDate ? parseDate(calendarDefaultDate) ?? undefined : undefined),
+    () => (calendarDefaultDate ? parseISOValue(calendarDefaultDate) ?? undefined : undefined),
     [calendarDefaultDate]
   );
 
   const handleChange = useCallback(
     (newValue: Date | null) => {
-      const iso = toISODate(newValue);
+      const iso = toISOValue(newValue, withTime);
       emitSelected(newValue);
       setStateValue("selected_date", iso);
     },
-    [emitSelected, setStateValue]
+    [emitSelected, setStateValue, withTime]
   );
 
   return (
@@ -128,8 +124,12 @@ const DatePickerComponent: FC<Props> = ({ data, setStateValue }) => {
         appearance={appearance}
         size={size}
         placeholder={placeholder || undefined}
+        ref={popup.ref}
+        onOpen={popup.onOpen}
+        onClose={popup.onClose}
         placement={placement as any}
         oneTap={oneTap}
+        showMeridiem={showMeridiem}
         disabled={disabled}
         cleanable={cleanable}
         block={block}
