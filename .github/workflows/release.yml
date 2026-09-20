@@ -117,9 +117,15 @@ jobs:
           path: dist/
 
       # Upload dists to the GitHub Release that semantic-release already created.
+      #
+      # GH_REPO is required, not decorative: this job only downloads an
+      # artifact and never checks the repository out, so gh has no git remote
+      # to infer the target from and exits with "fatal: not a git repository".
+      # Naming the repo explicitly is cheaper than cloning just to upload.
       - name: Upload assets to GitHub Release
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_REPO: ${{ github.repository }}
         run: gh release upload "${{ needs.release.outputs.tag }}" dist/* --clobber
 
   publish:
