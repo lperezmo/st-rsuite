@@ -197,10 +197,17 @@ jobs:
 
       - name: Bump demo app version requirement
         run: |
+          set -euo pipefail
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          VERSION=${{ needs.release.outputs.version }}
+          VERSION="${{ needs.release.outputs.version }}"
           sed -i "s/st-rsuite>=.*/st-rsuite>=${VERSION}/" examples/requirements.txt
+          # git commit exits non-zero with nothing staged, which would fail the
+          # job over a floor that is already correct.
+          if git diff --quiet -- examples/requirements.txt; then
+            echo "examples/requirements.txt already names ${VERSION}; nothing to push."
+            exit 0
+          fi
           git add examples/requirements.txt
           git commit -m "chore: bump demo app requirement to v${VERSION}"
           git push
