@@ -144,7 +144,13 @@ jobs:
           attestations: false
 
   bump-demo:
-    needs: [release]
+    # publish, not just release: the demo app's requirements.txt must never
+    # name a version PyPI cannot serve yet. Depending on release alone ran this
+    # job alongside publish, so the bump commit landed - and the demo app
+    # redeployed against it - before the wheel had been uploaded at all. A
+    # ">=" floor is no safer than an exact pin here, because pip cannot satisfy
+    # a floor above the newest published version.
+    needs: [release, publish]
     if: needs.release.outputs.released == 'true'
     runs-on: ubuntu-latest
     permissions:
@@ -154,6 +160,40 @@ jobs:
         with:
           ref: main
           token: ${{ secrets.GITHUB_TOKEN }}
+
+      - uses: actions/setup-python@v6
+        with: { python-version: '3.13' }
+
+      # A successful upload is not the same as an installable release: the
+      # index and the CDN in front of the files take their own time to catch
+      # up. Poll the thing the demo app actually does - resolve and fetch the
+      # wheel from PyPI - rather than sleeping a fixed guess.
+      - name: Wait for the release to be installable from PyPI
+        env:
+          VERSION: ${{ needs.release.outputs.version }}
+        run: |
+          set -euo pipefail
+          dest="$(mktemp -d)"
+          deadline=$(( SECONDS + 600 ))
+          attempt=0
+          until pip download "st-rsuite==${VERSION}" \
+              --no-deps --only-binary=:all: --no-cache-dir \
+              --dest "$dest" >/dev/null 2>&1; do
+            attempt=$(( attempt + 1 ))
+            if (( SECONDS >= deadline )); then
+              echo "::error::st-rsuite==${VERSION} was still not installable"\
+                   "from PyPI after 10 minutes. The demo app was left on the"\
+                   "previous version; re-run this job once the release shows"\
+                   "up on PyPI."
+              exit 1
+            fi
+            echo "Attempt ${attempt}: ${VERSION} not on PyPI yet, retrying in 15s"
+            sleep 15
+          done
+          # This runner reached one CDN edge; the one serving the demo app's
+          # build may be a few seconds behind it.
+          echo "${VERSION} is installable. Letting the CDN settle for 30s."
+          sleep 30
 
       - name: Bump demo app version requirement
         run: |
