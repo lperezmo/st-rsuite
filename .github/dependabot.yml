@@ -1,0 +1,28 @@
+version: 2
+updates:
+  - package-ecosystem: "uv"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    # Security updates only: a limit of 0 turns off routine version-update PRs.
+    open-pull-requests-limit: 0
+    commit-message:
+      prefix: "chore"
+      include: "scope"
+    groups:
+      uv-security:
+        applies-to: security-updates
+        patterns: ["*"]
+  - package-ecosystem: "npm"
+    directory: "/st_rsuite/frontend"
+    schedule:
+      interval: "weekly"
+    # Security updates only: a limit of 0 turns off routine version-update PRs.
+    open-pull-requests-limit: 0
+    commit-message:
+      prefix: "chore"
+      include: "scope"
+    groups:
+      npm-security:
+        applies-to: security-updates
+        patterns: ["*"]
