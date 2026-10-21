@@ -5,7 +5,7 @@
   <p>Built using <a href="https://rsuitejs.com/">RSuite</a> · Streamlit <a href="https://docs.streamlit.io/develop/api-reference/custom-components/st.components.v2.component">Components v2</a></p>
 
   <a href="https://pypi.org/project/st-rsuite/"><img src="https://img.shields.io/pypi/v/st-rsuite" alt="PyPI version"></a>
-  <a href="https://www.python.org/"><img src="https://img.shields.io/badge/python-%E2%89%A53.10-blue" alt="Python >=3.10"></a>
+  <a href="https://www.python.org/"><img src="https://img.shields.io/badge/python-%E2%89%A53.11-blue" alt="Python >=3.11"></a>
   <a href="https://streamlit.io/"><img src="https://img.shields.io/badge/Streamlit-%E2%89%A51.51-FF4B4B?logo=streamlit&logoColor=white" alt="Streamlit >=1.51"></a>
   <a href="https://github.com/lperezmo/st-rsuite/actions/workflows/tests.yml"><img src="https://github.com/lperezmo/st-rsuite/actions/workflows/tests.yml/badge.svg" alt="Tests"></a>
   <a href="https://rsuite.streamlit.app/"><img src="https://img.shields.io/badge/Streamlit-App-FF4B4B?logo=streamlit&logoColor=white" alt="Open in Streamlit"></a>
@@ -67,7 +67,7 @@ All components are **MIT licensed** (RSuite is fully open-source).
 ## Requirements
 
 - **Streamlit >= 1.51**: these components are built on Streamlit [Components v2](https://docs.streamlit.io/develop/api-reference/custom-components/st.components.v2.component); 1.51 is the first release with the `st.components.v2` API they rely on. st-rsuite works on every release from 1.51 onward (on 1.51 and 1.52 a small compatibility shim applies `isolate_styles` on the per-call renderer; from 1.53 it is applied at registration). On older Streamlit the components cannot register and you get a `must be declared ... with asset_dir` error (see [Troubleshooting](#troubleshooting)).
-- **Python >= 3.10**
+- **Python >= 3.11**
 
 ## Installation
 
