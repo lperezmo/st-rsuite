@@ -10,7 +10,7 @@ silently vanished on both sides. These tests pin the narrower check.
 date_range_picker, so one guard covers all four.
 """
 
-from datetime import date, datetime, timedelta, timezone
+from datetime import UTC, date, datetime, timedelta, timezone
 
 import pytest
 
@@ -20,7 +20,7 @@ DATETIMES = [
     datetime(2026, 1, 2, 3, 4, 5),
     datetime(2026, 1, 2, 0, 0, 0),
     datetime(2026, 1, 2, 23, 59, 59, 999999),
-    datetime(2026, 1, 2, 3, 4, 5, tzinfo=timezone.utc),
+    datetime(2026, 1, 2, 3, 4, 5, tzinfo=UTC),
     datetime(2026, 1, 2, 3, 4, 5, tzinfo=timezone(timedelta(hours=-8))),
 ]
 

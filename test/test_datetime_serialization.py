@@ -11,7 +11,7 @@ the return-trip parser. Everything here is pure Python, so no CCv2 registration
 or Streamlit runtime is involved.
 """
 
-from datetime import date, datetime, timedelta, timezone
+from datetime import UTC, date, datetime, timedelta, timezone
 
 import pytest
 
@@ -94,7 +94,7 @@ def test_microseconds_are_truncated_not_rendered():
 def test_tz_aware_datetime_keeps_wall_time_and_drops_the_offset():
     aware = datetime(2026, 6, 1, 8, 30, tzinfo=timezone(timedelta(hours=-8)))
     assert serialize_datetime(aware) == "2026-06-01T08:30:00"
-    assert serialize_datetime(datetime(2026, 6, 1, 8, 30, tzinfo=timezone.utc)) == (
+    assert serialize_datetime(datetime(2026, 6, 1, 8, 30, tzinfo=UTC)) == (
         "2026-06-01T08:30:00"
     )
 

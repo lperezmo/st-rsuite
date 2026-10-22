@@ -7,7 +7,7 @@ name = "st-rsuite"
 version = "0.12.0"
 description = "RSuite UI components for Streamlit: pickers, trees, carousel, timeline, and more."
 readme = "README.md"
-requires-python = ">=3.10"
+requires-python = ">=3.11"
 license = {text = "MIT"}
 authors = [{ name = "Luis Perez", email = "lperezmo@users.noreply.github.com" }]
 classifiers = [
@@ -16,7 +16,6 @@ classifiers = [
     "Topic :: Software Development :: Libraries :: Python Modules",
     "Topic :: Software Development :: User Interfaces",
     "Programming Language :: Python :: 3",
-    "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
     "Programming Language :: Python :: 3.13",
@@ -126,8 +125,7 @@ known-local-folder = ["e2e_utils", "utils"]
     # closed there, so it deliberately outlives the statement that opens it. A
     # context manager cannot express that lifetime.
     "SIM115",
-    # PYI034 wants `__enter__` annotated with `typing.Self`, which is 3.11+.
-    # The package supports 3.10 and does not depend on typing_extensions, so the
-    # class name is the only annotation available.
+    # PYI034 wants `__enter__` annotated with `typing.Self`; the helpers that
+    # define context managers annotate with the class name instead.
     "PYI034",
 ]
