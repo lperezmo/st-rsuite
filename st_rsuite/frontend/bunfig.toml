@@ -1,0 +1,9 @@
+[fmt]
+# "auto" keeps CRLF working trees on Windows passing the check while CI checks
+# out LF.
+endOfLine = "auto"
+
+[lint]
+
+[lint.rules]
+"eqeqeq" = ["error", "smart"]
