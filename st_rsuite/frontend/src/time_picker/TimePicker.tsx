@@ -8,7 +8,10 @@ import {
   buildHideSeconds,
 } from "../shared/timeConstraints";
 import { FieldLabel } from "../shared/FieldLabel";
-import { useAnchoredPopup } from "../shared/useAnchoredPopup";
+import {
+  useAnchoredPopup,
+  type PickerPlacement,
+} from "../shared/useAnchoredPopup";
 
 export type TimePickerState = {
   selected_time: string | null;
@@ -87,7 +90,7 @@ const TimePickerComponent: FC<Props> = ({ data, setStateValue }) => {
 
   const [selected, emitSelected] = useSyncedValue<Date | null>(
     keyOfScalar(value),
-    () => parseTime(value)
+    () => parseTime(value),
   );
 
   const handleChange = useCallback(
@@ -96,19 +99,27 @@ const TimePickerComponent: FC<Props> = ({ data, setStateValue }) => {
       emitSelected(newValue);
       setStateValue("selected_time", iso);
     },
-    [emitSelected, setStateValue]
+    [emitSelected, setStateValue],
   );
 
-  const constraints = { hiddenHours, hiddenMinutes, hiddenSeconds, minHour, maxHour };
+  // Each builder gets only the fields it reads, so its memo depends on exactly
+  // those and nothing else.
   const hideHours = useMemo(
-    () => buildHideHours(constraints),
-    [hiddenHours, minHour, maxHour]
+    () => buildHideHours({ hiddenHours, minHour, maxHour }),
+    [hiddenHours, minHour, maxHour],
   );
-  const hideMinutes = useMemo(() => buildHideMinutes(constraints), [hiddenMinutes]);
-  const hideSeconds = useMemo(() => buildHideSeconds(constraints), [hiddenSeconds]);
+  const hideMinutes = useMemo(
+    () => buildHideMinutes({ hiddenMinutes }),
+    [hiddenMinutes],
+  );
+  const hideSeconds = useMemo(
+    () => buildHideSeconds({ hiddenSeconds }),
+    [hiddenSeconds],
+  );
 
   // If showMeridiem is true, use 12-hour format
-  const effectiveFormat = showMeridiem && format === "HH:mm" ? "hh:mm aa" : format;
+  const effectiveFormat =
+    showMeridiem && format === "HH:mm" ? "hh:mm aa" : format;
 
   return (
     <div style={{ width: "100%", padding: "4px 0" }}>
@@ -124,7 +135,7 @@ const TimePickerComponent: FC<Props> = ({ data, setStateValue }) => {
         ref={popup.ref}
         onOpen={popup.onOpen}
         onClose={popup.onClose}
-        placement={placement as any}
+        placement={placement as PickerPlacement}
         disabled={disabled}
         cleanable={cleanable}
         block={block}

@@ -11,9 +11,9 @@ import { fileURLToPath } from "node:url";
 import process from "node:process";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
-// Production is the default: a bare `npm run build` (locally or in CI) must
+// Production is the default: a bare `bun run build` (locally or in CI) must
 // always produce minified bundles without sourcemaps. Dev builds are opt-in
-// via `npm run build:dev` / `npm run dev`, which set NODE_ENV=development.
+// via `bun run build:dev` / `bun run dev`, which set NODE_ENV=development.
 const isProd = process.env.NODE_ENV !== "development";
 const isWatch = process.argv.includes("--watch");
 
@@ -28,7 +28,7 @@ async function main() {
     plugins: [react(), cssInjectedByJsPlugin()],
     define: {
       "process.env.NODE_ENV": JSON.stringify(
-        process.env.NODE_ENV || "production"
+        process.env.NODE_ENV || "production",
       ),
     },
     build: {

@@ -17,15 +17,15 @@ def test_build_dependencies_never_run_with_pypi_oidc():
 
     assert "contents: read" in build
     assert "id-token: write" not in build
-    assert "npm ci" in build and "python -m build" in build
+    assert "bun install --frozen-lockfile" in build and "python -m build" in build
 
     assert "contents: write" in upload
     assert "id-token: write" not in upload
 
     assert "id-token: write" in publish
     assert "contents: write" not in publish
-    assert "npm ci" not in publish
+    assert "bun install" not in publish
     assert "python -m build" not in publish
     assert "python -m pip install" not in publish
-    assert "actions/download-artifact@v7" in publish
-    assert "pypa/gh-action-pypi-publish@release/v1" in publish
+    assert "uses: actions/download-artifact@" in publish
+    assert "uses: pypa/gh-action-pypi-publish@" in publish

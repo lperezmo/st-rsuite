@@ -22,7 +22,7 @@ export type TimeConstraints = {
 };
 
 export function buildHideHours(
-  c: TimeConstraints
+  c: TimeConstraints,
 ): ((hour: number) => boolean) | undefined {
   const hidden = new Set(c.hiddenHours ?? []);
   const hasWindow = c.minHour != null || c.maxHour != null;
@@ -36,7 +36,7 @@ export function buildHideHours(
 }
 
 export function buildHideMinutes(
-  c: TimeConstraints
+  c: TimeConstraints,
 ): ((minute: number) => boolean) | undefined {
   const hidden = new Set(c.hiddenMinutes ?? []);
   if (hidden.size === 0) return undefined;
@@ -44,7 +44,7 @@ export function buildHideMinutes(
 }
 
 export function buildHideSeconds(
-  c: TimeConstraints
+  c: TimeConstraints,
 ): ((second: number) => boolean) | undefined {
   const hidden = new Set(c.hiddenSeconds ?? []);
   if (hidden.size === 0) return undefined;

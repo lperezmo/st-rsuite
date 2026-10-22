@@ -28,7 +28,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 
 export function useSyncedValue<T>(
   incomingKey: string,
-  parseIncoming: () => T
+  parseIncoming: () => T,
 ): [T, (next: T) => void] {
   // Keep the latest parse closure without making it an effect dependency, so a
   // new closure each render does not re-run the sync effect on its own.
@@ -60,7 +60,7 @@ export function keyOfScalar(v: string | null | undefined): string {
 /** Canonical key for a (start, end) pair of nullable strings. */
 export function keyOfPair(
   start: string | null | undefined,
-  end: string | null | undefined
+  end: string | null | undefined,
 ): string {
   return `${start ?? ""}|${end ?? ""}`;
 }

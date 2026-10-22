@@ -11,7 +11,7 @@
 # current production entry, so ordinary dependency growth does not trip it,
 # while still well under the dev-build size. The sourcemap check below catches
 # dev builds independently, so this is a size sanity check rather than the only
-# line of defense. Run this after `npm run build` in any workflow that packages
+# line of defense. Run this after `bun run build` in any workflow that packages
 # or tests the built assets.
 set -euo pipefail
 

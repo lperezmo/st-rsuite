@@ -4,7 +4,10 @@ import { DatePicker as RsuiteDatePicker } from "rsuite";
 import { useSyncedValue, keyOfScalar } from "../shared/useSyncedValue";
 import { buildShouldDisableDate } from "../shared/dateConstraints";
 import { FieldLabel } from "../shared/FieldLabel";
-import { useAnchoredPopup } from "../shared/useAnchoredPopup";
+import {
+  useAnchoredPopup,
+  type PickerPlacement,
+} from "../shared/useAnchoredPopup";
 import { toISOValue, parseISOValue } from "../shared/dateValue";
 
 export type DatePickerState = {
@@ -85,7 +88,7 @@ const DatePickerComponent: FC<Props> = ({ data, setStateValue }) => {
 
   const [selected, emitSelected] = useSyncedValue<Date | null>(
     keyOfScalar(value),
-    () => parseISOValue(value)
+    () => parseISOValue(value),
   );
 
   const shouldDisableDate = useMemo(
@@ -96,12 +99,15 @@ const DatePickerComponent: FC<Props> = ({ data, setStateValue }) => {
         disabledDates,
         disabledWeekdays,
       }),
-    [minDate, maxDate, disabledDates, disabledWeekdays]
+    [minDate, maxDate, disabledDates, disabledWeekdays],
   );
 
   const calDefaultDate = useMemo(
-    () => (calendarDefaultDate ? parseISOValue(calendarDefaultDate) ?? undefined : undefined),
-    [calendarDefaultDate]
+    () =>
+      calendarDefaultDate
+        ? (parseISOValue(calendarDefaultDate) ?? undefined)
+        : undefined,
+    [calendarDefaultDate],
   );
 
   const handleChange = useCallback(
@@ -110,7 +116,7 @@ const DatePickerComponent: FC<Props> = ({ data, setStateValue }) => {
       emitSelected(newValue);
       setStateValue("selected_date", iso);
     },
-    [emitSelected, setStateValue, withTime]
+    [emitSelected, setStateValue, withTime],
   );
 
   return (
@@ -127,7 +133,7 @@ const DatePickerComponent: FC<Props> = ({ data, setStateValue }) => {
         ref={popup.ref}
         onOpen={popup.onOpen}
         onClose={popup.onClose}
-        placement={placement as any}
+        placement={placement as PickerPlacement}
         oneTap={oneTap}
         showMeridiem={showMeridiem}
         disabled={disabled}

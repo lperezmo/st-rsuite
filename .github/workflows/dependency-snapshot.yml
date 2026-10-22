@@ -1,0 +1,47 @@
+name: Dependency snapshot
+
+# GitHub's dependency graph does not read bun.lock, so on its own it only sees
+# the ranges in st_rsuite/frontend/package.json and Dependabot alerts miss every
+# transitive npm package. This job turns bun.lock into a dependency submission
+# snapshot and posts it, which puts the full resolved tree back in the graph.
+# Only the newest snapshot per correlator counts, so each run replaces the last.
+on:
+  push:
+    branches: [main]
+    paths:
+      - st_rsuite/frontend/bun.lock
+      - st_rsuite/frontend/scripts/dependency-snapshot.ts
+      - .github/workflows/dependency-snapshot.yml
+  workflow_dispatch:
+
+permissions: {}
+
+concurrency:
+  group: dependency-snapshot
+  cancel-in-progress: true
+
+jobs:
+  submit:
+    name: Submit bun.lock to the dependency graph
+    runs-on: ubuntu-latest
+    # The submission API needs write access; nothing here pushes code.
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          persist-credentials: false
+      - uses: oven-sh/setup-bun@0c5077e51419868618aeaa5fe8019c62421857d6 # v2.2.0
+        with:
+          bun-version-file: st_rsuite/frontend/package.json
+      # The script only reads bun.lock, so nothing is installed and no
+      # package code runs in a job holding a write token.
+      - name: Build the snapshot
+        run: bun scripts/dependency-snapshot.ts > "$RUNNER_TEMP/snapshot.json"
+        working-directory: st_rsuite/frontend
+      - name: Submit the snapshot
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh api --method POST "repos/${{ github.repository }}/dependency-graph/snapshots" \
+            --input "$RUNNER_TEMP/snapshot.json"

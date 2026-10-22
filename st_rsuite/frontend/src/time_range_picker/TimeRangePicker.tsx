@@ -9,7 +9,10 @@ import {
   buildHideSeconds,
 } from "../shared/timeConstraints";
 import { FieldLabel } from "../shared/FieldLabel";
-import { useAnchoredPopup } from "../shared/useAnchoredPopup";
+import {
+  useAnchoredPopup,
+  type PickerPlacement,
+} from "../shared/useAnchoredPopup";
 
 export type TimeRangePickerState = {
   start_time: string | null;
@@ -97,7 +100,7 @@ const TimeRangePickerComponent: FC<Props> = ({ data, setStateValue }) => {
       const s = parseTime(startValue);
       const e = parseTime(endValue);
       return s && e ? [s, e] : null;
-    }
+    },
   );
 
   const handleChange = useCallback(
@@ -108,18 +111,26 @@ const TimeRangePickerComponent: FC<Props> = ({ data, setStateValue }) => {
       setStateValue("start_time", s);
       setStateValue("end_time", e);
     },
-    [emitSelected, setStateValue]
+    [emitSelected, setStateValue],
   );
 
-  const constraints = { hiddenHours, hiddenMinutes, hiddenSeconds, minHour, maxHour };
+  // Each builder gets only the fields it reads, so its memo depends on exactly
+  // those and nothing else.
   const hideHours = useMemo(
-    () => buildHideHours(constraints),
-    [hiddenHours, minHour, maxHour]
+    () => buildHideHours({ hiddenHours, minHour, maxHour }),
+    [hiddenHours, minHour, maxHour],
   );
-  const hideMinutes = useMemo(() => buildHideMinutes(constraints), [hiddenMinutes]);
-  const hideSeconds = useMemo(() => buildHideSeconds(constraints), [hiddenSeconds]);
+  const hideMinutes = useMemo(
+    () => buildHideMinutes({ hiddenMinutes }),
+    [hiddenMinutes],
+  );
+  const hideSeconds = useMemo(
+    () => buildHideSeconds({ hiddenSeconds }),
+    [hiddenSeconds],
+  );
 
-  const effectiveFormat = showMeridiem && format === "HH:mm" ? "hh:mm aa" : format;
+  const effectiveFormat =
+    showMeridiem && format === "HH:mm" ? "hh:mm aa" : format;
 
   return (
     <div style={{ width: "100%", padding: "4px 0" }}>
@@ -136,7 +147,7 @@ const TimeRangePickerComponent: FC<Props> = ({ data, setStateValue }) => {
         ref={popup.ref}
         onOpen={popup.onOpen}
         onClose={popup.onClose}
-        placement={placement as any}
+        placement={placement as PickerPlacement}
         disabled={disabled}
         cleanable={cleanable}
         block={block}

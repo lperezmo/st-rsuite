@@ -34,18 +34,12 @@ type Props = {
 };
 
 const CarouselComponent: FC<Props> = ({ data, setStateValue }) => {
-  const {
-    items,
-    autoplay,
-    autoplayInterval,
-    placement,
-    shape,
-    activeIndex,
-  } = data;
+  const { items, autoplay, autoplayInterval, placement, shape, activeIndex } =
+    data;
 
   const [active, emitActive] = useSyncedValue<number>(
     String(activeIndex || 0),
-    () => activeIndex || 0
+    () => activeIndex || 0,
   );
 
   const handleSelect = useCallback(
@@ -53,7 +47,7 @@ const CarouselComponent: FC<Props> = ({ data, setStateValue }) => {
       emitActive(index);
       setStateValue("active_index", index);
     },
-    [emitActive, setStateValue]
+    [emitActive, setStateValue],
   );
 
   return (

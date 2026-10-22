@@ -14,7 +14,9 @@ function getCSSVar(element: Element, name: string, fallback: string): string {
 function parseColorChannels(color: string): [number, number, number] | null {
   const value = color.trim();
 
-  const rgbMatch = value.match(/^rgba?\(\s*([\d.]+)[\s,]+([\d.]+)[\s,]+([\d.]+)/i);
+  const rgbMatch = value.match(
+    /^rgba?\(\s*([\d.]+)[\s,]+([\d.]+)[\s,]+([\d.]+)/i,
+  );
   if (rgbMatch) {
     return [Number(rgbMatch[1]), Number(rgbMatch[2]), Number(rgbMatch[3])];
   }
@@ -124,11 +126,7 @@ const PRIMARY_RAMP_LIGHTNESS_FRACTIONS: ReadonlyArray<[string, number]> = [
   ["900", -0.5],
 ];
 
-function rgbToHsl(
-  r: number,
-  g: number,
-  b: number
-): [number, number, number] {
+function rgbToHsl(r: number, g: number, b: number): [number, number, number] {
   const red = r / 255;
   const green = g / 255;
   const blue = b / 255;
@@ -163,7 +161,7 @@ function hslToHex(h: number, s: number, l: number): string {
   const secondary = chroma * (1 - Math.abs(((h / 60) % 2) - 1));
   const offset = lightness - chroma / 2;
 
-  const sector = Math.floor(((h % 360) + 360) % 360 / 60);
+  const sector = Math.floor((((h % 360) + 360) % 360) / 60);
   const [r, g, b] = (
     [
       [chroma, secondary, 0],

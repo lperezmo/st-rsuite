@@ -49,7 +49,7 @@ const CheckTreeComponent: FC<Props> = ({ data, setStateValue }) => {
 
   const [selected, emitSelected] = useSyncedValue<string[]>(
     keyOfList(value),
-    () => value || []
+    () => value || [],
   );
 
   const handleChange = useCallback(
@@ -58,7 +58,7 @@ const CheckTreeComponent: FC<Props> = ({ data, setStateValue }) => {
       emitSelected(vals);
       setStateValue("selected_values", vals);
     },
-    [emitSelected, setStateValue]
+    [emitSelected, setStateValue],
   );
 
   // CheckTree has no wrapper-level `disabled` prop, so the wrapper is a

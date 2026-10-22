@@ -6,7 +6,10 @@ import { useSyncedValue, keyOfPair } from "../shared/useSyncedValue";
 import { buildShouldDisableDate } from "../shared/dateConstraints";
 import { buildRanges, SerializedRange } from "../shared/rangePresets";
 import { FieldLabel } from "../shared/FieldLabel";
-import { useAnchoredPopup } from "../shared/useAnchoredPopup";
+import {
+  useAnchoredPopup,
+  type PickerPlacement,
+} from "../shared/useAnchoredPopup";
 import { toISOValue, parseISOValue } from "../shared/dateValue";
 
 export type DateRangePickerState = {
@@ -102,7 +105,7 @@ const DateRangePickerComponent: FC<Props> = ({ data, setStateValue }) => {
       const s = parseISOValue(startValue);
       const e = parseISOValue(endValue);
       return s && e ? [s, e] : null;
-    }
+    },
   );
 
   const shouldDisableDate = useMemo(
@@ -113,7 +116,7 @@ const DateRangePickerComponent: FC<Props> = ({ data, setStateValue }) => {
         disabledDates,
         disabledWeekdays,
       }),
-    [minDate, maxDate, disabledDates, disabledWeekdays]
+    [minDate, maxDate, disabledDates, disabledWeekdays],
   );
 
   const rangePresets = useMemo(() => buildRanges(ranges), [ranges]);
@@ -132,7 +135,7 @@ const DateRangePickerComponent: FC<Props> = ({ data, setStateValue }) => {
       setStateValue("start_date", s);
       setStateValue("end_date", e);
     },
-    [emitSelected, setStateValue, withTime]
+    [emitSelected, setStateValue, withTime],
   );
 
   return (
@@ -150,7 +153,7 @@ const DateRangePickerComponent: FC<Props> = ({ data, setStateValue }) => {
         ref={popup.ref}
         onOpen={popup.onOpen}
         onClose={popup.onClose}
-        placement={placement as any}
+        placement={placement as PickerPlacement}
         disabled={disabled}
         cleanable={cleanable}
         block={block}
