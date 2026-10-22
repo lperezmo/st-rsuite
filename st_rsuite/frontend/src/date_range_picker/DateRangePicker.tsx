@@ -6,7 +6,10 @@ import { useSyncedValue, keyOfPair } from "../shared/useSyncedValue";
 import { buildShouldDisableDate } from "../shared/dateConstraints";
 import { buildRanges, SerializedRange } from "../shared/rangePresets";
 import { FieldLabel } from "../shared/FieldLabel";
-import { useAnchoredPopup } from "../shared/useAnchoredPopup";
+import {
+  useAnchoredPopup,
+  type PickerPlacement,
+} from "../shared/useAnchoredPopup";
 import { toISOValue, parseISOValue } from "../shared/dateValue";
 
 export type DateRangePickerState = {
@@ -150,7 +153,7 @@ const DateRangePickerComponent: FC<Props> = ({ data, setStateValue }) => {
         ref={popup.ref}
         onOpen={popup.onOpen}
         onClose={popup.onClose}
-        placement={placement as any}
+        placement={placement as PickerPlacement}
         disabled={disabled}
         cleanable={cleanable}
         block={block}

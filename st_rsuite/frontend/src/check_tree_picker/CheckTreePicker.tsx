@@ -2,7 +2,10 @@ import { FC, useCallback } from "react";
 import { FrontendRendererArgs } from "@streamlit/component-v2-lib";
 import { CheckTreePicker as RsuiteCheckTreePicker } from "rsuite";
 import { useSyncedValue, keyOfList } from "../shared/useSyncedValue";
-import { useAnchoredPopup } from "../shared/useAnchoredPopup";
+import {
+  useAnchoredPopup,
+  type PickerPlacement,
+} from "../shared/useAnchoredPopup";
 
 export type CheckTreePickerState = {
   selected_values: string[];
@@ -93,7 +96,7 @@ const CheckTreePickerComponent: FC<Props> = ({ data, setStateValue }) => {
         ref={popup.ref}
         onOpen={popup.onOpen}
         onClose={popup.onClose}
-        placement={placement as any}
+        placement={placement as PickerPlacement}
         disabled={disabled}
         cleanable={cleanable}
         block={block}

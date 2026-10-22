@@ -8,7 +8,10 @@ import {
   buildHideSeconds,
 } from "../shared/timeConstraints";
 import { FieldLabel } from "../shared/FieldLabel";
-import { useAnchoredPopup } from "../shared/useAnchoredPopup";
+import {
+  useAnchoredPopup,
+  type PickerPlacement,
+} from "../shared/useAnchoredPopup";
 
 export type TimePickerState = {
   selected_time: string | null;
@@ -99,23 +102,18 @@ const TimePickerComponent: FC<Props> = ({ data, setStateValue }) => {
     [emitSelected, setStateValue],
   );
 
-  const constraints = {
-    hiddenHours,
-    hiddenMinutes,
-    hiddenSeconds,
-    minHour,
-    maxHour,
-  };
+  // Each builder gets only the fields it reads, so its memo depends on exactly
+  // those and nothing else.
   const hideHours = useMemo(
-    () => buildHideHours(constraints),
+    () => buildHideHours({ hiddenHours, minHour, maxHour }),
     [hiddenHours, minHour, maxHour],
   );
   const hideMinutes = useMemo(
-    () => buildHideMinutes(constraints),
+    () => buildHideMinutes({ hiddenMinutes }),
     [hiddenMinutes],
   );
   const hideSeconds = useMemo(
-    () => buildHideSeconds(constraints),
+    () => buildHideSeconds({ hiddenSeconds }),
     [hiddenSeconds],
   );
 
@@ -137,7 +135,7 @@ const TimePickerComponent: FC<Props> = ({ data, setStateValue }) => {
         ref={popup.ref}
         onOpen={popup.onOpen}
         onClose={popup.onClose}
-        placement={placement as any}
+        placement={placement as PickerPlacement}
         disabled={disabled}
         cleanable={cleanable}
         block={block}

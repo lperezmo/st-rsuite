@@ -4,7 +4,10 @@ import { DatePicker as RsuiteDatePicker } from "rsuite";
 import { useSyncedValue, keyOfScalar } from "../shared/useSyncedValue";
 import { buildShouldDisableDate } from "../shared/dateConstraints";
 import { FieldLabel } from "../shared/FieldLabel";
-import { useAnchoredPopup } from "../shared/useAnchoredPopup";
+import {
+  useAnchoredPopup,
+  type PickerPlacement,
+} from "../shared/useAnchoredPopup";
 import { toISOValue, parseISOValue } from "../shared/dateValue";
 
 export type DatePickerState = {
@@ -130,7 +133,7 @@ const DatePickerComponent: FC<Props> = ({ data, setStateValue }) => {
         ref={popup.ref}
         onOpen={popup.onOpen}
         onClose={popup.onClose}
-        placement={placement as any}
+        placement={placement as PickerPlacement}
         oneTap={oneTap}
         showMeridiem={showMeridiem}
         disabled={disabled}

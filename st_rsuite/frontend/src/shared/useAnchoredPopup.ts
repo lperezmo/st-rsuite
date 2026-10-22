@@ -40,7 +40,15 @@
  * the configured `placement`.
  */
 import { RefObject, useCallback, useEffect, useRef, useState } from "react";
-import type { PickerHandle } from "rsuite";
+import type { DatePickerProps, PickerHandle } from "rsuite";
+
+/**
+ * RSuite's picker placement union. rsuite does not export the type from its
+ * root, and every picker shares the one DatePicker uses. The Python side passes
+ * placement through as a plain string, so the widgets cast it to this type
+ * (the same unchecked cast `as any` made before, just narrower).
+ */
+export type PickerPlacement = NonNullable<DatePickerProps["placement"]>;
 
 /** The picker props the hook drives. Pass them to the RSuite picker. */
 export type AnchoredPopupProps = {
