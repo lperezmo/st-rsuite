@@ -68,7 +68,7 @@ const SelectPickerComponent: FC<Props> = ({ data, setStateValue }) => {
 
   const [selected, emitSelected] = useSyncedValue<string | null>(
     keyOfScalar(value),
-    () => value
+    () => value,
   );
 
   const handleChange = useCallback(
@@ -76,7 +76,7 @@ const SelectPickerComponent: FC<Props> = ({ data, setStateValue }) => {
       emitSelected(newValue);
       setStateValue("selected_value", newValue);
     },
-    [emitSelected, setStateValue]
+    [emitSelected, setStateValue],
   );
 
   return (

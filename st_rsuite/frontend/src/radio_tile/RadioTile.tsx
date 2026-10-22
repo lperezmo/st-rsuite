@@ -35,7 +35,7 @@ const RadioTileComponent: FC<Props> = ({ data, setStateValue }) => {
 
   const [selected, emitSelected] = useSyncedValue<string | null>(
     keyOfScalar(value),
-    () => value
+    () => value,
   );
 
   const handleChange = useCallback(
@@ -44,7 +44,7 @@ const RadioTileComponent: FC<Props> = ({ data, setStateValue }) => {
       emitSelected(val);
       setStateValue("selected_value", val);
     },
-    [emitSelected, setStateValue]
+    [emitSelected, setStateValue],
   );
 
   return (

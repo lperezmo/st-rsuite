@@ -17,10 +17,7 @@ import {
 import { ComponentProps, StrictMode, FC } from "react";
 import { createRoot, Root } from "react-dom/client";
 import { CustomProvider } from "rsuite";
-import {
-  applyStreamlitPrimaryPalette,
-  getStreamlitRsuiteTheme,
-} from "./theme";
+import { applyStreamlitPrimaryPalette, getStreamlitRsuiteTheme } from "./theme";
 
 type RsuiteLocale = ComponentProps<typeof CustomProvider>["locale"];
 
@@ -61,11 +58,31 @@ const localeLoaders: Record<string, () => Promise<{ default: RsuiteLocale }>> =
 
 // Fallback from language code to default locale for that language
 const langFallback: Record<string, string> = {
-  ar: "ar_EG", ca: "ca_ES", cs: "cs_CZ", da: "da_DK", de: "de_DE",
-  en: "en_US", es: "es_ES", fa: "fa_IR", fi: "fi_FI", fr: "fr_FR",
-  gu: "gu_IN", hu: "hu_HU", it: "it_IT", ja: "ja_JP", kk: "kk_KZ",
-  ko: "ko_KR", ne: "ne_NP", nl: "nl_NL", pl: "pl_PL", pt: "pt_BR",
-  ru: "ru_RU", sv: "sv_SE", th: "th_TH", tr: "tr_TR", uk: "uk_UA",
+  ar: "ar_EG",
+  ca: "ca_ES",
+  cs: "cs_CZ",
+  da: "da_DK",
+  de: "de_DE",
+  en: "en_US",
+  es: "es_ES",
+  fa: "fa_IR",
+  fi: "fi_FI",
+  fr: "fr_FR",
+  gu: "gu_IN",
+  hu: "hu_HU",
+  it: "it_IT",
+  ja: "ja_JP",
+  kk: "kk_KZ",
+  ko: "ko_KR",
+  ne: "ne_NP",
+  nl: "nl_NL",
+  pl: "pl_PL",
+  pt: "pt_BR",
+  ru: "ru_RU",
+  sv: "sv_SE",
+  th: "th_TH",
+  tr: "tr_TR",
+  uk: "uk_UA",
   zh: "zh_CN",
 };
 
@@ -110,7 +127,7 @@ export function createRsuiteRenderer<
   TState extends Record<string, unknown>,
   TData extends Record<string, unknown>,
 >(
-  Component: FC<RendererProps<TState, TData>>
+  Component: FC<RendererProps<TState, TData>>,
 ): FrontendRenderer<TState, TData> {
   return (args) => {
     const { data, parentElement, setStateValue } = args;
@@ -134,8 +151,7 @@ export function createRsuiteRenderer<
     const theme = getStreamlitRsuiteTheme(rootElement);
     applyStreamlitPrimaryPalette(rootElement);
     const explicit = (data as Record<string, unknown>).locale as
-      | string
-      | undefined;
+      string | undefined;
     const localeKey = resolveLocaleKey(explicit);
 
     const renderTree = () => {
@@ -145,7 +161,7 @@ export function createRsuiteRenderer<
           <CustomProvider theme={theme} locale={locale}>
             <Component data={data} setStateValue={setStateValue} />
           </CustomProvider>
-        </StrictMode>
+        </StrictMode>,
       );
     };
 

@@ -30,7 +30,7 @@ function parseISODate(val: string): Date | null {
 }
 
 export function buildShouldDisableDate(
-  c: DateConstraints
+  c: DateConstraints,
 ): ((date: Date) => boolean) | undefined {
   const min = c.minDate ? parseISODate(c.minDate) : null;
   const max = c.maxDate ? parseISODate(c.maxDate) : null;

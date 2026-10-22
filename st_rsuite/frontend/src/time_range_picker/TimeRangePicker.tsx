@@ -97,7 +97,7 @@ const TimeRangePickerComponent: FC<Props> = ({ data, setStateValue }) => {
       const s = parseTime(startValue);
       const e = parseTime(endValue);
       return s && e ? [s, e] : null;
-    }
+    },
   );
 
   const handleChange = useCallback(
@@ -108,18 +108,31 @@ const TimeRangePickerComponent: FC<Props> = ({ data, setStateValue }) => {
       setStateValue("start_time", s);
       setStateValue("end_time", e);
     },
-    [emitSelected, setStateValue]
+    [emitSelected, setStateValue],
   );
 
-  const constraints = { hiddenHours, hiddenMinutes, hiddenSeconds, minHour, maxHour };
+  const constraints = {
+    hiddenHours,
+    hiddenMinutes,
+    hiddenSeconds,
+    minHour,
+    maxHour,
+  };
   const hideHours = useMemo(
     () => buildHideHours(constraints),
-    [hiddenHours, minHour, maxHour]
+    [hiddenHours, minHour, maxHour],
   );
-  const hideMinutes = useMemo(() => buildHideMinutes(constraints), [hiddenMinutes]);
-  const hideSeconds = useMemo(() => buildHideSeconds(constraints), [hiddenSeconds]);
+  const hideMinutes = useMemo(
+    () => buildHideMinutes(constraints),
+    [hiddenMinutes],
+  );
+  const hideSeconds = useMemo(
+    () => buildHideSeconds(constraints),
+    [hiddenSeconds],
+  );
 
-  const effectiveFormat = showMeridiem && format === "HH:mm" ? "hh:mm aa" : format;
+  const effectiveFormat =
+    showMeridiem && format === "HH:mm" ? "hh:mm aa" : format;
 
   return (
     <div style={{ width: "100%", padding: "4px 0" }}>

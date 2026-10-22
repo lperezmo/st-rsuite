@@ -69,7 +69,7 @@ const DateRangeInputComponent: FC<Props> = ({ data, setStateValue }) => {
       const s = parseDate(startValue);
       const e = parseDate(endValue);
       return s && e ? [s, e] : null;
-    }
+    },
   );
 
   const handleChange = useCallback(
@@ -80,7 +80,7 @@ const DateRangeInputComponent: FC<Props> = ({ data, setStateValue }) => {
       setStateValue("start_date", s);
       setStateValue("end_date", e);
     },
-    [emitSelected, setStateValue]
+    [emitSelected, setStateValue],
   );
 
   return (

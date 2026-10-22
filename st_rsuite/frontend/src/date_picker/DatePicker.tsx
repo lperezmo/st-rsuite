@@ -85,7 +85,7 @@ const DatePickerComponent: FC<Props> = ({ data, setStateValue }) => {
 
   const [selected, emitSelected] = useSyncedValue<Date | null>(
     keyOfScalar(value),
-    () => parseISOValue(value)
+    () => parseISOValue(value),
   );
 
   const shouldDisableDate = useMemo(
@@ -96,12 +96,15 @@ const DatePickerComponent: FC<Props> = ({ data, setStateValue }) => {
         disabledDates,
         disabledWeekdays,
       }),
-    [minDate, maxDate, disabledDates, disabledWeekdays]
+    [minDate, maxDate, disabledDates, disabledWeekdays],
   );
 
   const calDefaultDate = useMemo(
-    () => (calendarDefaultDate ? parseISOValue(calendarDefaultDate) ?? undefined : undefined),
-    [calendarDefaultDate]
+    () =>
+      calendarDefaultDate
+        ? (parseISOValue(calendarDefaultDate) ?? undefined)
+        : undefined,
+    [calendarDefaultDate],
   );
 
   const handleChange = useCallback(
@@ -110,7 +113,7 @@ const DatePickerComponent: FC<Props> = ({ data, setStateValue }) => {
       emitSelected(newValue);
       setStateValue("selected_date", iso);
     },
-    [emitSelected, setStateValue, withTime]
+    [emitSelected, setStateValue, withTime],
   );
 
   return (

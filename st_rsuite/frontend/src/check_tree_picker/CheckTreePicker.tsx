@@ -66,7 +66,7 @@ const CheckTreePickerComponent: FC<Props> = ({ data, setStateValue }) => {
 
   const [selected, emitSelected] = useSyncedValue<string[]>(
     keyOfList(value),
-    () => value || []
+    () => value || [],
   );
 
   const handleChange = useCallback(
@@ -75,7 +75,7 @@ const CheckTreePickerComponent: FC<Props> = ({ data, setStateValue }) => {
       emitSelected(vals);
       setStateValue("selected_values", vals);
     },
-    [emitSelected, setStateValue]
+    [emitSelected, setStateValue],
   );
 
   return (

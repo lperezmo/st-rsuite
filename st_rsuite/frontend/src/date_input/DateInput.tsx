@@ -48,7 +48,7 @@ const DateInputComponent: FC<Props> = ({ data, setStateValue }) => {
 
   const [selected, emitSelected] = useSyncedValue<Date | null>(
     keyOfScalar(value),
-    () => parseDate(value)
+    () => parseDate(value),
   );
 
   const handleChange = useCallback(
@@ -57,7 +57,7 @@ const DateInputComponent: FC<Props> = ({ data, setStateValue }) => {
       emitSelected(newValue);
       setStateValue("selected_date", iso);
     },
-    [emitSelected, setStateValue]
+    [emitSelected, setStateValue],
   );
 
   return (

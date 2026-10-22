@@ -102,7 +102,7 @@ const DateRangePickerComponent: FC<Props> = ({ data, setStateValue }) => {
       const s = parseISOValue(startValue);
       const e = parseISOValue(endValue);
       return s && e ? [s, e] : null;
-    }
+    },
   );
 
   const shouldDisableDate = useMemo(
@@ -113,7 +113,7 @@ const DateRangePickerComponent: FC<Props> = ({ data, setStateValue }) => {
         disabledDates,
         disabledWeekdays,
       }),
-    [minDate, maxDate, disabledDates, disabledWeekdays]
+    [minDate, maxDate, disabledDates, disabledWeekdays],
   );
 
   const rangePresets = useMemo(() => buildRanges(ranges), [ranges]);
@@ -132,7 +132,7 @@ const DateRangePickerComponent: FC<Props> = ({ data, setStateValue }) => {
       setStateValue("start_date", s);
       setStateValue("end_date", e);
     },
-    [emitSelected, setStateValue, withTime]
+    [emitSelected, setStateValue, withTime],
   );
 
   return (

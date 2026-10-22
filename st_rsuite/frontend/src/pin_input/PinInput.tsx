@@ -45,7 +45,7 @@ const PinInputComponent: FC<Props> = ({ data, setStateValue }) => {
 
   const [pinValue, emitPinValue] = useSyncedValue<string>(
     keyOfScalar(value),
-    () => value || ""
+    () => value || "",
   );
 
   const handleChange = useCallback(
@@ -53,15 +53,16 @@ const PinInputComponent: FC<Props> = ({ data, setStateValue }) => {
       emitPinValue(newValue);
       setStateValue("pin_value", newValue);
     },
-    [emitPinValue, setStateValue]
+    [emitPinValue, setStateValue],
   );
 
   // Map string type to PinInput's type prop
-  const pinType = type === "alphabetic"
-    ? "alphabetic" as const
-    : type === "alphanumeric"
-    ? "alphanumeric" as const
-    : "number" as const;
+  const pinType =
+    type === "alphabetic"
+      ? ("alphabetic" as const)
+      : type === "alphanumeric"
+        ? ("alphanumeric" as const)
+        : ("number" as const);
 
   return (
     <div style={{ width: "100%", padding: "4px 0" }}>
