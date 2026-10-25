@@ -50,11 +50,11 @@ jobs:
       - run: bun run typecheck
         working-directory: st_rsuite/frontend
 
-  # bun fmt and bun lint are canary-only until they reach a stable release, so
-  # this job runs canary while every other job stays on the bun version pinned
-  # in package.json. Neither needs node_modules. bunfig.toml sets endOfLine
-  # "auto" so the check agrees with CRLF working trees on Windows and LF
-  # checkouts here.
+  # bun fmt is stable since 1.4.4, but bun lint is canary-only until a stable
+  # release ships it, so this job runs canary while every other job stays on the
+  # bun version pinned in package.json. Neither needs node_modules. bunfig.toml
+  # sets endOfLine "auto" so the check agrees with CRLF working trees on Windows
+  # and LF checkouts here.
   format-and-lint:
     name: Format and lint frontend
     runs-on: ubuntu-latest
